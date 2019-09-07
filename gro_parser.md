@@ -35,7 +35,43 @@ equivalent smol\sbml (or other) markup representations.
 - Write conclusion section.
 - Finish working kernel of the gro parser.
 
-## Learning refs:
+## Theory Study Schedule
+
+### Compiler principles, techniques and tools - main topics
+			- Intro : 2.1-2.5
+			- Lexical analysis : 2.6, 3.1-3.4
+			- Symbol tables 2.7, 7.6
+			- Parsing 2.4, 4.1-4.4
+			- Syntax-directed translation : 2.5, 5-1-5.5
+			- Lexical analisis generators : 3.5
+			- Parse generators : 4.8, 4.9
+			- Code generators : 9.12
+			- Techniques for compiler constructions : Chapter 11
+
+### Week 1 and 2 - Introduction to compilers
+- Introduction : 2.1 - 2.5
+
+### Week 3 and 4 - Lexical analysis, and lexical analisis generator
+- Lexical analysis : 2.6, 3.1-3.5
+- Lexical analysis generator : 3.5
+
+### Week 5 - Parsing and parse generators
+- Parsing : 2.4, 4.1-4.4
+- Parse generators : 4.8, 4.9
+
+### Week 6 and 7 - Techniques for compiler construction and code generators
+- Techniques for compiler construction : 11.1, 11.2, 11.4, A.3, A.4
+- Code generators : 9.12
+
+### Week 8 and 9 - Syntax-directed translation - Part I
+- Syntax-directed translation : 2.5, 5.1-5.5
+
+### Week 10 and 11 - Syntax-directed translation - Part II
+- Syntax-directed translation : 5.6-5.10
+
+### Week FREE - Symbol table
+- Symbol table : 2.7, 7.6
+## Learning refs:c
 
 - [Awesome Compilers](https://github.com/aalhour/awesome-compilers)
 - [The gro programming Language](https://depts.washington.edu/soslab/gro/)
