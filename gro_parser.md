@@ -5,6 +5,10 @@
 Develop a parser for the gro programming language with focus on generating
 equivalent smol\sbml (or other) markup representations.
 
+## Methodology:
+
+We're definitely going with a top-down approach here. There isn't enough time to read the entirety of the dragon book in parallel with flex & bison. In conclusion, low-level stuff is going to be an aside plate, not main course. 
+
 ## Learning Schedule
 
 ### weeks 5-8
@@ -77,6 +81,8 @@ equivalent smol\sbml (or other) markup representations.
 - [The gro programming Language](https://depts.washington.edu/soslab/gro/)
 - [The dragon book](https://www.amazon.com/Compilers-Principles-Techniques-Alfred-Aho/dp/0201100886/ref=sr_1_2?keywords=Compilers%3A+Principles%2C+Techniques%2C+and+Tool&qid=1567550137&s=books&sr=1-2)
 - [C to HDL](https://en.wikipedia.org/wiki/C_to_HDL)
+- [Flex & Bison, O'Reilly](http://web.iitd.ac.in/~sumeet/flex__bison.pdf)
+- [Bison 3.4](https://www.gnu.org/software/bison/manual/bison.html)
 
 ## Scientific studies refs:
 
