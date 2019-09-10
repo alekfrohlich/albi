@@ -84,6 +84,7 @@ We're definitely going with a top-down approach here. There isn't enough time to
 - [Flex & Bison, O'Reilly](http://web.iitd.ac.in/~sumeet/flex__bison.pdf)
 - [Bison 3.4](https://www.gnu.org/software/bison/manual/bison.html)
 - [Flex in a Nutshell](https://web.stanford.edu/class/archive/cs/cs143/cs143.1128/handouts/050%20Flex%20In%20A%20Nutshell.pdf)
+- [Using flex - Input and Output](https://perso.esiee.fr/~najmanl/compil/Flex/flex_2.html)
 
 ## Scientific studies refs:
 
