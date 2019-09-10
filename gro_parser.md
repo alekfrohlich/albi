@@ -3,7 +3,7 @@
 ## Project goal: 
 
 Develop a parser for the gro programming language with focus on generating
-equivalent smol\sbml (or other) markup representations.
+equivalent sbml representations.
 
 ## Methodology:
 
@@ -39,7 +39,7 @@ We're definitely going with a top-down approach here. There isn't enough time to
 - Write conclusion section.
 - Finish working kernel of the gro parser.
 
-## Theory Study Schedule
+## Compilers Study Schedule
 
 ### Compiler principles, techniques and tools - main topics
 			- Intro : 2.1-2.5
@@ -75,8 +75,8 @@ We're definitely going with a top-down approach here. There isn't enough time to
 
 ### Week FREE - Symbol table
 - Symbol table : 2.7, 7.6
-## Learning refs:c
 
+## Learning refs:
 - [Awesome Compilers](https://github.com/aalhour/awesome-compilers)
 - [The gro programming Language](https://depts.washington.edu/soslab/gro/)
 - [The dragon book](https://www.amazon.com/Compilers-Principles-Techniques-Alfred-Aho/dp/0201100886/ref=sr_1_2?keywords=Compilers%3A+Principles%2C+Techniques%2C+and+Tool&qid=1567550137&s=books&sr=1-2)
@@ -85,6 +85,7 @@ We're definitely going with a top-down approach here. There isn't enough time to
 - [Bison 3.4](https://www.gnu.org/software/bison/manual/bison.html)
 - [Flex in a Nutshell](https://web.stanford.edu/class/archive/cs/cs143/cs143.1128/handouts/050%20Flex%20In%20A%20Nutshell.pdf)
 - [Using flex - Input and Output](https://perso.esiee.fr/~najmanl/compil/Flex/flex_2.html)
+- [SBML specifications](http://sbml.org/Documents/Specifications)
 
 ## Scientific studies refs:
 
