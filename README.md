@@ -2,24 +2,39 @@
 
 ## Project goal: 
 
-Develop a parser for the gro programming language with focus on generating
-equivalent sbml representations.
+Our goal here is to aid the synthesis process of biological systems by
+developing a tool for parsing high level language semantics (gro) into lower
+level more valuable for simulations and model exchange ones (SMBL).
+
+## Contribution:
+
+The main contribution of this work should be in filling the gaps between existing
+simulating and synthesis tools.
+
+## Why we chose Gro & SBML?
+
+We need to understand our contribution better and what's
+important in the gro language. SBML in the other hand,
+
+### Gro
+
+### SMBL
 
 ## Methodology:
 
-We're definitely going with a top-down approach here. There isn't enough time to read the entirety of the dragon book in parallel with flex & bison. In conclusion, low-level stuff is going to be an aside plate, not main course. 
+...
 
 ## Learning Schedule
 
 ### weeks 5-8
-- Learn gro syntax.
-- see basic gro examples in practice (debugging simulator work).
-- Begin to understand the way in which the gro simulator parses source code.
-- Begin toying with flex and bison.
+- Learn gro syntax and semantics.
+- See basic gro examples in practice.
+- Translate simple language constructs into SMBL.
 
 ### weeks 9-12
-- Intensive code review of the gro simulator.
+- Intensive review and discussion of the gro syntax.
 - Define compiler software architecture.
+- Define our 'kernel' translation space.
 
 ### weeks 13-16
 - Discuss about representability of the gro language on the smol\sbml formats.
