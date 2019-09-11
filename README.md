@@ -101,6 +101,7 @@ important in the gro language. SBML in the other hand,
 - [Flex in a Nutshell](https://web.stanford.edu/class/archive/cs/cs143/cs143.1128/handouts/050%20Flex%20In%20A%20Nutshell.pdf)
 - [Using flex - Input and Output](https://perso.esiee.fr/~najmanl/compil/Flex/flex_2.html)
 - [SBML specifications](http://sbml.org/Documents/Specifications)
+- [python to SBML](https://pythonscriptingmanual.readthedocs.io/en/latest/building_sbml_models_using_tellurium.html)
 
 ## Scientific studies refs:
 
