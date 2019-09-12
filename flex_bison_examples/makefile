@@ -1,7 +1,7 @@
 all:
-	flex calc.l
-	bison -d calc.y
-	gcc calc.tab.c lex.yy.c -lfl -lm -o calc
+	flex fcalc.l
+	bison -d fcalc.y
+	gcc fcalc.tab.c lex.yy.c -lfl -lm -o fcalc
 
 clean:
-	@rm -f calc.tab.* lex.yy.c calc
+	@rm -f fcalc.tab.* lex.yy.c fcalc
