@@ -7,3 +7,5 @@ used during project.
     - Why does yytokentype start at 258 (ascii support)
     - Left/Right recursion in YACC.
     - yylval: %union
+
+- [has no declared type](https://stackoverflow.com/questions/1014619/how-to-solve-bison-warning-has-no-declared-type)
