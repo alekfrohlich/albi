@@ -11,7 +11,7 @@ int yylex(void);
 
 %token <f> NUM
 %token <str> VAR
-%token ASSIGN SEMICOL EOL PROG OPEN_BODY CLOSE_BODY
+%token ASSIGN SEMICOL EOL PROG OPEN_BODY CLOSE_BODY SUB ADD OPEN_PAR CLOSE_PAR DOUBLEDOT RATE
 
 %type <str> program_def program_construct statement
 
@@ -28,6 +28,7 @@ program_def:
 
 program_construct: program_def
 | program_construct statement {printf("specie %s;\n", $2); printf("%s in %s;\n", $2, $1); }
+| program_construct rate
 ;
 
 program :
@@ -36,6 +37,27 @@ program :
 
 statement:
  VAR ASSIGN NUM SEMICOL { printf("%s = %0.4f;\n", $1, $3); }
+;
+
+rate_def :
+RATE OPEN_PAR VAR CLOSE_PAR DOUBLEDOT OPEN_BODY { printf("rate definition\n"); }
+;
+
+rate_construct: rate_def
+| rate_construct product
+| rate_construct reactant
+;
+
+rate : 
+rate_construct CLOSE_BODY
+;
+
+reactant :
+VAR ASSIGN VAR SUB NUM SEMICOL {printf("%s--\n", $1);}
+;
+
+product :
+VAR ASSIGN VAR ADD NUM SEMICOL {printf("%s++\n", $1);}
 ;
 
 parameter :

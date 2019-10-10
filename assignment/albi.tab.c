@@ -118,7 +118,13 @@ extern int yydebug;
     EOL = 262,
     PROG = 263,
     OPEN_BODY = 264,
-    CLOSE_BODY = 265
+    CLOSE_BODY = 265,
+    SUB = 266,
+    ADD = 267,
+    OPEN_PAR = 268,
+    CLOSE_PAR = 269,
+    DOUBLEDOT = 270,
+    RATE = 271
   };
 #endif
 
@@ -131,7 +137,7 @@ union YYSTYPE
     char * str;
     float f;
 
-#line 135 "albi.tab.c"
+#line 141 "albi.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -381,19 +387,19 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  2
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   15
+#define YYLAST   31
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  11
+#define YYNTOKENS  17
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  7
+#define YYNNTS  12
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  10
+#define YYNRULES  18
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  21
+#define YYNSTATES  42
 
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   265
+#define YYMAXUTOK   271
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
    as returned by yylex, with out-of-bounds checking.  */
@@ -430,15 +436,16 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8,     9,    10
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15,    16
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    20,    20,    21,    22,    26,    29,    30,    34,    38,
-      42
+       0,    20,    20,    21,    22,    26,    29,    30,    31,    35,
+      39,    43,    46,    47,    48,    52,    56,    60,    64
 };
 #endif
 
@@ -448,8 +455,10 @@ static const yytype_uint8 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "NUM", "VAR", "ASSIGN", "SEMICOL", "EOL",
-  "PROG", "OPEN_BODY", "CLOSE_BODY", "$accept", "start_of_prog",
-  "program_def", "program_construct", "program", "statement", "parameter", YY_NULLPTR
+  "PROG", "OPEN_BODY", "CLOSE_BODY", "SUB", "ADD", "OPEN_PAR", "CLOSE_PAR",
+  "DOUBLEDOT", "RATE", "$accept", "start_of_prog", "program_def",
+  "program_construct", "program", "statement", "rate_def",
+  "rate_construct", "rate", "reactant", "product", "parameter", YY_NULLPTR
 };
 #endif
 
@@ -459,14 +468,14 @@ static const char *const yytname[] =
 static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265
+     265,   266,   267,   268,   269,   270,   271
 };
 # endif
 
-#define YYPACT_NINF -6
+#define YYPACT_NINF -9
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-6)))
+  (!!((Yystate) == (-9)))
 
 #define YYTABLE_NINF -1
 
@@ -477,9 +486,11 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -6,     0,    -6,    -2,     1,    -6,    -3,    -5,    -6,    -1,
-       6,     5,     7,    -6,    -6,    -6,     8,     2,    -6,    -6,
-      -6
+      -9,     1,    -9,     2,     6,    -9,    -4,     4,    -9,     7,
+      10,    11,     9,     5,    -9,    -9,    -2,    -9,    -9,    -9,
+      13,     8,    -9,    16,    17,    -9,    -9,    -9,    -9,    -9,
+      12,    19,    14,    -8,    15,    18,    22,    -9,    21,    24,
+      -9,    -9
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -487,21 +498,25 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       2,     0,     1,     0,     0,     6,     0,     0,    10,     0,
-       0,     0,     0,     7,     4,     3,     0,     0,     8,     9,
-       5
+       2,     0,     1,     0,     0,     6,     0,     0,    18,     0,
+       0,     0,     0,     0,     7,    12,     0,     8,     4,     3,
+       0,     0,     9,     0,     0,    15,    14,    13,    10,     5,
+       0,     0,     0,     0,     0,     0,     0,    11,     0,     0,
+      16,    17
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -6,    -6,    -6,    -6,    -6,     9,    -6
+      -9,    -9,    -9,    -9,    -9,    25,    -9,    -9,    -9,    -9,
+      -9,    -9
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     1,     5,     6,     7,     8,     9
+      -1,     1,     5,     6,     7,     8,    15,    16,    17,    26,
+      27,     9
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -509,37 +524,43 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-       2,     3,    14,    10,     3,    11,    15,    12,     4,    16,
-      17,    20,     0,    18,    19,    13
+       3,     2,    24,    35,    36,     3,    12,    10,    25,     4,
+      11,    18,    13,    20,    19,    22,    21,    29,    23,    28,
+      30,    38,    31,    33,    37,    39,    32,    40,     0,    34,
+      41,    14
 };
 
 static const yytype_int8 yycheck[] =
 {
-       0,     4,     7,     5,     4,     4,     7,    10,     8,     3,
-       5,     9,    -1,     6,     6,     6
+       4,     0,     4,    11,    12,     4,    10,     5,    10,     8,
+       4,     7,    16,     3,     7,     6,     5,     9,    13,     6,
+       4,     3,     5,     4,     9,     3,    14,     6,    -1,    15,
+       6,     6
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,    12,     0,     4,     8,    13,    14,    15,    16,    17,
-       5,     4,    10,    16,     7,     7,     3,     5,     6,     6,
-       9
+       0,    18,     0,     4,     8,    19,    20,    21,    22,    28,
+       5,     4,    10,    16,    22,    23,    24,    25,     7,     7,
+       3,     5,     6,    13,     4,    10,    26,    27,     6,     9,
+       4,     5,    14,     4,    15,    11,    12,     9,     3,     3,
+       6,     6
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    11,    12,    12,    12,    13,    14,    14,    15,    16,
-      17
+       0,    17,    18,    18,    18,    19,    20,    20,    20,    21,
+      22,    23,    24,    24,    24,    25,    26,    27,    28
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     0,     3,     3,     4,     1,     2,     3,     4,
-       1
+       0,     2,     0,     3,     3,     4,     1,     2,     2,     3,
+       4,     6,     1,     2,     2,     2,     6,     6,     1
 };
 
 
@@ -1226,23 +1247,41 @@ yyreduce:
   case 5:
 #line 26 "albi.y"
     {(yyval.str) = (yyvsp[-2].str); printf("compartment %s;\n",  (yyvsp[-2].str)); printf("%s = 1.0;\n", (yyvsp[-2].str));}
-#line 1230 "albi.tab.c"
+#line 1251 "albi.tab.c"
     break;
 
   case 7:
 #line 30 "albi.y"
     {printf("specie %s;\n", (yyvsp[0].str)); printf("%s in %s;\n", (yyvsp[0].str), (yyvsp[-1].str)); }
-#line 1236 "albi.tab.c"
+#line 1257 "albi.tab.c"
     break;
 
-  case 9:
-#line 38 "albi.y"
+  case 10:
+#line 39 "albi.y"
     { printf("%s = %0.4f;\n", (yyvsp[-3].str), (yyvsp[-1].f)); }
-#line 1242 "albi.tab.c"
+#line 1263 "albi.tab.c"
+    break;
+
+  case 11:
+#line 43 "albi.y"
+    { printf("rate definition\n"); }
+#line 1269 "albi.tab.c"
+    break;
+
+  case 16:
+#line 56 "albi.y"
+    {printf("%s--\n", (yyvsp[-5].str));}
+#line 1275 "albi.tab.c"
+    break;
+
+  case 17:
+#line 60 "albi.y"
+    {printf("%s++\n", (yyvsp[-5].str));}
+#line 1281 "albi.tab.c"
     break;
 
 
-#line 1246 "albi.tab.c"
+#line 1285 "albi.tab.c"
 
       default: break;
     }
@@ -1474,7 +1513,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 45 "albi.y"
+#line 67 "albi.y"
 
 
 int main(int argc, char **argv)

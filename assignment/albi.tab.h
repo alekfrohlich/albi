@@ -56,7 +56,13 @@ extern int yydebug;
     EOL = 262,
     PROG = 263,
     OPEN_BODY = 264,
-    CLOSE_BODY = 265
+    CLOSE_BODY = 265,
+    SUB = 266,
+    ADD = 267,
+    OPEN_PAR = 268,
+    CLOSE_PAR = 269,
+    DOUBLEDOT = 270,
+    RATE = 271
   };
 #endif
 
@@ -69,7 +75,7 @@ union YYSTYPE
     char * str;
     float f;
 
-#line 73 "albi.tab.h"
+#line 79 "albi.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
