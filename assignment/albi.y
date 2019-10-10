@@ -11,16 +11,35 @@ int yylex(void);
 
 %token <f> NUM
 %token <str> VAR
-%token ASSIGN SEMICOL EOL
+%token ASSIGN SEMICOL EOL PROG OPEN_BODY CLOSE_BODY
 
 %%
 
 start_of_prog:
-| start_of_prog parameter EOL 
+| start_of_prog parameter EOL
+| start_of_prog program EOL
 ;
 
-parameter:
- VAR ASSIGN NUM SEMICOL     { printf("%s = %0.4f;\n", $1, $3); }
+program_def:
+ PROG VAR ASSIGN	{printf("component %s\n",  $2); }
+;
+
+program_body:
+OPEN_BODY
+| program_body statement
+| program_body CLOSE_BODY SEMICOL
+;
+
+program :
+ program_def program_body
+;
+
+statement:
+ VAR ASSIGN NUM SEMICOL
+;
+
+parameter :
+ statement
 ;
 
 %%

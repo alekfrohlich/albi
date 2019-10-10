@@ -13,6 +13,7 @@ variable            [a-zA-Z_]+
 float               [+-]?{integer}(\.{integer})?
 
 assignment          ":="
+program_keyword		"program "
 
 %%
 
@@ -22,8 +23,11 @@ assignment          ":="
 {float}             { yylval.f = atof(yytext); return NUM; }
 {variable}          { yylval.str = strdup(yytext); return VAR; }
 {assignment}        { return ASSIGN;  }
-
+{program_keyword}	{ return PROG; }
 ";"                 { return SEMICOL; }
+
+"{"					{ return OPEN_BODY; }
+"}"					{ return CLOSE_BODY; }
 "\n"                { return EOL; }
 .                   { }
 
