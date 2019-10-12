@@ -1,6 +1,6 @@
-#line 1 "albi.yy.c"
+#line 2 "albi.yy.c"
 
-#line 3 "albi.yy.c"
+#line 4 "albi.yy.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -479,8 +479,8 @@ char *yytext;
 #include <stdlib.h>
 #include <string.h>
 #include "albi.tab.h"
-#line 482 "albi.yy.c"
 #line 483 "albi.yy.c"
+#line 484 "albi.yy.c"
 
 #define INITIAL 0
 
@@ -700,7 +700,7 @@ YY_DECL
 #line 18 "albi.l"
 
 
-#line 703 "albi.yy.c"
+#line 704 "albi.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -848,7 +848,7 @@ YY_RULE_SETUP
 #line 39 "albi.l"
 ECHO;
 	YY_BREAK
-#line 851 "albi.yy.c"
+#line 852 "albi.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
