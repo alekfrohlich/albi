@@ -2,7 +2,7 @@
     //  Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
     //  & Gustavo Biage <gustavo.c.biage@gmail.com>.
     //  
- 	//    This file is a part of Albi.
+ 	//  This file is a part of Albi.
     //  
     //  Albi is free software; you can redistribute it and/or modify
     //  it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
     //  You should have received a copy of the GNU General Public License along
     //  with this program; if not, write to the Free Software Foundation, Inc.,
     //  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
+    //
 
 %option noyywrap
 
@@ -24,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "albi.tab.h"
+#include "ast.h"
 %}
 
 white               [ \t]+
@@ -64,14 +66,11 @@ ignore              "include gro"
 
 %%
 
-/* int main(int argc, char **argv)
+/**
+ * Entry point.
+ */
+int main(int argc, char **argv)
 {
-    if (argc != 2)
-    {
-        printf("Unknown parameters, usage: albi <file>\n");
-        return -1;
-    }
-
     yyin = fopen(argv[1],"r");
     
 	yyparse();
@@ -81,4 +80,4 @@ ignore              "include gro"
 int yyerror(const char *s)
 {
     fprintf(stderr, "erro: %s\n", s);
-} */
+}

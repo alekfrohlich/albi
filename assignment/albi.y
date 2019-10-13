@@ -1,105 +1,32 @@
+/*	  
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+ *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
+ *
+ * 	  This file is a part of Albi.
+ * 
+ *    Albi is free software; you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation; either version 2 of the License, or
+ *    (at your option) any later version.
+ *
+ *    Albi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License along
+ *    with this program; if not, write to the Free Software Foundation, Inc.,
+ *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include "ast.h"
+#include "ast.c"
 
-#define START_OF_PROG_TYPE 1
-#define RATE_TYPE 2
-#define PARAMETER_TYPE 3
-#define SPECIE_TYPE 4
-#define STATEMENT_TYPE 5
-
-int yyerror(const char* s);
-int yylex(void);
-
-struct node {
-	int type;
-	struct node * left;
-	struct node * right;
-	
-	char * compartment;
-	char * var;
-	char ** prod;
-	char ** reac;
-	int n_prod, n_reac;
-	float value;
-};
-
-void search_program(struct node * node, char * compartment);
-void search_tree(struct node * node);
-struct node * new_node(int type, struct node * left_of, struct node * right_of);
-
-struct node * head;
-
-/**
- * Construct new AST node.
- */
-struct node * new_node(int type, struct node * left_of, struct node * right_of) {
-	
-	struct node * node = (struct node *) malloc(sizeof(struct node));
-
-	node->type = type;
-	
-	if (left_of != NULL)
-		left_of->left = node;
-
-	if (right_of != NULL)
-		right_of->right = node;
-
-	return node;
-}
-
-void search_tree(struct node * node) {
-	switch(node->type) {
-		case START_OF_PROG_TYPE:
-			if (node->right != NULL) {
-				search_tree(node->right);
-			}
-			if (node->left != NULL) {
-				search_tree(node->left);
-			}
-			break;
-		case PARAMETER_TYPE:
-			printf("%s = %0.4lf;\n", node->var, node->value);
-			break;
-		case RATE_TYPE:
-		case SPECIE_TYPE:
-			printf("compartment %s;\n",  node->compartment);
-			printf("%s = 1.0;\n", node->compartment);
-			search_program(node, node->compartment);
-			break;
-	}
-}
-
-void search_program(struct node * node, char * compartment) {
-	
-	if (node->type == SPECIE_TYPE) {
-		printf("specie %s;\n", node->var);
-		printf("%s in %s;\n", node->var, compartment);
-		printf("%s = %0.4lf;\n", node->var, node->value);
-	} else if(node->type == RATE_TYPE) {
-		for (int i = 0; i < node->n_reac; i++) {
-			printf("%s ", node->reac[i]);
-		}
-		printf("->");
-		for (int i = 0; i < node->n_prod - 1; i++) {
-			if (i == 0) {
-				printf("s ");
-			}
-			printf("%s ", node->prod[i]);
-		}
-
-		if (node->n_prod > 0 && node->n_prod != 1)
-			printf("%s; %s;\n", node->prod[node->n_prod - 1], node->var);
-		else if (node->n_prod == 1)
-			printf(" %s; %s;\n", node->prod[node->n_prod - 1], node->var);
-	}
-
-	if (node->right != NULL) {
-		search_program(node->right, compartment);
-	}
-}
-
+extern int yyerror(const char* s);
+extern int yylex(void);
 %}
 
 %union {
@@ -116,33 +43,6 @@ void search_program(struct node * node, char * compartment) {
 %type <str> program_def product reactant rate_def
 
 %%
-//
-//				start_prog
-//				   /
-//			 start_prog
-//				/       \
-//		  start_prog    parameter
-//	   	      /     \
-//		start_prog  specie
-//			/			\
-//	  start_prog		 rate
-//		  /		  \		    \
-//  start_program  parameter specie
-// [...]	   
-//			    
-//
-//				parameter
-//				   /
-//			 parameter
-//				/    
-//		      rate    
-//	   	      /     \
-//		parameter  specie
-//			/			\
-//	    specie		    rate
-//		  /	  \		       \
-//  parameter  rate       specie
-
 
 start_of_prog: 					
 								{
@@ -167,10 +67,9 @@ program_def:
  PROG VAR ASSIGN 				
  								{
 	 								$$ = $2;
-									//printf("compartment %s;\n",  $2);
-									//printf("%s = 1.0;\n", $2);
 								}
 ;
+
 
 program :
  program_def program_body ';' 
@@ -217,7 +116,7 @@ statement:
 
 rate_def :
 RATE '(' VAR ')' ':' 
-								{
+								{ 
 									$$ = $3; 
 								}
 ;
@@ -311,14 +210,3 @@ specie :
 ;
 
 %%
-
-int main(int argc, char **argv)
-{
-    if (yyparse() != 1)
-		search_tree(head);
-}
-
-int yyerror(const char *s)
-{
-    fprintf(stderr, "erro: %s\n", s);
-}
