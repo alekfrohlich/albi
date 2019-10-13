@@ -39,8 +39,13 @@ extern int yylex(void);
 %token <str> VAR
 %token ASSIGN EOL PROG RATE
 
+<<<<<<< HEAD
 %type <node_type> start_of_prog program program_body program_content_list parameter specie statement rate rate_body reagent_list;
 %type <str> program_def product reactant rate_def
+=======
+%type <node_type> start_of_prog program program_body program_content_list parameter specie statement
+%type <str> program_def
+>>>>>>> fa2eb25698be475674963584596bf0c818ec4528
 
 %%
 
@@ -67,6 +72,11 @@ program_def:
  PROG VAR ASSIGN 				
  								{
 	 								$$ = $2;
+<<<<<<< HEAD
+=======
+									//printf("compartment %s;\n",  $2);
+									//printf("%s = 1.0;\n", $2);
+>>>>>>> fa2eb25698be475674963584596bf0c818ec4528
 								}
 ;
 
@@ -85,7 +95,11 @@ program_content_list : specie
 								}
 | rate							
 								{
+<<<<<<< HEAD
 									$$ = $1;
+=======
+									$$ = new_node(RATE_TYPE, NULL, NULL);
+>>>>>>> fa2eb25698be475674963584596bf0c818ec4528
 								}
 | program_content_list specie
 								{
@@ -117,7 +131,11 @@ statement:
 rate_def :
 RATE '(' VAR ')' ':' 
 								{ 
+<<<<<<< HEAD
 									$$ = $3; 
+=======
+									printf("rate definition\n"); 
+>>>>>>> fa2eb25698be475674963584596bf0c818ec4528
 								}
 ;
 
@@ -156,9 +174,12 @@ product
 
 rate_body :
 '{' reagent_list '}'
+<<<<<<< HEAD
 								{
 									$$ = $2;
 								}
+=======
+>>>>>>> fa2eb25698be475674963584596bf0c818ec4528
 ;
 
 rate : 
@@ -172,24 +193,32 @@ rate_def rate_body
 reactant :
 VAR ASSIGN VAR '-' NUM ';' 
 							{
+<<<<<<< HEAD
 								if (strcmp($1, $3) == 0) {
 									$$ = $1;
 								} else {
 									yyerror("invalid rate body.\n");
 									return 1;
 								}
+=======
+								printf("%s--\n", $1);
+>>>>>>> fa2eb25698be475674963584596bf0c818ec4528
 							}
 ;
 
 product :
 VAR ASSIGN VAR '+' NUM ';' 
 							{
+<<<<<<< HEAD
 								if (strcmp($1, $3) == 0) {
 									$$ = $1;
 								} else {
 									yyerror("invalid rate body.\n");
 									return 1;
 								}
+=======
+								printf("%s++\n", $1);
+>>>>>>> fa2eb25698be475674963584596bf0c818ec4528
 							}
 ;
 
