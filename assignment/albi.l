@@ -40,6 +40,7 @@ rate_keyword		"rate"
 ignore              "include gro"
 %%
 
+"\n"                { } 
 {white}             { }
 {ignore}            { }
 
@@ -55,13 +56,12 @@ ignore              "include gro"
 "-"					|
 "[" 				|
 "]"					|
-"("					|
-")"					|
+"("                 |
+")"                 |
 ":"					|
 "{"					|
 "}"					{ return yytext[0]; }
 
-"\n"                { return EOL; } 
 .                   { }
 
 %%

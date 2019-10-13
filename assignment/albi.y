@@ -50,13 +50,13 @@ start_of_prog:
 									$$ = head; 
 								}
 				
-| start_of_prog parameter EOL 	
+| start_of_prog parameter	
 								{
 									$$ = new_node(START_OF_PROG_TYPE, $1, NULL); 
 									$$->right = $2;
 							 	}
 
-| start_of_prog program EOL 	
+| start_of_prog program 	
 								{
 									$$ = new_node(START_OF_PROG_TYPE, $1, NULL);
 									$$->right = $2;
@@ -64,7 +64,7 @@ start_of_prog:
 ;
 
 program_def:
- PROG VAR ASSIGN 				
+ PROG VAR '(' ')' ASSIGN 				
  								{
 	 								$$ = $2;
 								}
