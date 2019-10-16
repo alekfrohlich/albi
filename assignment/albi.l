@@ -75,7 +75,7 @@ int main(int argc, char **argv)
     yyout = fopen("parsed.intermediate", "w");
     
 	yyparse();
-	search_tree(head);
+	search_tree(head, yyout);
 }
 
 int yyerror(const char *s)

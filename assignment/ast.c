@@ -41,53 +41,54 @@ struct node * new_node(int type, struct node * left_of, struct node * right_of) 
 	return node;
 }
 
-void search_tree(struct node * node) {
+void search_tree(struct node * node, FILE * yyout) {
 	switch(node->type) {
 		case START_OF_PROG_TYPE:
 			if (node->right != NULL) {
-				search_tree(node->right);
+				search_tree(node->right, yyout);
 			}
 			if (node->left != NULL) {
-				search_tree(node->left);
+				search_tree(node->left, yyout);
 			}
 			break;
 		case PARAMETER_TYPE:
-			printf("%s = %0.4lf;\n", node->var, node->value);
+			fprintf(yyout, "%s = %0.4lf\n", node->var, node->value);
 			break;
 		case RATE_TYPE:
 		case SPECIE_TYPE:
-			printf("compartment %s;\n",  node->compartment);
-			printf("%s = 1.0;\n", node->compartment);
-			search_program(node, node->compartment);
+			fprintf(yyout, "compartment %s = 1.0\n",  node->compartment);
+			// fprintf(yyout, "%s = 1.0;\n", node->compartment);
+			search_program(node, node->compartment, yyout);
 			break;
 	}
 }
 
-void search_program(struct node * node, char * compartment) {
+void search_program(struct node * node, char * compartment, FILE * yyout) {
 	
 	if (node->right != NULL) {
-		search_program(node->right, compartment);
+		search_program(node->right, compartment, yyout);
 	}
 
 	if (node->type == SPECIE_TYPE) {
-		printf("specie %s;\n", node->var);
-		printf("%s in %s;\n", node->var, compartment);
-		printf("%s = %0.4lf;\n", node->var, node->value);
+		// fprintf(yyout, "specie %s\n", node->var);
+		fprintf(yyout, "species %s;\n", node->var);
+		fprintf(yyout, "%s in %s\n", node->var, compartment);
+		fprintf(yyout, "%s = %0.4lf\n", node->var, node->value);
 	} else if(node->type == RATE_TYPE) {
 		for (int i = 0; i < node->n_reac; i++) {
-			printf("%s ", node->reac[i]);
+			fprintf(yyout, "%s ", node->reac[i]);
 		}
-		printf("->");
+		fprintf(yyout, "->");
 		for (int i = 0; i < node->n_prod - 1; i++) {
 			if (i == 0) {
-				printf("s ");
+				fprintf(yyout, "s ");
 			}
-			printf("%s ", node->prod[i]);
+			fprintf(yyout, "%s ", node->prod[i]);
 		}
 
 		if (node->n_prod > 0 && node->n_prod != 1)
-			printf("%s; %s;\n", node->prod[node->n_prod - 1], node->var);
+			fprintf(yyout, "%s; %s\n", node->prod[node->n_prod - 1], node->var);
 		else if (node->n_prod == 1)
-			printf(" %s; %s;\n", node->prod[node->n_prod - 1], node->var);
+			fprintf(yyout, " $%s; %s\n", node->prod[node->n_prod - 1], node->var);
 	}
 }

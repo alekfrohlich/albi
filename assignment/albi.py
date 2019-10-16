@@ -30,18 +30,17 @@ import roadrunner
 
 BISON_OUTPUT = "parsed.intermediate"
 
-
 if len(sys.argv) < 2:
     print("Unknown parameters, usage: albi <file>\n")
-    exit 0
+    # exit 0
+else:
+	call(["./albi", sys.argv[1]])
 
-call(["./albi", sys.argv[1]])
+	with open(BISON_OUTPUT, "r") as f:
+	    r = te.loada(f.read())
 
-with open(BISON_OUTPUT, "r") as f:
-    r = te.loada(f.read())
+	sbml_file = open('output.sbml','w')
+	sbml_file.write(r.getSBML())
+	sbml_file.close()
 
-sbml_file = open('output.sbml','w')
-sbml_file.write(r.getSBML())
-sbml_file.close()
-
-call(["./rm", BISON_OUTPUT])
+	call(["rm", BISON_OUTPUT])

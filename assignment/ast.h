@@ -41,8 +41,8 @@ struct node {
 /**
  * AST interface.
  */
-void search_program(struct node * node, char * compartment);
-void search_tree(struct node * node);
+void search_program(struct node * node, char * compartment, FILE * yyout);
+void search_tree(struct node * node, FILE * yyout);
 struct node * new_node(int type, struct node * left_of, struct node * right_of);
 
 struct node * head;
