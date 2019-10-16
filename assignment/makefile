@@ -34,3 +34,4 @@ albi: albi.l albi.y $(DEPS)
 
 clean:
 	@rm -f albi.tab.* albi.yy.c albi
+	@rm -f parsed.intermediate

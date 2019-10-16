@@ -1,13 +1,5 @@
-include gro
 
-alpha_r := 69.4 / 2.35; // mRNA / min / fL
-beta_r := - log ( 0.5 ) / 3.69; // 1/min
-alpha_p := 3.0; // protein/min/fL/RNA
-beta_p := 0.01; // 1/min
-
-program gfp() := {
-
-	E := 25;
-	rate ( p.k * volume ) : { E := E + 1 }
-
-};
+alpha_r := 69.4;
+beta_r := -0.5;
+alpha_p := 3.0;
+beta_p := 0.01;
