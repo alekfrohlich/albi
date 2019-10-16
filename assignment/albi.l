@@ -72,6 +72,7 @@ ignore              "include gro"
 int main(int argc, char **argv)
 {
     yyin = fopen(argv[1],"r");
+    yyout = fopen("parsed.intermediate", "w");
     
 	yyparse();
 	search_tree(head);
