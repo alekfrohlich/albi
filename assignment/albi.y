@@ -44,7 +44,7 @@ extern int yylex(void);
 
 %%
 
-start_of_prog: 					
+start_of_prog: %empty 					
 								{
 									head = new_node(START_OF_PROG_TYPE, NULL, NULL); 
 									$$ = head; 
@@ -63,23 +63,41 @@ start_of_prog:
 								}
 ;
 
-program_def:
- PROG VAR '(' ')' ASSIGN 				
- 								{
-	 								$$ = $2;
+parameter: statement
+								{
+									$1->type = PARAMETER_TYPE;
+									$$ = $1;
 								}
 ;
 
+statement: VAR ASSIGN NUM ';' 
+ 								{ 
+									$$ = new_node(STATEMENT_TYPE, NULL, NULL);
+									$$->var = $1;
+									$$->value = $3;
+								}
+;
 
-program :
- program_def program_body ';' 
+program: program_def program_body ';' 
  								{
 									$$ = $2;
 									$$->compartment = $1;
 								}
 ;
 
-program_content_list : specie 
+program_def: PROG VAR '(' ')' ASSIGN 				
+ 								{
+	 								$$ = $2;
+								}
+;
+
+program_body: '{' program_content_list '}' 
+								{
+									$$ = $2;
+								}
+;
+
+program_content_list: specie 
 								{
 									$$ = $1;
 								}
@@ -99,30 +117,33 @@ program_content_list : specie
 								}
 ;
 
-program_body: '{' program_content_list '}' 
+specie: statement
+								{
+									$1->type = SPECIE_TYPE;
+									$$ = $1;
+								}
+;
+
+rate: rate_def rate_body
 								{
 									$$ = $2;
-								}
-;
-
-statement:
- VAR ASSIGN NUM ';' 
- 								{ 
-									$$ = new_node(STATEMENT_TYPE, NULL, NULL);
 									$$->var = $1;
-									$$->value = $3;
 								}
 ;
 
-rate_def :
-RATE '(' VAR ')' ':' 
+rate_def: RATE '(' VAR ')' ':' 
 								{ 
 									$$ = $3; 
 								}
 ;
 
-reagent_list: 
-product 
+rate_body: '{' reagent_list '}'
+								{
+									$$ = $2;
+								}
+;
+
+reagent_list: product 
 								{
 									$$ = new_node(RATE_TYPE, NULL, NULL);
 									$$->n_prod = 1;
@@ -154,23 +175,7 @@ product
 								}
 ;
 
-rate_body :
-'{' reagent_list '}'
-								{
-									$$ = $2;
-								}
-;
-
-rate : 
-rate_def rate_body
-								{
-									$$ = $2;
-									$$->var = $1;
-								}
-;
-
-reactant :
-VAR ASSIGN VAR '-' NUM ';' 
+product: VAR ASSIGN VAR '+' NUM ';' 
 							{
 								if (strcmp($1, $3) == 0) {
 									$$ = $1;
@@ -181,8 +186,7 @@ VAR ASSIGN VAR '-' NUM ';'
 							}
 ;
 
-product :
-VAR ASSIGN VAR '+' NUM ';' 
+reactant: VAR ASSIGN VAR '-' NUM ';' 
 							{
 								if (strcmp($1, $3) == 0) {
 									$$ = $1;
@@ -191,22 +195,6 @@ VAR ASSIGN VAR '+' NUM ';'
 									return 1;
 								}
 							}
-;
-
-parameter :
- statement
- 							{
- 								$1->type = PARAMETER_TYPE;
-								$$ = $1;
- 							}
-;
-
-specie :
- statement
- 							{
-								$1->type = SPECIE_TYPE;
-								$$ = $1;
- 							}
 ;
 
 %%
