@@ -22,26 +22,39 @@
 # Albi's BNF grammar
 
 <start_of_prog> ::= ""
-                  | <start_of_prog> <parameter> EOL
-                  | <start_of_prog> <program> EOL
-                  | <start_of_prog> <ecolli> EOL
+                  | <start_of_prog> <assignment>
+                  | <start_of_prog> <program>
+                  | <start_of_prog> <ecolli>
 
-<parameter> ::= SET '(' VAR ',' VAL ')' ';'
+<assignment> ::= VAR ASSIGN <exp> ';'
 
-<program> ::= PROG VAR '(' ')' ASSIGN '{' <list> '}' ';'
+<exp> ::= <exp> '+' <exp>
+        | <exp> '-' <exp>
+        | <exp> '*' <exp>
+        | <exp> '/' <exp>
+        | NUM
+        | VAR
+        
+<program> ::= PROG VAR '(' <symlist> ')' ASSIGN '{' <list> '}' ';'
 
-
-
-
-
-
-
-// IDEAS
 <symlist> ::= VAR
             | VAR ',' <symlist>
 
 <list> ::= ""
          | <statement> ';' <list>
 
-<statement> ::= VAR ASSIGN <exp>
-              | RATE '(' VAR ')' ':' '{' <list>
+<statement> ::= <assignment>
+              | RATE '(' VAR ')' ':' '{' <assignment_list> '}'
+
+<assignment_list> ::= ""
+                    | <assignment> <assignment_list>
+
+<ecolli> ::= ECOLLI '(' '[' ']' ',' PROG <prog_list> ')' ';'
+
+<prog_list> ::= VAR '(' <exp_list> ')'
+                | VAR '(' <exp_list> ')' SHARE <symlist>
+                | VAR '(' <exp_list> ')' '+' <prog_list>
+                | VAR '(' <exp_list> ')' SHARE <symlist> '+' <prog_list>
+
+<exp_list> ::= ""
+         | <exp> ',' <exp_list>

@@ -19,7 +19,7 @@
 #  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
 #
 
-DEPS = ast.h
+DEPS = ast.h symtab.h
 
 all: albi
 

@@ -32,10 +32,10 @@ enum nodetypes {
     MINUS,
     TIMES,
     DIV,
+    EXPLIST,
     SYM_REF,
     SYM_ASSIGN,
-    PRIV_COMPART,
-    SHARED_COMPART,
+    COMPART,
 };
 
 /**
@@ -50,10 +50,10 @@ struct ast {
 /**
  * Compartment instantiation node.
  */
-struct newcompart {
+struct compart {
  	enum nodetypes type;
     struct symbol *sym;
-    struct symlist *progs;
+    struct progcall *params;  
 };
 
 /**
@@ -81,16 +81,35 @@ struct symassign {
     struct ast *val;
 };
 
+/**
+ * Symbol assignment node.
+ */
+struct rate {
+	enum nodetypes type;
+    struct ast *exp;
+    struct assignlist *assigns;
+};
+
 // END AST NODES
+
+struct progcall {
+	struct symbol * sym;
+	struct progcall * next;
+	struct symlist * list;
+};
 
 /**
  * Build an AST.
  */
 struct ast *newast(enum nodetypes type, struct ast *l, struct ast *r);
-struct ast *newcompart(struct symbol *sym, struct ast *args);
+struct ast *newcompart(struct symbol *sym, struct progcall *params);
 struct ast *newnum(double d);
 struct ast *newref(struct symbol *sym);
 struct ast *newassign(struct symbol *s, struct ast *v);
+struct ast *newrate(struct ast* exp, struct assignlist *assigns);
+
+struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next);
+void assignlistfree(struct assignlist *sl);
 
 /** 
  * Define a program.

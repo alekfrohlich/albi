@@ -22,179 +22,176 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "ast.h"
-#include "ast.c"
+#include "albi.c"
 
-extern int yyerror(const char* s);
 extern int yylex(void);
 %}
 
 %union {
-    char * str;
-    float f;
-    struct node * node_type;
+    struct ast *node;
+    double double_t;
+    struct symbol *sym_tok;   // which symbol?  
+    struct symlist *symlist_tok;
+	struct assignlist *assigns;
+	struct progcall *call_params;
 }
 
-%token <f> NUM
-%token <str> VAR
-%token ASSIGN EOL PROG RATE
+// declare tokens.
+%token <double_t> NUM
+%token <sym_tok> VAR
+%token ASSIGN PROG RATE SHARE ECOLLI
 
-%type <node_type> start_of_prog program program_body program_content_list parameter specie statement rate rate_body reagent_list;
-%type <str> program_def product reactant rate_def
+%right '='
+%left '+' '-'
+%left '*' '/'
+
+%type <node> exp statement list explist assignment ecolli
+%type <symlist_tok> symlist
+%type <assigns> assignment_list
+%type <call_params> proglist
 
 %%
 
-start_of_prog: %empty 					
-								{
-									head = new_node(START_OF_PROG_TYPE, NULL, NULL); 
-									$$ = head; 
-								}
-				
-| start_of_prog parameter	
-								{
-									$$ = new_node(START_OF_PROG_TYPE, $1, NULL); 
-									$$->right = $2;
-							 	}
-
-| start_of_prog program 	
-								{
-									$$ = new_node(START_OF_PROG_TYPE, $1, NULL);
-									$$->right = $2;
-								}
+start_of_prog: %empty
+| start_of_prog assignment
+									{
+										//genmodel();
+									}
+| start_of_prog program
+									{
+										curr_env = 0;
+									}
+| start_of_prog ecolli				
+									{
+										//genmodel();
+									}
 ;
 
-parameter: statement
-								{
-									$1->type = PARAMETER_TYPE;
-									$$ = $1;
-								}
+assignment: VAR ASSIGN exp ';'		
+									{
+										$$ = newassign($1, $3);
+									}
 ;
 
-statement: VAR ASSIGN NUM ';' 
- 								{ 
-									$$ = new_node(STATEMENT_TYPE, NULL, NULL);
-									$$->var = $1;
-									$$->value = $3;
-								}
+exp: exp '+' exp					
+									{
+										$$ = newast(PLUS, $1, $3);
+									}
+| exp '-' exp						
+									{
+										$$ = newast(MINUS, $1, $3);
+									}
+| exp '*' exp						
+									{
+										$$ = newast(TIMES, $1, $3);
+									}
+| exp '/' exp						
+									{
+										$$ = newast(DIV, $1, $3);
+									}
+| NUM								
+									{
+										$$ = newnum($1);
+									}
+| VAR								
+									{
+										$$ = newref($1);
+									}
 ;
 
-program: program_def program_body ';' 
- 								{
-									$$ = $2;
-									$$->compartment = $1;
-								}
+program: PROG VAR '(' symlist ')' ASSIGN '{' list '}' ';'
+									{
+										progdef($2, $4, $8);
+									}
+| PROG VAR '(' ')' ASSIGN '{' list '}' ';'
+									{
+										progdef($2, NULL, $7);
+									}
 ;
 
-program_def: PROG VAR '(' ')' ASSIGN 				
- 								{
-	 								$$ = $2;
-								}
+symlist: VAR
+									{
+										$$ = newsymlist($1, NULL);
+									}
+| VAR ',' symlist              
+									{
+										$$ = newsymlist($1, $3);
+									}
 ;
 
-program_body: '{' program_content_list '}' 
-								{
-									$$ = $2;
-								}
+list: %empty
+									{
+										$$ = NULL;
+									}
+| statement list
+									{
+										if ($2 == NULL)
+											$$ = $1;
+										else
+											$$ = newast(EXPLIST, $1, $2);
+									}
 ;
 
-program_content_list: specie 
-								{
-									$$ = $1;
-								}
-| rate							
-								{
-									$$ = $1;
-								}
-| program_content_list specie
-								{
-									$$ = $2;
-									$$->right = $1;
-								}
-| program_content_list rate
-								{
-									$$ = $2;
-									$$ ->right = $1;
-								}
+statement: assignment
+| RATE '(' exp ')' ':' '{' assignment_list '}'
+									{
+										$$ = newrate($3, $7);
+									}
 ;
 
-specie: statement
-								{
-									$1->type = SPECIE_TYPE;
-									$$ = $1;
-								}
+assignment_list: %empty
+									{
+										$$ = NULL;
+									}
+| assignment assignment_list
+									{
+										if ($2 == NULL)
+											$$ = newassignlist((struct symassign *) $1, NULL);
+										else
+											$$ = newassignlist((struct symassign *) $1, $2);
+									}
 ;
 
-rate: rate_def rate_body
-								{
-									$$ = $2;
-									$$->var = $1;
-								}
+ecolli: ECOLLI '(' '[' ']' ',' PROG proglist ')' ';'
+									{
+										$$ = newcompart(lookup("1"), $7);
+									}
 ;
 
-rate_def: RATE '(' VAR ')' ':' 
-								{ 
-									$$ = $3; 
-								}
+proglist: VAR '(' explist ')' 
+									{ 
+										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
+										$$->list = NULL;
+										$$->sym = $1;
+										$$->next = NULL;
+									}
+| VAR '(' explist ')' SHARE symlist 
+									{
+										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
+										$$->list = $6;
+										$$->sym = $1;
+										$$->next = NULL;
+									}
+| VAR '(' explist ')' '+' proglist 
+									{ 
+										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
+										$$->list = NULL;
+										$$->sym = $1;
+										$$->next = $6;
+									}
+| VAR '(' explist ')' SHARE symlist '+' proglist 
+									{ 
+										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
+										$$->list = $6;
+										$$->sym = $1;
+										$$->next = $8;
+									}
 ;
 
-rate_body: '{' reagent_list '}'
-								{
-									$$ = $2;
-								}
+explist: exp
+| exp ',' explist
+									{
+										$$ = newast(EXPLIST, $1, $3);
+									}
 ;
-
-reagent_list: product 
-								{
-									$$ = new_node(RATE_TYPE, NULL, NULL);
-									$$->n_prod = 1;
-									$$->n_reac = 0;
-									$$->prod = (char **) malloc(sizeof(char *)*10);
-									$$->reac = (char **) malloc(sizeof(char *)*10);
-									$$->prod[0] = $1;
-								}
-| reactant
-								{
-									$$ = new_node(RATE_TYPE, NULL, NULL);
-									$$->n_prod = 0;
-									$$->n_reac = 1;
-									$$->prod = (char **) malloc(sizeof(char *)*10);
-									$$->reac = (char **) malloc(sizeof(char *)*10);
-									$$->reac[0] = $1;
-								}
-| reagent_list product
-								{
-									$$ = $1;
-									$$->prod[$$->n_prod] = $2;
-									$$->n_prod++;
-								}
-| reagent_list reactant
-								{
-									$$ = $1;
-									$$->reac[$$->n_reac] = $2;
-									$$->n_reac++;
-								}
-;
-
-product: VAR ASSIGN VAR '+' NUM ';' 
-							{
-								if (strcmp($1, $3) == 0) {
-									$$ = $1;
-								} else {
-									yyerror("invalid rate body.\n");
-									return 1;
-								}
-							}
-;
-
-reactant: VAR ASSIGN VAR '-' NUM ';' 
-							{
-								if (strcmp($1, $3) == 0) {
-									$$ = $1;
-								} else {
-									yyerror("invalid rate body.\n");
-									return 1;
-								}
-							}
-;
-
 %%

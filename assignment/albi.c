@@ -22,7 +22,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ast.h"
-#include "symtab.h"
+
+// TO CLEAN UP
+extern int yyerror(const char* s);
 
 // BEGIN AST NODE CONSTRUCTION
 
@@ -37,7 +39,7 @@ struct ast * newast(enum nodetypes type, struct ast *l, struct ast *r)
     return a;
 }
 
-struct ast *newcompart(struct symbol *sym, struct ast *args);
+struct ast *newcompart(struct symbol *sym, struct progcall *params);
 
 struct ast * newnum(double d)
 {
@@ -82,40 +84,40 @@ double genmodel(struct ast *a)
 
 }
 
-void treefree(struct ast *a)
-{
-    switch (a->type)
-    {
+// void treefree(struct ast *a)
+// {
+//     switch (a->type)
+//     {
 
-    // two subtrees.
-    case PLUS:
-    case MINUS:
-    case TIMES:
-    case DIV:
-        treefree(a->left);
-        treefree(a->right);
-        break;
+//     // two subtrees.
+//     case PLUS:
+//     case MINUS:
+//     case TIMES:
+//     case DIV:
+//         treefree(a->left);
+//         treefree(a->right);
+//         break;
     
-    // one subtree.
-    case SYM_ASSIGN:
-        free(((struct symassign *) a)->sym);
-        treefree(a->left);
+//     // one subtree.
+//     case SYM_ASSIGN:
+//         free(((struct symassign *) a)->sym);
+//         treefree(a->left);
 
-    // no subtree.
-    case CONSLIT: break;
-    case SYM_REF:
-        free(((struct symref *) a)->sym);
-        break;
-    case PRIV_COMPART: // double free problem?
-    case SHARED_COMPART:
-        break;
+//     // no subtree.
+//     case CONSLIT: break;
+//     case SYM_REF:
+//         free(((struct symref *) a)->sym);
+//         break;
+//     case PRIV_COMPART: // double free problem?
+//     case SHARED_COMPART:
+//         break;
 
-    default:
-        printf("internal error: bad node %c\n", a->type);
-    }
+//     default:
+//         printf("internal error: bad node %c\n", a->type);
+//     }
 
-    free(a);
-}
+//     free(a);
+// }
 
 // BEGIN SYMBOL TABLE IMPLEMENTATION
 

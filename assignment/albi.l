@@ -19,11 +19,12 @@
     //  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
     //
 
-%option noyywrap
+%option noyywrap yylineno
 
 %{
 #include <stdlib.h>
 #include <string.h>
+#include "ast.h"
 #include "albi.tab.h"
 %}
 
@@ -36,7 +37,8 @@ float               [+-]?{integer}(\.{integer})?
 assignment          ":="
 program_keyword		"program"
 rate_keyword		"rate"
-set_keyword         "set"
+sharing_keyword     "sharing"
+ecolli_keyword      "ecolli"
 ignore              "include gro"
 %%
 
@@ -44,12 +46,17 @@ ignore              "include gro"
 {white}             { }
 {ignore}            { }
 
-{program_keyword}	{ return PROG; }
+{program_keyword}	{ 
+                        env[1] = (struct symbol *) malloc(sizeof(struct symbol) * SYMTAB_SIZE);
+                        curr_env = 1;
+                        return PROG;
+                    }
 {rate_keyword}		{ return RATE; }
-{set_keyword}       { return SET;  }
+{sharing_keyword}   { return SHARE;  }
+{ecolli_keyword}    { return ECOLLI; }
 
-{float}             { yylval.f = atof(yytext); return NUM; }
-{variable}          { yylval.str = strdup(yytext); return VAR; }
+{float}             { yylval.double_t = atof(yytext); return NUM; }
+{variable}          { yylval.sym_tok = lookup(yytext); return VAR; }
 {assignment}        { return ASSIGN;  }
 
 ","                 |
@@ -81,5 +88,5 @@ int main(int argc, char **argv)
 
 int yyerror(const char *s)
 {
-    fprintf(stderr, "erro: %s\n", s);
+    fprintf(stderr, "error: %s on line %d\n", s, yylineno);
 }
