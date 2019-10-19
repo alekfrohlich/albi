@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "albi.tab.h"
-#include "ast.h"
 %}
 
 white               [ \t]+
@@ -37,6 +36,7 @@ float               [+-]?{integer}(\.{integer})?
 assignment          ":="
 program_keyword		"program"
 rate_keyword		"rate"
+set_keyword         "set"
 ignore              "include gro"
 %%
 
@@ -46,11 +46,13 @@ ignore              "include gro"
 
 {program_keyword}	{ return PROG; }
 {rate_keyword}		{ return RATE; }
+{set_keyword}       { return SET;  }
 
 {float}             { yylval.f = atof(yytext); return NUM; }
 {variable}          { yylval.str = strdup(yytext); return VAR; }
 {assignment}        { return ASSIGN;  }
 
+","                 |
 ";"                 |
 "+"					|
 "-"					|
@@ -75,7 +77,6 @@ int main(int argc, char **argv)
     yyout = fopen("parsed.intermediate", "w");
     
 	yyparse();
-	search_tree(head, yyout);
 }
 
 int yyerror(const char *s)

@@ -24,35 +24,24 @@
 <start_of_prog> ::= ""
                   | <start_of_prog> <parameter> EOL
                   | <start_of_prog> <program> EOL
+                  | <start_of_prog> <ecolli> EOL
 
-<parameter> ::= <statement>
+<parameter> ::= SET '(' VAR ',' VAL ')' ';'
 
-<statement> ::= VAR ASSIGN NUM ';'
+<program> ::= PROG VAR '(' ')' ASSIGN '{' <list> '}' ';'
 
-<program> ::= <program_def> <program_body> ';' 
 
-<program_def> ::= PROG VAR ASSIGN
 
-<program_body> ::= '{' <program_content_list> '}'
 
-<program_content_list> ::= <specie> 
-                         | <rate>
-                         | <program_content_list> <specie> 
-                         | <program_content_list> <rate>
 
-<specie> ::= <statement>
 
-<rate> ::= <rate_def> <rate_body>
 
-<rate_def> ::= RATE '(' VAR ')' ':' 
+// IDEAS
+<symlist> ::= VAR
+            | VAR ',' <symlist>
 
-<rate_body> ::= '{' <reagent_list> '}'
+<list> ::= ""
+         | <statement> ';' <list>
 
-<reagent_list> ::= <product> 
-                 | <reactant>
-                 | <reagent_list> <product>
-                 | <reagent_list> <reactant>
-
-<product> ::= VAR ASSIGN VAR '+' NUM ';'
-
-<reactant> ::= VAR ASSIGN VAR '-' NUM ';'
+<statement> ::= VAR ASSIGN <exp>
+              | RATE '(' VAR ')' ':' '{' <list>

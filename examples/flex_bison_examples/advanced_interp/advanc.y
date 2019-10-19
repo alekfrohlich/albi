@@ -103,7 +103,7 @@ exp: exp CMP exp                {
 ;
 
 explist: exp
-| exp ';' explist
+| exp ',' explist
                                 {
                                     $$ = newast('L', $1, $3);
                                 }
@@ -113,7 +113,7 @@ symlist: NAME
                                 {
                                     $$ = newsymlist($1, NULL);
                                 }
-| NAME ';' symlist              
+| NAME ',' symlist              
                                 {
                                     $$ = newsymlist($1, $3);
                                 }

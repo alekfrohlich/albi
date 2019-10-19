@@ -22,38 +22,89 @@
 #ifndef __AST_H__
 #define __AST_H__
 
-/**
- * AST node.
- */
-struct node {
-	int type;
-	struct node * left;
-	struct node * right;
-	
-	char * compartment;
-	char * var;
-	char ** prod;
-	char ** reac;
-	int n_prod, n_reac;
-	float value;
+#include "symtab.h"
+
+// BEGIN AST NODES
+
+enum nodetypes {
+    CONSLIT = 1,
+    PLUS,
+    MINUS,
+    TIMES,
+    DIV,
+    SYM_REF,
+    SYM_ASSIGN,
+    PRIV_COMPART,
+    SHARED_COMPART,
 };
 
 /**
- * AST interface.
+ * Generic expression node.
  */
-void search_program(struct node * node, char * compartment, FILE * yyout);
-void search_tree(struct node * node, FILE * yyout);
-struct node * new_node(int type, struct node * left_of, struct node * right_of);
-
-struct node * head;
+struct ast {
+	enum nodetypes type;
+	struct ast * left;
+	struct ast * right;
+};
 
 /**
- * AST node types.
+ * Compartment instantiation node.
  */
-#define START_OF_PROG_TYPE 1
-#define RATE_TYPE 2
-#define PARAMETER_TYPE 3
-#define SPECIE_TYPE 4
-#define STATEMENT_TYPE 5
+struct newcompart {
+ 	enum nodetypes type;
+    struct symbol *sym;
+    struct symlist *progs;
+};
+
+/**
+ * Numeric value node.
+ */
+struct numval {
+	enum nodetypes type;
+    double number;
+};
+
+/**
+ * Reference to symbol node.
+ */
+struct symref {
+ 	enum nodetypes type;
+    struct symbol *sym;
+};
+
+/**
+ * Symbol assignment node.
+ */
+struct symassign {
+	enum nodetypes type;
+    struct symbol *sym;
+    struct ast *val;
+};
+
+// END AST NODES
+
+/**
+ * Build an AST.
+ */
+struct ast *newast(enum nodetypes type, struct ast *l, struct ast *r);
+struct ast *newcompart(struct symbol *sym, struct ast *args);
+struct ast *newnum(double d);
+struct ast *newref(struct symbol *sym);
+struct ast *newassign(struct symbol *s, struct ast *v);
+
+/** 
+ * Define a program.
+ */
+void progdef(struct symbol *name, struct symlist *syms, struct ast *stmts);
+
+/**
+ * Generate SBML model from AST.
+ */
+double genmodel(struct ast *);
+
+/**
+ * Free AST.
+ */
+void treefree(struct ast *);
 
 #endif // __AST_H__
