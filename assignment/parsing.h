@@ -19,20 +19,32 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __SYMTAB__
-#define __SYMTAB__
+#ifndef __PARSING__
+#define __PARSING__
 
-#define SYMTAB_SIZE 9997
+struct progcall {
+	struct symbol * sym;
+	struct progcall * next;
+	struct symlist * list;
+};
 
-struct symbol {
-    char *name;
-    double value;           
-    struct program *prog;
+struct symlist {
+    struct symbol *sym;
+    struct symlist *next;
+};
+
+struct assignlist {
+    struct symassign *assign;
+    struct assignlist *next;
 };
 
 // forward defined.
-extern struct symbol* env[2];
-extern int curr_env;
-extern struct symbol *lookup(char *);
+extern struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next);
+extern void assignlistfree(struct assignlist *sl);
+extern void progdef(struct symbol *name, struct symlist *syms, struct ast *stmts);
+extern double genmodel(struct ast *);
+extern struct symlist *newsymlist(struct symbol *sym, struct symlist *next);
+extern void symlistfree(struct symlist *sl);
+extern int yyerror(const char *s);
 
-#endif  // __SYMTAB__
+#endif  // __PARSING__

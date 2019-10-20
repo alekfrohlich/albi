@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ast.h"
+#include "symtab.h"
+#include "parsing.h"
 
 extern int yylex(void);
 %}

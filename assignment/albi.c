@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ast.h"
+#include "parsing.h"
 
 // TO CLEAN UP
 extern int yyerror(const char* s);
@@ -120,6 +121,17 @@ double genmodel(struct ast *a)
 // }
 
 // BEGIN SYMBOL TABLE IMPLEMENTATION
+
+struct symbol symtab[SYMTAB_SIZE];
+struct symbol *env[2] = {
+    symtab,
+    NULL
+};
+
+void initparser()
+{
+    curr_env = 0;
+}
 
 static unsigned symhash(char *sym)
 {
