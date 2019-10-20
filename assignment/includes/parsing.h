@@ -22,6 +22,8 @@
 #ifndef __PARSING__
 #define __PARSING__
 
+#include "ast.h"
+
 // BEGIN INTERMEDIATE NODES
 
 struct progcall {
@@ -50,5 +52,7 @@ extern double genmodel(struct ast *);
 extern struct symlist *newsymlist(struct symbol *sym, struct symlist *next);
 extern void symlistfree(struct symlist *sl);
 extern int yyerror(const char *s);
+extern int yylex(void);
+extern void abort(void);
 
 #endif  // __PARSING__

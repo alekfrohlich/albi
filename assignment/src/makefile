@@ -19,8 +19,10 @@
 #  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
 #
 
-DEPS = ast.h symtab.h
-TARGETS = albi.c
+CFLAGS = -I ../includes
+
+DEPS = ../includes/ast.h ../includes/symtab.h ../includes/parsing.h
+TARGETS = ast.c symtab.c parsing.c
 
 all: albi
 
@@ -29,7 +31,7 @@ all: albi
 albi: albi.l albi.y $(DEPS)
 	flex -o albi.yy.c albi.l
 	bison -d albi.y
-	gcc albi.tab.c albi.yy.c $(TARGETS) -lm -o albi
+	gcc $(CFLAGS) albi.tab.c albi.yy.c $(TARGETS) -lm -o albi
 
 .PHONY: clean
 

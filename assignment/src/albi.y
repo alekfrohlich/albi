@@ -25,8 +25,6 @@
 #include "ast.h"
 #include "symtab.h"
 #include "parsing.h"
-
-extern int yylex(void);
 %}
 
 %union {
