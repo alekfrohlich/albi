@@ -24,8 +24,9 @@
 
 #include "symtab.h"
 
-// BEGIN AST NODES
-
+/**
+ * AST node types.
+ */
 enum nodetypes {
     CONSLIT = 1,
     PLUS,
@@ -37,6 +38,8 @@ enum nodetypes {
     SYM_ASSIGN,
     COMPART,
 };
+
+// BEGIN AST NODES
 
 /**
  * Generic expression node.

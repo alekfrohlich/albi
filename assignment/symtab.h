@@ -24,6 +24,9 @@
 
 #define SYMTAB_SIZE 9997
 
+/**
+ * Symbol table entry.
+ */
 struct symbol {
     char *name;
     double value;           

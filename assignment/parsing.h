@@ -22,6 +22,8 @@
 #ifndef __PARSING__
 #define __PARSING__
 
+// BEGIN INTERMEDIATE NODES
+
 struct progcall {
 	struct symbol * sym;
 	struct progcall * next;
@@ -37,6 +39,8 @@ struct assignlist {
     struct symassign *assign;
     struct assignlist *next;
 };
+
+// END INTERMEDIATE NODES
 
 // forward defined.
 extern struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next);
