@@ -22,7 +22,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "albi.c"
+#include "ast.h"
 
 extern int yylex(void);
 %}
@@ -135,7 +135,7 @@ list: %empty
 statement: assignment
 | RATE '(' exp ')' ':' '{' assignment_list '}'
 									{
-										$$ = newrate($3, $7);
+										// $$ = newrate($3, $7);
 									}
 ;
 
@@ -145,16 +145,16 @@ assignment_list: %empty
 									}
 | assignment assignment_list
 									{
-										if ($2 == NULL)
-											$$ = newassignlist((struct symassign *) $1, NULL);
-										else
-											$$ = newassignlist((struct symassign *) $1, $2);
+										// if ($2 == NULL)
+										// 	$$ = newassignlist((struct symassign *) $1, NULL);
+										// else
+										// 	$$ = newassignlist((struct symassign *) $1, $2);
 									}
 ;
 
 ecolli: ECOLLI '(' '[' ']' ',' PROG proglist ')' ';'
 									{
-										$$ = newcompart(lookup("1"), $7);
+										// $$ = newcompart(lookup("1"), $7);
 									}
 ;
 

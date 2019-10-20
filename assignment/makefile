@@ -20,6 +20,7 @@
 #
 
 DEPS = ast.h symtab.h
+TARGETS = albi.c
 
 all: albi
 
@@ -28,7 +29,7 @@ all: albi
 albi: albi.l albi.y $(DEPS)
 	flex -o albi.yy.c albi.l
 	bison -d albi.y
-	gcc albi.tab.c albi.yy.c -lm -o albi
+	gcc albi.tab.c albi.yy.c $(TARGETS) -lm -o albi
 
 .PHONY: clean
 

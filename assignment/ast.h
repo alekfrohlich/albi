@@ -98,32 +98,17 @@ struct progcall {
 	struct symlist * list;
 };
 
-/**
- * Build an AST.
- */
-struct ast *newast(enum nodetypes type, struct ast *l, struct ast *r);
-struct ast *newcompart(struct symbol *sym, struct progcall *params);
-struct ast *newnum(double d);
-struct ast *newref(struct symbol *sym);
-struct ast *newassign(struct symbol *s, struct ast *v);
-struct ast *newrate(struct ast* exp, struct assignlist *assigns);
-
-struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next);
-void assignlistfree(struct assignlist *sl);
-
-/** 
- * Define a program.
- */
-void progdef(struct symbol *name, struct symlist *syms, struct ast *stmts);
-
-/**
- * Generate SBML model from AST.
- */
-double genmodel(struct ast *);
-
-/**
- * Free AST.
- */
-void treefree(struct ast *);
+// forward defined.
+extern struct ast *newast(enum nodetypes type, struct ast *l, struct ast *r);
+extern struct ast *newcompart(struct symbol *sym, struct progcall *params);
+extern struct ast *newnum(double d);
+extern struct ast *newref(struct symbol *sym);
+extern struct ast *newassign(struct symbol *s, struct ast *v);
+extern struct ast *newrate(struct ast* exp, struct assignlist *assigns);
+extern struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next);
+extern void assignlistfree(struct assignlist *sl);
+extern void progdef(struct symbol *name, struct symlist *syms, struct ast *stmts);
+extern double genmodel(struct ast *);
+extern void treefree(struct ast *);
 
 #endif // __AST_H__

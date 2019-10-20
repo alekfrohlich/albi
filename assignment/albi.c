@@ -178,4 +178,36 @@ void symlistfree(struct symlist *sl)
     }
 }
 
+struct ast *newast(enum nodetypes type, struct ast *l, struct ast *r);
+struct ast *newcompart(struct symbol *sym, struct progcall *params);
+struct ast *newnum(double d);
+struct ast *newref(struct symbol *sym);
+struct ast *newassign(struct symbol *s, struct ast *v);
+struct ast *newrate(struct ast* exp, struct assignlist *assigns);
+
+struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next);
+void assignlistfree(struct assignlist *sl);
+
+struct symbol symtab[SYMTAB_SIZE];
+struct symbol* env[2];
+int curr_env;
+struct symbol *lookup(char *);
+struct symlist *newsymlist(struct symbol *sym, struct symlist *next);
+void symlistfree(struct symlist *sl);
+
+/** 
+ * Define a program.
+ */
+void progdef(struct symbol *name, struct symlist *syms, struct ast *stmts);
+
+/**
+ * Generate SBML model from AST.
+ */
+double genmodel(struct ast *);
+
+/**
+ * Free AST.
+ */
+void treefree(struct ast *);
+
 // END SYMBOL TABLE IMPLEMENTATION
