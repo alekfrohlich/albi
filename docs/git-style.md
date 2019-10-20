@@ -6,7 +6,7 @@ Every new **feature**/**documentation** patch should first be proposed as an iss
 
 ## Branch naming convention
 
-To name a new branch, follow the pattern,
+To name a new branch, follow the pattern:
 
 ```
 type/issue#/objective
@@ -20,9 +20,9 @@ where type may be:
 5. build
 6. docs
 
-issue# is the number given by github to the associated issue.
+and issue# is the number given by github to the associated issue.
 
-and lastly, objective is a short descriptive name related to the issue's goal.
+lastly, objective should be a short, descriptive name related to the issue's goal.
 
 an exaple of a possible bug-related branch could be:
 
