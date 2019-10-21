@@ -20,7 +20,7 @@
  */
 
 #include <stdlib.h>
-#include "ast.h"
+#include <ast.h>
 
 struct ast * newast(enum nodetypes type, struct ast *l, struct ast *r)
 {

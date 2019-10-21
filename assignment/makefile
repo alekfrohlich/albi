@@ -19,24 +19,20 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
 #
 
-# C source files.
-C_SRC = $(wildcard *.c)
+# Directories.
+export INCDIR   = $(CURDIR)/include
+export SRCDIR   = $(CURDIR)/src
+export GRODIR   = $(CURDIR)/gro
 
-# Lexer file.
-L_SRC = albi.l
+# Toolchain configuration.
+export CFLAGS   = -g -I $(INCDIR)
 
-# Parser file.
-Y_SRC = albi.y
+.PHONY: albi
 
-CFLAGS += -lm
+# Builds the parser.
+albi:
+	cd $(SRCDIR) && $(MAKE) all
 
-all: $(C_SRC) $(L_SRC) $(Y_SRC)
-	flex -o albi.yy.c $(L_SRC)
-	bison -d $(Y_SRC)
-	gcc $(CFLAGS) $(C_SRC) -o albi
-
-.PHONY: clean
-
+# Cleans compilation files.
 clean:
-	@rm -f albi.tab.* albi.yy.c albi
-	@rm -f parsed.intermediate
+	cd $(SRCDIR) && $(MAKE) clean
