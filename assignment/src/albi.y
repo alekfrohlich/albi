@@ -123,7 +123,7 @@ list: %empty
 									{
 										$$ = NULL;
 									}
-| statement list
+| statement ';' list
 									{
 										if ($2 == NULL)
 											$$ = $1;

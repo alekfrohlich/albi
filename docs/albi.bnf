@@ -36,6 +36,7 @@
         | VAR
         
 <program> ::= PROG VAR '(' <symlist> ')' ASSIGN '{' <list> '}' ';'
+            | PROG VAR '(' ')' ASSIGN '{' <list> '}' ';'
 
 <symlist> ::= VAR
             | VAR ',' <symlist>
@@ -49,12 +50,12 @@
 <assignment_list> ::= ""
                     | <assignment> <assignment_list>
 
-<ecolli> ::= ECOLLI '(' '[' ']' ',' PROG <prog_list> ')' ';'
+<ecolli> ::= ECOLLI '(' '[' ']' ',' PROG <proglist> ')' ';'
 
-<prog_list> ::= VAR '(' <exp_list> ')'
-                | VAR '(' <exp_list> ')' SHARE <symlist>
-                | VAR '(' <exp_list> ')' '+' <prog_list>
-                | VAR '(' <exp_list> ')' SHARE <symlist> '+' <prog_list>
+<proglist> ::= VAR '(' <explist> ')'
+             | VAR '(' <explist> ')' SHARE <symlist>
+             | VAR '(' <explist> ')' '+' <proglist>
+             | VAR '(' <explist> ')' SHARE <symlist> '+' <proglist>
 
-<exp_list> ::= ""
+<explist> ::= ""
          | <exp> ',' <exp_list>
