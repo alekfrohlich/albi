@@ -20,13 +20,7 @@
  */
 
 #include <stdlib.h>
-#include <string.h>
-#include "ast.h"
-
-// TO CLEAN UP
-extern int yyerror(const char* s);
-
-// BEGIN AST NODE CONSTRUCTION
+#include <ast.h>
 
 struct ast * newast(enum nodetypes type, struct ast *l, struct ast *r)
 {
@@ -72,17 +66,7 @@ struct ast * newassign(struct symbol *sym, struct ast *val)
     return (struct ast *) a;
 }
 
-// END AST NODE CONSTRUCTION
-
-void progdef(struct symbol *name, struct symlist *syms, struct ast *stmts)
-{
-
-}
-
-double genmodel(struct ast *a)
-{
-
-}
+struct ast *newrate(struct ast* exp, struct assignlist *assigns);
 
 // void treefree(struct ast *a)
 // {
@@ -118,96 +102,3 @@ double genmodel(struct ast *a)
 
 //     free(a);
 // }
-
-// BEGIN SYMBOL TABLE IMPLEMENTATION
-
-static unsigned symhash(char *sym)
-{
-    unsigned int hash = 0;
-    unsigned c;
-
-    while (c = *sym++) hash = hash*9 ^ c;
-
-    return hash;
-}
-
-struct symbol * lookup(char *sym)
-{
-    struct symbol *sp = &symtab[symhash(sym) % SYMTAB_SIZE];
-    int scount = SYMTAB_SIZE;
-
-    while (--scount >= 0)
-    {
-        if (sp->name && !strcmp(sp->name, sym)) { return sp; }
-
-        // new entry.
-        if (!sp->name)
-        {
-            sp->name = strdup(sym);
-            sp->value = 0;
-
-            return sp;
-        }
-
-        if (++sp >= symtab + SYMTAB_SIZE) sp = symtab;
-    }
-    
-    yyerror("symbol table overflow\n");
-    abort(); // tried them all, table is full.
-}
-
-struct symlist * newsymlist(struct symbol *sym, struct symlist *next)
-{
-    struct symlist *sl = malloc(sizeof(struct symlist));
-
-    sl->sym = sym;
-    sl->next = next;
-
-    return sl;
-}
-
-void symlistfree(struct symlist *sl)
-{
-    struct symlist *nsl;
-
-    while(sl)
-    {
-        nsl - sl->next;
-        free(sl);
-        sl = nsl;
-    }
-}
-
-struct ast *newast(enum nodetypes type, struct ast *l, struct ast *r);
-struct ast *newcompart(struct symbol *sym, struct progcall *params);
-struct ast *newnum(double d);
-struct ast *newref(struct symbol *sym);
-struct ast *newassign(struct symbol *s, struct ast *v);
-struct ast *newrate(struct ast* exp, struct assignlist *assigns);
-
-struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next);
-void assignlistfree(struct assignlist *sl);
-
-struct symbol symtab[SYMTAB_SIZE];
-struct symbol* env[2];
-int curr_env;
-struct symbol *lookup(char *);
-struct symlist *newsymlist(struct symbol *sym, struct symlist *next);
-void symlistfree(struct symlist *sl);
-
-/** 
- * Define a program.
- */
-void progdef(struct symbol *name, struct symlist *syms, struct ast *stmts);
-
-/**
- * Generate SBML model from AST.
- */
-double genmodel(struct ast *);
-
-/**
- * Free AST.
- */
-void treefree(struct ast *);
-
-// END SYMBOL TABLE IMPLEMENTATION

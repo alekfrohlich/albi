@@ -23,8 +23,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ast.h"
-
-extern int yylex(void);
+#include "symtab.h"
+#include "parsing.h"
 %}
 
 %union {

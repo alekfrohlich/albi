@@ -24,8 +24,9 @@
 
 #include "symtab.h"
 
-// BEGIN AST NODES
-
+/**
+ * AST node types.
+ */
 enum nodetypes {
     CONSLIT = 1,
     PLUS,
@@ -37,6 +38,8 @@ enum nodetypes {
     SYM_ASSIGN,
     COMPART,
 };
+
+// BEGIN AST NODES
 
 /**
  * Generic expression node.
@@ -92,12 +95,6 @@ struct rate {
 
 // END AST NODES
 
-struct progcall {
-	struct symbol * sym;
-	struct progcall * next;
-	struct symlist * list;
-};
-
 // forward defined.
 extern struct ast *newast(enum nodetypes type, struct ast *l, struct ast *r);
 extern struct ast *newcompart(struct symbol *sym, struct progcall *params);
@@ -105,10 +102,6 @@ extern struct ast *newnum(double d);
 extern struct ast *newref(struct symbol *sym);
 extern struct ast *newassign(struct symbol *s, struct ast *v);
 extern struct ast *newrate(struct ast* exp, struct assignlist *assigns);
-extern struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next);
-extern void assignlistfree(struct assignlist *sl);
-extern void progdef(struct symbol *name, struct symlist *syms, struct ast *stmts);
-extern double genmodel(struct ast *);
 extern void treefree(struct ast *);
 
 #endif // __AST_H__
