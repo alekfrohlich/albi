@@ -20,7 +20,7 @@
  */
 
 #include <stdlib.h>
-#include "parsing.h"
+#include "../include/parsing.h"
 
 void progdef(struct symbol *name, struct symlist *syms, struct ast *stmts)
 {
@@ -60,3 +60,12 @@ void symlistfree(struct symlist *sl)
 
 struct symlist *newsymlist(struct symbol *sym, struct symlist *next);
 void symlistfree(struct symlist *sl);
+
+struct explist * newexplist(struct ast* exp, struct explist* next) {
+    struct explist *a = (struct explist *) malloc(sizeof(struct explist));
+    a->exp = exp;
+    a->next = (struct explist*) next;
+    return a;
+}
+
+void explistfree(struct explist * el);

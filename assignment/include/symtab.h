@@ -37,5 +37,5 @@ struct symbol {
 extern struct symbol* env[2];
 extern int curr_env;
 extern struct symbol *lookup(char *);
-
+void freesymbol(struct symbol * sym);
 #endif  // __SYMTAB__

@@ -22,9 +22,9 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "ast.h"
-#include "symtab.h"
-#include "parsing.h"
+#include "../include/ast.h"
+#include "../include/symtab.h"
+#include "../include/parsing.h"
 %}
 
 %union {
@@ -33,22 +33,24 @@
     struct symbol *sym_tok;   // which symbol?  
     struct symlist *symlist_tok;
 	struct assignlist *assigns;
+	struct explist * expressions;
 	struct progcall *call_params;
 }
 
 // declare tokens.
 %token <double_t> NUM
 %token <sym_tok> VAR
-%token ASSIGN PROG RATE SHARE ECOLLI
+%token ASSIGN PROG RATE SHARE ECOLI
 
 %right '='
 %left '+' '-'
 %left '*' '/'
 
-%type <node> exp statement list explist assignment ecolli
+%type <node> exp statement list assignment ecoli
 %type <symlist_tok> symlist
 %type <assigns> assignment_list
 %type <call_params> proglist
+%type <expressions> explist
 
 %%
 
@@ -56,14 +58,16 @@ start_of_prog: %empty
 | start_of_prog assignment
 									{
 										//genmodel();
+										treefree($2);
 									}
 | start_of_prog program
 									{
 										curr_env = 0;
 									}
-| start_of_prog ecolli				
+| start_of_prog ecoli				
 									{
 										//genmodel();
+										treefree($2);
 									}
 ;
 
@@ -97,6 +101,10 @@ exp: exp '+' exp
 									{
 										$$ = newref($1);
 									}
+| %empty							
+									{
+										$$ = NULL;
+									}
 ;
 
 program: PROG VAR '(' symlist ')' ASSIGN '{' list '}' ';'
@@ -123,7 +131,7 @@ list: %empty
 									{
 										$$ = NULL;
 									}
-| statement ';' list
+| statement list
 									{
 										if ($2 == NULL)
 											$$ = $1;
@@ -152,9 +160,9 @@ assignment_list: %empty
 									}
 ;
 
-ecolli: ECOLLI '(' '[' ']' ',' PROG proglist ')' ';'
+ecoli: ECOLI '(' '[' ']' ',' PROG proglist ')' ';'
 									{
-										// $$ = newcompart(lookup("1"), $7);
+										$$ = newcompart("ECOLI", $7);
 									}
 ;
 
@@ -164,6 +172,7 @@ proglist: VAR '(' explist ')'
 										$$->list = NULL;
 										$$->sym = $1;
 										$$->next = NULL;
+										$$->exp = (struct explist*) $3;
 									}
 | VAR '(' explist ')' SHARE symlist 
 									{
@@ -171,6 +180,7 @@ proglist: VAR '(' explist ')'
 										$$->list = $6;
 										$$->sym = $1;
 										$$->next = NULL;
+										$$->exp = (struct explist*) $3;
 									}
 | VAR '(' explist ')' '+' proglist 
 									{ 
@@ -178,6 +188,7 @@ proglist: VAR '(' explist ')'
 										$$->list = NULL;
 										$$->sym = $1;
 										$$->next = $6;
+										$$->exp = (struct explist*) $3;
 									}
 | VAR '(' explist ')' SHARE symlist '+' proglist 
 									{ 
@@ -185,13 +196,21 @@ proglist: VAR '(' explist ')'
 										$$->list = $6;
 										$$->sym = $1;
 										$$->next = $8;
+										printf("is null = %d\n", $3 == NULL);
+										$$->exp = $3;
 									}
 ;
 
-explist: exp
+explist: exp 						{
+										if ($1 != NULL) {
+											$$ = newexplist($1, NULL);
+										} else {
+											$$ = NULL;
+										}
+									}
 | exp ',' explist
 									{
-										$$ = newast(EXPLIST, $1, $3);
+										$$ = newexplist($1, $3);
 									}
 ;
 %%

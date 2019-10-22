@@ -20,7 +20,9 @@
  */
 
 #include <stdlib.h>
-#include <ast.h>
+#include <stdio.h>
+#include "../include/ast.h"
+#include "../include/parsing.h"
 
 struct ast * newast(enum nodetypes type, struct ast *l, struct ast *r)
 {
@@ -33,7 +35,13 @@ struct ast * newast(enum nodetypes type, struct ast *l, struct ast *r)
     return a;
 }
 
-struct ast *newcompart(struct symbol *sym, struct progcall *params);
+struct ast *newcompart(char *sym, struct progcall *params) {
+    struct compart *a = malloc(sizeof(struct compart*));
+    a->type = COMPART;
+    a->sym = sym;
+    a->params = params;
+    return (struct ast*) a;
+}
 
 struct ast * newnum(double d)
 {
@@ -68,37 +76,67 @@ struct ast * newassign(struct symbol *sym, struct ast *val)
 
 struct ast *newrate(struct ast* exp, struct assignlist *assigns);
 
-// void treefree(struct ast *a)
-// {
-//     switch (a->type)
-//     {
+void treefree(struct ast *a)
+{
+    switch (a->type)
+    {
 
-//     // two subtrees.
-//     case PLUS:
-//     case MINUS:
-//     case TIMES:
-//     case DIV:
-//         treefree(a->left);
-//         treefree(a->right);
-//         break;
-    
-//     // one subtree.
-//     case SYM_ASSIGN:
-//         free(((struct symassign *) a)->sym);
-//         treefree(a->left);
+    // two subtrees.
+    case PLUS:
+    case MINUS:
+    case TIMES:
+    case DIV:
+        treefree(a->left);
+        treefree(a->right);
+        break;
+    // one subtree.
+    case SYM_ASSIGN:
+        treefree(((struct symassign*)a)->val);
+        // freesymbol(((struct symassign *) a)->sym);
+        break;
+    case EXPLIST:
+        treefree(a->left);
+        treefree(a->right);
+        break;
+    // no subtree.
+    case SYM_REF:
+        // freesymbol(((struct symref *) a)->sym);
+        break;
+    case COMPART: // double free problem?
+        ;
+        struct progcall * prog = ((struct compart *)a)->params;
+        
+        while (prog != NULL) {
+            printf("%s\n", prog->sym->name);
+            struct progcall * aux = prog;
+            prog = prog->next;
+            // freesymbol(aux->sym);
+            struct symlist * list = aux->list;
+            while (list != NULL) {
+                struct symlist * aux_ = list;
+                list = list->next;
+                // freesymbol(aux_->sym);
+                free(aux_);
+            }
 
-//     // no subtree.
-//     case CONSLIT: break;
-//     case SYM_REF:
-//         free(((struct symref *) a)->sym);
-//         break;
-//     case PRIV_COMPART: // double free problem?
-//     case SHARED_COMPART:
-//         break;
+            struct explist * explist = aux->exp;
+            printf("next\n");
+            // printf("|%d|\n", aux->exp->type);
+            // PROQUE QUEBRAS AMIGO??
+            while (explist != NULL) {
+                struct explist * aux_ = explist;
+                explist = explist->next;
+                if (aux->exp != NULL) treefree(aux_->exp);
+                free(aux_);
+            }
+            free(aux);
+        }
+        break;
+    case CONSLIT:
+        break;
+    default:
+        printf("internal error: bad node %c\n", a->type);
+    }
 
-//     default:
-//         printf("internal error: bad node %c\n", a->type);
-//     }
-
-//     free(a);
-// }
+    free(a);
+}
