@@ -21,8 +21,8 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "../include/symtab.h"
-#include "../include/parsing.h"
+#include "symtab.h"
+#include "parsing.h"
 
 int curr_env = 1;
 

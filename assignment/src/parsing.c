@@ -20,7 +20,7 @@
  */
 
 #include <stdlib.h>
-#include "../include/parsing.h"
+#include "parsing.h"
 
 void progdef(struct symbol *name, struct symlist *syms, struct ast *stmts)
 {

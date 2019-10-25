@@ -22,9 +22,9 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "../include/ast.h"
-#include "../include/symtab.h"
-#include "../include/parsing.h"
+#include "ast.h"
+#include "symtab.h"
+#include "parsing.h"
 %}
 
 %union {
