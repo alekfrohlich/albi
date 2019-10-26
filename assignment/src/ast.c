@@ -107,7 +107,6 @@ void treefree(struct ast *a)
         struct progcall * prog = ((struct compart *)a)->params;
         
         while (prog != NULL) {
-            printf("%s\n", prog->sym->name);
             struct progcall * aux = prog;
             prog = prog->next;
             // freesymbol(aux->sym);
@@ -120,9 +119,7 @@ void treefree(struct ast *a)
             }
 
             struct explist * explist = aux->exp;
-            printf("next\n");
-            // printf("|%d|\n", aux->exp->type);
-            // PROQUE QUEBRAS AMIGO??
+
             while (explist != NULL) {
                 struct explist * aux_ = explist;
                 explist = explist->next;

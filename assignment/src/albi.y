@@ -101,10 +101,6 @@ exp: exp '+' exp
 									{
 										$$ = newref($1);
 									}
-| %empty							
-									{
-										$$ = NULL;
-									}
 ;
 
 program: PROG VAR '(' symlist ')' ASSIGN '{' list '}' ';'
@@ -196,8 +192,39 @@ proglist: VAR '(' explist ')'
 										$$->list = $6;
 										$$->sym = $1;
 										$$->next = $8;
-										printf("is null = %d\n", $3 == NULL);
 										$$->exp = $3;
+									}
+| VAR '('')' 
+									{ 
+										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
+										$$->list = NULL;
+										$$->sym = $1;
+										$$->next = NULL;
+										$$->exp = NULL;
+									}
+| VAR '('')' SHARE symlist 
+									{
+										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
+										$$->list = $5;
+										$$->sym = $1;
+										$$->next = NULL;
+										$$->exp = NULL;
+									}
+| VAR '(' ')' '+' proglist 
+									{ 
+										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
+										$$->list = NULL;
+										$$->sym = $1;
+										$$->next = $5;
+										$$->exp = NULL;
+									}
+| VAR '(' ')' SHARE symlist '+' proglist 
+									{ 
+										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
+										$$->list = $5;
+										$$->sym = $1;
+										$$->next = $7;
+										$$->exp = NULL;
 									}
 ;
 
