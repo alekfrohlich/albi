@@ -21,8 +21,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "../include/ast.h"
-#include "../include/parsing.h"
+#include "ast.h"
+#include "parsing.h"
 
 struct ast * newast(enum nodetypes type, struct ast *l, struct ast *r)
 {
