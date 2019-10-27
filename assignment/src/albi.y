@@ -35,6 +35,7 @@
 	struct assignlist *assigns;
 	struct explist * expressions;
 	struct progcall *call_params;
+	struct stmtlist * statements;
 }
 
 // declare tokens.
@@ -46,7 +47,8 @@
 %left '+' '-'
 %left '*' '/'
 
-%type <node> exp statement list assignment ecoli
+%type <node> exp statement assignment ecoli
+%type <statements> list;
 %type <symlist_tok> symlist
 %type <assigns> assignment_list
 %type <call_params> proglist
@@ -130,16 +132,16 @@ list: %empty
 | statement list
 									{
 										if ($2 == NULL)
-											$$ = $1;
+											$$ = newstmtlist($1, NULL);
 										else
-											$$ = newast(EXPLIST, $1, $2);
+											$$ = newstmtlist($1, $2);
 									}
 ;
 
 statement: assignment
 | RATE '(' exp ')' ':' '{' assignment_list '}'
 									{
-										// $$ = newrate($3, $7);
+										$$ = newrate($3, $7);
 									}
 ;
 
@@ -149,10 +151,10 @@ assignment_list: %empty
 									}
 | assignment assignment_list
 									{
-										// if ($2 == NULL)
-										// 	$$ = newassignlist((struct symassign *) $1, NULL);
-										// else
-										// 	$$ = newassignlist((struct symassign *) $1, $2);
+										if ($2 == NULL)
+											$$ = newassignlist((struct symassign *) $1, NULL);
+										else
+										 	$$ = newassignlist((struct symassign *) $1, $2);
 									}
 ;
 
@@ -164,67 +166,67 @@ ecoli: ECOLI '(' '[' ']' ',' PROG proglist ')' ';'
 
 proglist: VAR '(' explist ')' 
 									{ 
-										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
-										$$->list = NULL;
-										$$->sym = $1;
-										$$->next = NULL;
-										$$->exp = (struct explist*) $3;
+										$$ = newprogcall(
+										    $1, 
+										    NULL, 
+										    (struct explist*) $3, 
+										    NULL);
 									}
 | VAR '(' explist ')' SHARE symlist 
 									{
-										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
-										$$->list = $6;
-										$$->sym = $1;
-										$$->next = NULL;
-										$$->exp = (struct explist*) $3;
+										$$ = newprogcall(
+										    $1, 
+										    $6, 
+										    (struct explist*) $3, 
+										    NULL);
 									}
 | VAR '(' explist ')' '+' proglist 
 									{ 
-										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
-										$$->list = NULL;
-										$$->sym = $1;
-										$$->next = $6;
-										$$->exp = (struct explist*) $3;
+										$$ = newprogcall(
+										    $1, 
+										    NULL, 
+										    (struct explist*) $3, 
+										    $6);
 									}
 | VAR '(' explist ')' SHARE symlist '+' proglist 
 									{ 
-										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
-										$$->list = $6;
-										$$->sym = $1;
-										$$->next = $8;
-										$$->exp = $3;
+										$$ = newprogcall(
+										    $1, 
+										    $6, 
+										    $3, 
+										    $8);
 									}
 | VAR '('')' 
 									{ 
-										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
-										$$->list = NULL;
-										$$->sym = $1;
-										$$->next = NULL;
-										$$->exp = NULL;
+										$$ = newprogcall(
+										    $1, 
+										    NULL, 
+										    NULL, 
+										    NULL);
 									}
 | VAR '('')' SHARE symlist 
 									{
-										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
-										$$->list = $5;
-										$$->sym = $1;
-										$$->next = NULL;
-										$$->exp = NULL;
+										$$ = newprogcall(
+										    $1, 
+										    $5, 
+										    NULL, 
+										    NULL);
 									}
 | VAR '(' ')' '+' proglist 
 									{ 
-										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
-										$$->list = NULL;
-										$$->sym = $1;
-										$$->next = $5;
-										$$->exp = NULL;
+										$$ = newprogcall(
+										    $1, 
+										    NULL, 
+										    NULL, 
+										    $5);
 									}
 | VAR '(' ')' SHARE symlist '+' proglist 
 									{ 
-										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
-										$$->list = $5;
-										$$->sym = $1;
-										$$->next = $7;
-										$$->exp = NULL;
+										$$ = newprogcall(
+										    $1, 
+										    $5, 
+										    NULL, 
+										    $7);
 									}
 ;
 

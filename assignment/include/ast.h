@@ -37,6 +37,7 @@ enum nodetypes {
     SYM_REF,
     SYM_ASSIGN,
     COMPART,
+    RATESTATEMENT,
 };
 
 // BEGIN AST NODES

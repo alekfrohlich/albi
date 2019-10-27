@@ -74,7 +74,13 @@ struct ast * newassign(struct symbol *sym, struct ast *val)
     return (struct ast *) a;
 }
 
-struct ast *newrate(struct ast* exp, struct assignlist *assigns);
+struct ast *newrate(struct ast* exp, struct assignlist *assigns) {
+    struct rate * r = malloc(sizeof(struct rate));
+    r->assigns = assigns;
+    r->type = RATESTATEMENT;
+
+    return (struct ast *) r;
+}
 
 void treefree(struct ast *a)
 {
@@ -102,32 +108,14 @@ void treefree(struct ast *a)
     case SYM_REF:
         // freesymbol(((struct symref *) a)->sym);
         break;
+    case RATESTATEMENT:
+        ;
+        struct rate * rate = (struct rate *) a;
+        treefree(rate->exp);
+        assignlistfree(rate->assigns);
     case COMPART: // double free problem?
         ;
-        struct progcall * prog = ((struct compart *)a)->params;
-        
-        while (prog != NULL) {
-            struct progcall * aux = prog;
-            prog = prog->next;
-            // freesymbol(aux->sym);
-            struct symlist * list = aux->list;
-            while (list != NULL) {
-                struct symlist * aux_ = list;
-                list = list->next;
-                // freesymbol(aux_->sym);
-                free(aux_);
-            }
-
-            struct explist * explist = aux->exp;
-
-            while (explist != NULL) {
-                struct explist * aux_ = explist;
-                explist = explist->next;
-                if (aux->exp != NULL) treefree(aux_->exp);
-                free(aux_);
-            }
-            free(aux);
-        }
+        progcallfree(((struct compart *)a)->params);
         break;
     case CONSLIT:
         break;
