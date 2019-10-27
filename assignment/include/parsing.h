@@ -23,6 +23,7 @@
 #define __PARSING__
 
 #include "ast.h"
+#include <stdio.h>
 
 // BEGIN INTERMEDIATE NODES
 
@@ -55,20 +56,21 @@ struct stmtlist {
 // END INTERMEDIATE NODES
 
 // forward defined.
-extern struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next);
-extern void assignlistfree(struct assignlist *sl);
+extern void genparam(char *name, struct ast *val);
+extern void gencompart(struct compart* compartment);
+extern void symdef(struct symbol *sym, struct ast *val);
 extern void progdef(struct symbol *name, struct symlist *syms, struct stmtlist *stmts);
-extern double genmodel(struct ast *);
+extern struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next);
 extern struct symlist *newsymlist(struct symbol *sym, struct symlist *next);
-extern void symlistfree(struct symlist *sl);
 extern struct explist *newexplist(struct ast* exp, struct explist* next);
-extern void explistfree(struct explist * el);
 extern struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next);
-extern void stmtlistfree(struct stmtlist * list);
 extern struct progcall *newprogcall();
-extern void progcallfree(struct progcall * prog);
+extern void treefree(struct ast *a);
+
+// toolchain defined.
 extern int yyerror(const char *s);
 extern int yylex(void);
 extern void abort(void);
+extern FILE * yyout;
 
 #endif  // __PARSING__

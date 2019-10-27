@@ -59,7 +59,9 @@
 start_of_prog: %empty
 | start_of_prog assignment
 									{
-										//genmodel();
+										struct symassign *assign = (struct symassign *) $2;
+										symdef(assign->sym, assign->val);
+										genparam(assign->sym->name, assign->val);
 										treefree($2);
 									}
 | start_of_prog program
