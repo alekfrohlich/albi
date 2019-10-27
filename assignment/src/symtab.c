@@ -20,6 +20,7 @@
  */
 
 #include <string.h>
+#include <stdlib.h>
 #include "symtab.h"
 #include "parsing.h"
 
@@ -65,4 +66,10 @@ struct symbol * lookup(char *sym)
     
     yyerror("symbol table overflow\n");
     abort(); // tried them all, table is full.
+}
+
+void freesymbol(struct symbol * sym) {
+    free(sym->name);
+    free(sym->prog);
+    // free(sym);
 }

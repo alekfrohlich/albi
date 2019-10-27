@@ -33,22 +33,26 @@
     struct symbol *sym_tok;   // which symbol?  
     struct symlist *symlist_tok;
 	struct assignlist *assigns;
+	struct explist * expressions;
 	struct progcall *call_params;
+	struct stmtlist * statements;
 }
 
 // declare tokens.
 %token <double_t> NUM
 %token <sym_tok> VAR
-%token ASSIGN PROG RATE SHARE ECOLLI
+%token ASSIGN PROG RATE SHARE ECOLI
 
 %right '='
 %left '+' '-'
 %left '*' '/'
 
-%type <node> exp statement list explist assignment ecolli
+%type <node> exp statement assignment ecoli
+%type <statements> list;
 %type <symlist_tok> symlist
 %type <assigns> assignment_list
 %type <call_params> proglist
+%type <expressions> explist
 
 %%
 
@@ -56,14 +60,16 @@ start_of_prog: %empty
 | start_of_prog assignment
 									{
 										//genmodel();
+										treefree($2);
 									}
 | start_of_prog program
 									{
 										curr_env = 0;
 									}
-| start_of_prog ecolli				
+| start_of_prog ecoli				
 									{
 										//genmodel();
+										treefree($2);
 									}
 ;
 
@@ -123,19 +129,19 @@ list: %empty
 									{
 										$$ = NULL;
 									}
-| statement ';' list
+| statement list
 									{
 										if ($2 == NULL)
-											$$ = $1;
+											$$ = newstmtlist($1, NULL);
 										else
-											$$ = newast(EXPLIST, $1, $2);
+											$$ = newstmtlist($1, $2);
 									}
 ;
 
 statement: assignment
 | RATE '(' exp ')' ':' '{' assignment_list '}'
 									{
-										// $$ = newrate($3, $7);
+										$$ = newrate($3, $7);
 									}
 ;
 
@@ -145,53 +151,95 @@ assignment_list: %empty
 									}
 | assignment assignment_list
 									{
-										// if ($2 == NULL)
-										// 	$$ = newassignlist((struct symassign *) $1, NULL);
-										// else
-										// 	$$ = newassignlist((struct symassign *) $1, $2);
+										if ($2 == NULL)
+											$$ = newassignlist((struct symassign *) $1, NULL);
+										else
+										 	$$ = newassignlist((struct symassign *) $1, $2);
 									}
 ;
 
-ecolli: ECOLLI '(' '[' ']' ',' PROG proglist ')' ';'
+ecoli: ECOLI '(' '[' ']' ',' PROG proglist ')' ';'
 									{
-										// $$ = newcompart(lookup("1"), $7);
+										$$ = newcompart("ECOLI", $7);
 									}
 ;
 
 proglist: VAR '(' explist ')' 
 									{ 
-										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
-										$$->list = NULL;
-										$$->sym = $1;
-										$$->next = NULL;
+										$$ = newprogcall(
+										    $1, 
+										    NULL, 
+										    (struct explist*) $3, 
+										    NULL);
 									}
 | VAR '(' explist ')' SHARE symlist 
 									{
-										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
-										$$->list = $6;
-										$$->sym = $1;
-										$$->next = NULL;
+										$$ = newprogcall(
+										    $1, 
+										    $6, 
+										    (struct explist*) $3, 
+										    NULL);
 									}
 | VAR '(' explist ')' '+' proglist 
 									{ 
-										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
-										$$->list = NULL;
-										$$->sym = $1;
-										$$->next = $6;
+										$$ = newprogcall(
+										    $1, 
+										    NULL, 
+										    (struct explist*) $3, 
+										    $6);
 									}
 | VAR '(' explist ')' SHARE symlist '+' proglist 
 									{ 
-										$$ = (struct progcall *) malloc(sizeof(struct progcall)); 
-										$$->list = $6;
-										$$->sym = $1;
-										$$->next = $8;
+										$$ = newprogcall(
+										    $1, 
+										    $6, 
+										    $3, 
+										    $8);
+									}
+| VAR '('')' 
+									{ 
+										$$ = newprogcall(
+										    $1, 
+										    NULL, 
+										    NULL, 
+										    NULL);
+									}
+| VAR '('')' SHARE symlist 
+									{
+										$$ = newprogcall(
+										    $1, 
+										    $5, 
+										    NULL, 
+										    NULL);
+									}
+| VAR '(' ')' '+' proglist 
+									{ 
+										$$ = newprogcall(
+										    $1, 
+										    NULL, 
+										    NULL, 
+										    $5);
+									}
+| VAR '(' ')' SHARE symlist '+' proglist 
+									{ 
+										$$ = newprogcall(
+										    $1, 
+										    $5, 
+										    NULL, 
+										    $7);
 									}
 ;
 
-explist: exp
+explist: exp 						{
+										if ($1 != NULL) {
+											$$ = newexplist($1, NULL);
+										} else {
+											$$ = NULL;
+										}
+									}
 | exp ',' explist
 									{
-										$$ = newast(EXPLIST, $1, $3);
+										$$ = newexplist($1, $3);
 									}
 ;
 %%

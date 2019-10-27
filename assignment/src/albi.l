@@ -24,6 +24,7 @@
 %{
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "symtab.h"    // lookup, curr_env.
 #include "albi.tab.h"  // tokens, yylval.
 %}
@@ -38,7 +39,7 @@ assignment          ":="
 program_keyword		"program"
 rate_keyword		"rate"
 sharing_keyword     "sharing"
-ecolli_keyword      "ecolli"
+ecoli_keyword      "ecoli"
 ignore              "include gro"
 %%
 
@@ -53,7 +54,7 @@ ignore              "include gro"
                     }
 {rate_keyword}		{ return RATE; }
 {sharing_keyword}   { return SHARE;  }
-{ecolli_keyword}    { return ECOLLI; }
+{ecoli_keyword}    { return ECOLI; }
 
 {float}             { yylval.double_t = atof(yytext); return NUM; }
 {variable}          { yylval.sym_tok = lookup(yytext); return VAR; }

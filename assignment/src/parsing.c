@@ -22,13 +22,84 @@
 #include <stdlib.h>
 #include "parsing.h"
 
-void progdef(struct symbol *name, struct symlist *syms, struct ast *stmts)
+
+void symbolfree(struct symbol * sym) {
+    free(sym->name);
+    free(sym->prog);
+}
+
+void progdef(struct symbol *name, struct symlist *syms, struct stmtlist *stmts)
 {
 
 }
+
+struct progcall *newprogcall(
+    struct symbol* sym, 
+    struct symlist * symlist, 
+    struct explist* explist, 
+    struct progcall* next) 
+{
+    struct progcall * p = (struct progcall *) malloc(sizeof(struct progcall)); 
+    p->sym = sym;
+    p->list = symlist;
+    p->exp = explist;
+    p->next = next;
+}
+
+void progcallfree(struct progcall * prog) {
+    while (prog != NULL) {
+        struct progcall * aux = prog;
+        prog = prog->next;
+        symlistfree(aux->list);
+        explistfree(aux->exp);
+        symbolfree(aux->sym);
+        free(aux);
+    }
+}
+
 double genmodel(struct ast *a)
 {
 
+}
+
+double genmodelprogram(struct ast *a) 
+{
+
+}
+
+
+struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next) {
+    struct stmtlist * sl = (struct stmtlist *) malloc(sizeof(struct stmtlist));
+    sl->stmt = stmt;
+    sl->next = next;
+    return sl;
+}
+
+extern void stmtlistfree(struct stmtlist * l) {
+    while (l != NULL) {
+        struct stmtlist * aux = l;
+        l = l->next;
+        treefree(aux->stmt);
+        free(aux);
+    }
+}
+
+struct symbol* env[2];
+
+struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next) {
+    struct assignlist * al = (struct assignlist *) malloc(sizeof(struct assignlist));
+    al->assign = assign;
+    al->next = next;
+    return al; 
+}
+
+void assignlistfree(struct assignlist *sl) {
+    while (sl != NULL) {
+        struct assignlist * aux = sl;
+        sl = sl->next;
+        treefree((struct ast *) aux->assign);
+        free(aux);
+    }
 }
 
 struct symlist * newsymlist(struct symbol *sym, struct symlist *next)
@@ -41,22 +112,32 @@ struct symlist * newsymlist(struct symbol *sym, struct symlist *next)
     return sl;
 }
 
-struct symbol* env[2];
-
-struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next);
-void assignlistfree(struct assignlist *sl);
-
 void symlistfree(struct symlist *sl)
 {
     struct symlist *nsl;
 
     while(sl)
     {
-        nsl - sl->next;
+        nsl = sl->next;
+        symbolfree(sl->sym);
         free(sl);
         sl = nsl;
     }
 }
 
-struct symlist *newsymlist(struct symbol *sym, struct symlist *next);
-void symlistfree(struct symlist *sl);
+struct explist * newexplist(struct ast* exp, struct explist* next) {
+    struct explist *a = (struct explist *) malloc(sizeof(struct explist));
+    a->exp = exp;
+    a->next = (struct explist*) next;
+    return a;
+}
+
+void explistfree(struct explist * el) 
+{
+    while (el != NULL) {
+        struct explist * aux = el;
+        el = el->next;
+        treefree(aux->exp);
+        free(aux);
+    }
+}

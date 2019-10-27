@@ -26,10 +26,16 @@
 
 // BEGIN INTERMEDIATE NODES
 
+struct explist {
+	struct ast * exp;
+	struct explist * next;
+};
+
 struct progcall {
 	struct symbol * sym;
 	struct progcall * next;
 	struct symlist * list;
+	struct explist * exp;
 };
 
 struct symlist {
@@ -42,15 +48,25 @@ struct assignlist {
     struct assignlist *next;
 };
 
+struct stmtlist {
+	struct ast * stmt;
+	struct stmtlist * next;
+};
 // END INTERMEDIATE NODES
 
 // forward defined.
 extern struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next);
 extern void assignlistfree(struct assignlist *sl);
-extern void progdef(struct symbol *name, struct symlist *syms, struct ast *stmts);
+extern void progdef(struct symbol *name, struct symlist *syms, struct stmtlist *stmts);
 extern double genmodel(struct ast *);
 extern struct symlist *newsymlist(struct symbol *sym, struct symlist *next);
 extern void symlistfree(struct symlist *sl);
+extern struct explist *newexplist(struct ast* exp, struct explist* next);
+extern void explistfree(struct explist * el);
+extern struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next);
+extern void stmtlistfree(struct stmtlist * list);
+extern struct progcall *newprogcall();
+extern void progcallfree(struct progcall * prog);
 extern int yyerror(const char *s);
 extern int yylex(void);
 extern void abort(void);

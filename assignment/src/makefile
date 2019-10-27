@@ -22,21 +22,22 @@
 # C source files.
 C_SRC = $(wildcard *.c)
 
-# Lexer file.
-L_SRC = albi.l
-
-# Parser file.
-Y_SRC = albi.y
-
+# Additional compiler flags.
 CFLAGS += -lm
 
-all: $(C_SRC) $(L_SRC) $(Y_SRC)
-	flex -o albi.yy.c $(L_SRC)
-	bison -d $(Y_SRC)
-	gcc $(CFLAGS) $(C_SRC) -o albi
+all: albi
+
+albi.tab.c albi.tab.h: albi.y
+	bison -d $<
+
+albi.yy.c: albi.l albi.tab.h
+	flex -o $@ $<
+
+albi: $(C_SRC) albi.yy.c albi.tab.c
+	gcc $^ $(CFLAGS) -o translator
 
 .PHONY: clean
 
 clean:
-	@rm -f albi.tab.* albi.yy.c albi
+	@rm -f albi.tab.* albi.yy.c translator
 	@rm -f parsed.intermediate

@@ -37,6 +37,7 @@ enum nodetypes {
     SYM_REF,
     SYM_ASSIGN,
     COMPART,
+    RATESTATEMENT,
 };
 
 // BEGIN AST NODES
@@ -55,8 +56,8 @@ struct ast {
  */
 struct compart {
  	enum nodetypes type;
-    struct symbol *sym;
-    struct progcall *params;  
+    char *sym;
+    struct progcall *params;
 };
 
 /**
@@ -85,7 +86,7 @@ struct symassign {
 };
 
 /**
- * Symbol assignment node.
+ * rate expresion node.
  */
 struct rate {
 	enum nodetypes type;
@@ -97,7 +98,7 @@ struct rate {
 
 // forward defined.
 extern struct ast *newast(enum nodetypes type, struct ast *l, struct ast *r);
-extern struct ast *newcompart(struct symbol *sym, struct progcall *params);
+extern struct ast *newcompart(char *sym, struct progcall *params);
 extern struct ast *newnum(double d);
 extern struct ast *newref(struct symbol *sym);
 extern struct ast *newassign(struct symbol *s, struct ast *v);
