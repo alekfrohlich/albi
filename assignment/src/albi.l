@@ -39,7 +39,7 @@ assignment          ":="
 program_keyword		"program"
 rate_keyword		"rate"
 sharing_keyword     "sharing"
-ecoli_keyword      "ecoli"
+ecoli_keyword       "ecoli"
 ignore              "include gro"
 %%
 
@@ -54,7 +54,7 @@ ignore              "include gro"
                     }
 {rate_keyword}		{ return RATE; }
 {sharing_keyword}   { return SHARE;  }
-{ecoli_keyword}    { return ECOLI; }
+{ecoli_keyword}     { return ECOLI; }
 
 {float}             { yylval.double_t = atof(yytext); return NUM; }
 {variable}          { yylval.sym_tok = lookup(yytext); return VAR; }

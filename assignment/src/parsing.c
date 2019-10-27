@@ -23,7 +23,7 @@
 #include "parsing.h"
 
 struct symbol* env[2];
-static int currentcount = 0;
+static int curr_compart = 0;
 
 static double eval(struct ast *a)
 {
@@ -55,6 +55,16 @@ static double eval(struct ast *a)
     return v;
 }
 
+static void mergeprograms(
+    struct program* programs,
+    struct symlist** export,
+    struct explist** params,
+    int size,
+    char * id)
+ {
+ 
+ }
+
 void symdef(struct symbol *sym, struct ast *val)
 {
     sym->value = eval(val);
@@ -69,11 +79,37 @@ void genparam(char *name, struct ast *val)
 {
     fprintf(yyout, "%s = %0.4lf;\n", name, eval(val));
 }
-
-void gencompart(struct compart *compartment) 
+ 
+void gencompart(struct compart * compartment) 
 {
+    curr_compart++;
+    // struct progcall * call = compartment->params;
 
+    // int size = 0;
+    // while (call != NULL) {
+    //     call = call->next;
+    //     size++;
+    // }
+
+    // struct program * prog[size];
+    // struct symlist * export[size];
+    // struct explist * params[size];
+
+    // call  = compartment->params;
+    // int index = 0;
+    // while (call != NULL) {
+    //     struct progcall * aux = call;
+    //     call = call->next;
+    //     prog[index] = lookup(call->sym->name)->prog;
+    //     export[index] = call->list;
+    //     params[index] = call->exp;
+    //     index++;
+    // }
+    
+    // char * id = strcat(compartment->sym, itoa(curr_compart, 10));
+    // mergeprograms(prog, export, params, size, compartment->sym);
 }
+// PARSING STRUCTURES INITIALIZATION.
 
 struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next)
 {
