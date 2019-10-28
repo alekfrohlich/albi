@@ -20,6 +20,8 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include "parsing.h"
 #include "program.h"
 
@@ -79,7 +81,7 @@ void progdef(struct symbol *name, struct symlist *syms, struct stmtlist * stmts)
     struct program * program = (struct program *) malloc(sizeof(struct program));
 
     /**
-     * Change parsing context.
+     * Store parsing context.
      */
     program->symtab = env[curr_env];
     
@@ -106,33 +108,33 @@ void genparam(char *name, struct ast *val)
  
 void gencompart(struct compart * compartment) 
 {
-    curr_compart++;
-    struct progcall * call = compartment->params;
+    // curr_compart++;
+    // struct progcall * call = compartment->params;
 
-    int size = 0;
-    while (call != NULL)
-    {
-        call = call->next;
-        size++;
-    }
+    // int size = 0;
+    // while (call != NULL)
+    // {
+    //     call = call->next;
+    //     size++;
+    // }
 
-    struct program * prog[size];
-    struct symlist * export[size];
-    struct explist * params[size];
+    // struct program * prog[size];
+    // struct symlist * export[size];
+    // struct explist * params[size];
 
-    call  = compartment->params;
-    int index = 0;
-    while (call != NULL) {
-        struct progcall * aux = call;
-        call = call->next;
-        prog[index] = lookup(call->sym->name)->prog;
-        export[index] = call->list;
-        params[index] = call->exp;
-        index++;
-    }
+    // call  = compartment->params;
+    // int index = 0;
+    // while (call != NULL) {
+    //     struct progcall * aux = call;
+    //     call = call->next;
+    //     prog[index] = lookup(call->sym->name)->prog;
+    //     export[index] = call->list;
+    //     params[index] = call->exp;
+    //     index++;
+    // }
     
-    char * id = strcat(compartment->sym, itoa(curr_compart, 10));
-    mergeprograms(prog, export, params, size, compartment->sym);
+    // char * id = strcat(compartment->sym, itoa(curr_compart, 10));
+    // mergeprograms(prog, export, params, size, compartment->sym);
 }
 
 // PARSING STRUCTURES INITIALIZATION.

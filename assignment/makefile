@@ -22,9 +22,9 @@
 .PHONY: albi test
 
 # Directories.
-export INCDIR   = $(CURDIR)/include
-export SRCDIR   = $(CURDIR)/src
-export GRODIR   = $(CURDIR)/gro
+export INCDIR  = $(CURDIR)/include
+export SRCDIR  = $(CURDIR)/src
+export GRODIR  = $(CURDIR)/gro
 
 # Gro translator.
 export TRANSLATOR = $(SRCDIR)/translator
@@ -33,17 +33,21 @@ export TRANSLATOR = $(SRCDIR)/translator
 export CFLAGS   = -g -I $(INCDIR)
 
 # Deny make calls to sub-makefikes.
-export PERMITED = 1 
+export PERMITED = 1
+
+# Albi input's file name.
+ALBI_SRC = $(patsubst $(GRODIR)/%, %, $(gro))
 
 # Test macro
-DOTEST = $(TRANSLATOR) $(gro)
+DOTEST = ($(TRANSLATOR) $(gro) $(ALBI_SRC)) || (echo "TEST $(ALBI_SRC) FAILED!"; exit 1);
 
 # Builds the parser.
 albi:
 	cd $(SRCDIR) && $(MAKE) all
 
 test: albi
-	$(foreach gro, $(wildcard $(GRODIR)/*.gro), $(DOTEST))
+	@$(foreach gro, $(wildcard $(GRODIR)/*.gro), $(DOTEST))
+	@echo "SUCCESS!"
 
 # Cleans compilation files.
 clean:

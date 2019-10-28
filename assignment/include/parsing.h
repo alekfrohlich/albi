@@ -53,6 +53,7 @@ struct stmtlist {
 	struct ast * stmt;
 	struct stmtlist * next;
 };
+
 // END INTERMEDIATE NODES
 
 // forward defined.

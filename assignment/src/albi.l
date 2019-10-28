@@ -28,6 +28,7 @@
 #include "symtab.h"    // lookup, curr_env.
 #include "albi.tab.h"  // tokens, yylval.
 
+// Bison location.
 int yycolumn = 1;
 #define YY_USER_ACTION \
     yylloc.first_line = yylloc.last_line = yylineno; \
@@ -84,6 +85,9 @@ ignore              "include gro"
 
 %%
 
+// Current yyin file name.
+char *filename;
+
 /**
  * Entry point.
  */
@@ -91,15 +95,29 @@ int main(int argc, char **argv)
 {
     yyin = fopen(argv[1],"r");
     yyout = fopen("parsed.intermediate", "w");
-    
+    filename = argv[2];
+
 	yyparse();
 }
 
+/**
+ * Display error message and exit.
+ */
 int yyerror(const char *s)
 {
+    #define ERROR_RED(s)    fprintf(stderr, "\033[1;31m%s\033[0m", s)
+    #define BEGIN_BOLD      fprintf(stderr, "\033[1;80m")
+    #define COLOR_RESET     fprintf(stderr, "\033[0m")
+
     if (yylloc.first_line)
-        fprintf(stderr, "[%d-%d,%d-%d]: ", yylloc.first_line,
+    {
+        BEGIN_BOLD;
+        fprintf(stderr, "%s:[%d-%d,%d-%d]: ", filename, yylloc.first_line,
             yylloc.first_column, yylloc.last_line, yylloc.last_column);
+        COLOR_RESET;
+    }
+
+    ERROR_RED("error: ");
     fprintf(stderr, "%s.\n", s);
     exit(-1);
 }
