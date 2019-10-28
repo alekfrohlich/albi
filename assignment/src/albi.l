@@ -27,6 +27,12 @@
 #include <stdio.h>
 #include "symtab.h"    // lookup, curr_env.
 #include "albi.tab.h"  // tokens, yylval.
+
+int yycolumn = 1;
+#define YY_USER_ACTION \
+    yylloc.first_line = yylloc.last_line = yylineno; \
+    yylloc.first_column = yycolumn; yylloc.last_column = yycolumn+yyleng-1; \
+    yycolumn += yyleng;
 %}
 
 white               [ \t]+
@@ -43,7 +49,6 @@ ecoli_keyword       "ecoli"
 ignore              "include gro"
 %%
 
-"\n"                { } 
 {white}             { }
 {ignore}            { }
 
@@ -64,6 +69,8 @@ ignore              "include gro"
 ";"                 |
 "+"					|
 "-"					|
+"*"                 |
+"/"                 |
 "[" 				|
 "]"					|
 "("                 |
@@ -72,6 +79,7 @@ ignore              "include gro"
 "{"					|
 "}"					{ return yytext[0]; }
 
+"\n"                { yycolumn = 1; }
 .                   { }
 
 %%
@@ -89,5 +97,9 @@ int main(int argc, char **argv)
 
 int yyerror(const char *s)
 {
-    fprintf(stderr, "error: %s on line %d\n", s, yylineno);
+    if (yylloc.first_line)
+        fprintf(stderr, "[%d-%d,%d-%d]: ", yylloc.first_line,
+            yylloc.first_column, yylloc.last_line, yylloc.last_column);
+    fprintf(stderr, "%s.\n", s);
+    exit(-1);
 }

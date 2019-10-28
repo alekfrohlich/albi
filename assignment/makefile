@@ -19,20 +19,33 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
 #
 
+.PHONY: albi test
+
 # Directories.
 export INCDIR   = $(CURDIR)/include
 export SRCDIR   = $(CURDIR)/src
 export GRODIR   = $(CURDIR)/gro
 
+# Gro translator.
+export TRANSLATOR = $(SRCDIR)/translator
+
 # Toolchain configuration.
 export CFLAGS   = -g -I $(INCDIR)
 
-.PHONY: albi
+# Deny make calls to sub-makefikes.
+export PERMITED = 1 
+
+# Test macro
+DOTEST = $(TRANSLATOR) $(gro)
 
 # Builds the parser.
 albi:
 	cd $(SRCDIR) && $(MAKE) all
 
+test: albi
+	$(foreach gro, $(wildcard $(GRODIR)/*.gro), $(DOTEST))
+
 # Cleans compilation files.
 clean:
 	cd $(SRCDIR) && $(MAKE) clean
+	@rm -f parsed.intermediate

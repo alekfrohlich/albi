@@ -25,6 +25,11 @@ C_SRC = $(wildcard *.c)
 # Additional compiler flags.
 CFLAGS += -lm
 
+ifndef PERMITED
+$(error Do not execute this makefile directly, \
+	please run make from the root directory!)
+endif
+
 all: albi
 
 albi.tab.c albi.tab.h: albi.y
@@ -40,4 +45,3 @@ albi: $(C_SRC) albi.yy.c albi.tab.c
 
 clean:
 	@rm -f albi.tab.* albi.yy.c translator
-	@rm -f parsed.intermediate
