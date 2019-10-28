@@ -72,7 +72,7 @@ start_of_prog: %empty
 									}
 | start_of_prog ecoli				
 									{
-										//genmodel();
+										gencompart((struct compart *) $2);
 										treefree($2);
 									}
 ;

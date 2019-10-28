@@ -21,7 +21,7 @@
 
 #include <stdlib.h>
 #include "parsing.h"
-#include "structures.h"
+#include "program.h"
 
 struct symbol* env[2];
 static int curr_compart = 0;
@@ -125,6 +125,7 @@ void gencompart(struct compart * compartment)
     // char * id = strcat(compartment->sym, itoa(curr_compart, 10));
     // mergeprograms(prog, export, params, size, compartment->sym);
 }
+
 // PARSING STRUCTURES INITIALIZATION.
 
 struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next)

@@ -48,4 +48,3 @@ test: albi
 # Cleans compilation files.
 clean:
 	cd $(SRCDIR) && $(MAKE) clean
-	@rm -f parsed.intermediate

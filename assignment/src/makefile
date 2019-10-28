@@ -45,3 +45,4 @@ albi: $(C_SRC) albi.yy.c albi.tab.c
 
 clean:
 	@rm -f albi.tab.* albi.yy.c translator
+	@rm -f parsed.intermediate
