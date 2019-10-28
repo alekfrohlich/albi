@@ -53,11 +53,7 @@ ignore              "include gro"
 {white}             { }
 {ignore}            { }
 
-{program_keyword}	{ 
-                        env[1] = (struct symbol *) malloc(sizeof(struct symbol) * SYMTAB_SIZE);
-                        curr_env = 1;
-                        return PROG;
-                    }
+{program_keyword}	{ return PROG; }
 {rate_keyword}		{ return RATE; }
 {sharing_keyword}   { return SHARE;  }
 {ecoli_keyword}     { return ECOLI; }

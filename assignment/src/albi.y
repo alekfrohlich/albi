@@ -51,7 +51,8 @@
 %left '*' '/'
 
 %type <node> exp statement assignment ecoli
-%type <statements> list;
+%type <statements> list
+%type <sym_tok> progdef
 %type <symlist_tok> symlist
 %type <assigns> assignment_list
 %type <callparams> proglist
@@ -110,13 +111,20 @@ exp: exp '+' exp
 									}
 ;
 
-program: PROG VAR '(' symlist ')' ASSIGN '{' list '}' ';'
+program: progdef '(' symlist ')' ASSIGN '{' list '}' ';'
 									{
-										progdef($2, $4, $8);
+										progdef($1, $3, $7);
 									}
-| PROG VAR '(' ')' ASSIGN '{' list '}' ';'
+| progdef '(' ')' ASSIGN '{' list '}' ';'
 									{
-										progdef($2, NULL, $7);
+										progdef($1, NULL, $6);
+									}
+;
+
+progdef: PROG VAR
+									{
+										env[1] = (struct symbol *) malloc(sizeof(struct symbol) * SYMTAB_SIZE);
+										curr_env = 1;
 									}
 ;
 
