@@ -21,6 +21,7 @@
 
 #include <stdlib.h>
 #include "parsing.h"
+#include "structures.h"
 
 struct symbol* env[2];
 static int curr_compart = 0;
@@ -70,9 +71,24 @@ void symdef(struct symbol *sym, struct ast *val)
     sym->value = eval(val);
 }
 
-void progdef(struct symbol *name, struct symlist *syms, struct stmtlist *stmts)
+void progdef(struct symbol *name, struct symlist *syms, struct stmtlist * stmts)
 {
+    struct program * program = (struct program *) malloc(sizeof(struct program));
+    
+    // program->depedences = syms;
 
+    struct stmtlist * iter = stmts;
+    while (iter != NULL) {
+        if (iter->stmt->type == SYM_ASSIGN) {
+            declare_parameter(program, (struct symassign *) iter->stmt);
+        } else if (iter->stmt->type == RATESTATEMENT) {
+            newreaction(program, (struct rate *) iter->stmt);
+        } else {
+            //incorrect format
+            //GENERATE ERROR
+        }
+        iter = iter->next;
+    }
 }
 
 void genparam(char *name, struct ast *val)
