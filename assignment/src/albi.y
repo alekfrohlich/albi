@@ -27,6 +27,7 @@
 #include "ast.h"
 #include "symtab.h"
 #include "parsing.h"
+#include "program.h"
 %}
 
 %union {
@@ -36,7 +37,7 @@
     struct symlist *symlist_tok;
 	struct assignlist *assigns;
 	struct explist * expressions;
-	struct progcall *call_params;
+	struct calllist *callparams;
 	struct stmtlist * statements;
 }
 
@@ -53,7 +54,7 @@
 %type <statements> list;
 %type <symlist_tok> symlist
 %type <assigns> assignment_list
-%type <call_params> proglist
+%type <callparams> proglist
 %type <expressions> explist
 
 %%
@@ -170,7 +171,7 @@ ecoli: ECOLI '(' '[' ']' ',' PROG proglist ')' ';'
 
 proglist: VAR '(' explist ')' 
 									{ 
-										$$ = newprogcall(
+										$$ = newcalllist(
 										    $1, 
 										    NULL, 
 										    (struct explist*) $3, 
@@ -178,7 +179,7 @@ proglist: VAR '(' explist ')'
 									}
 | VAR '(' explist ')' SHARE symlist 
 									{
-										$$ = newprogcall(
+										$$ = newcalllist(
 										    $1, 
 										    $6, 
 										    (struct explist*) $3, 
@@ -186,7 +187,7 @@ proglist: VAR '(' explist ')'
 									}
 | VAR '(' explist ')' '+' proglist 
 									{ 
-										$$ = newprogcall(
+										$$ = newcalllist(
 										    $1, 
 										    NULL, 
 										    (struct explist*) $3, 
@@ -194,7 +195,7 @@ proglist: VAR '(' explist ')'
 									}
 | VAR '(' explist ')' SHARE symlist '+' proglist 
 									{ 
-										$$ = newprogcall(
+										$$ = newcalllist(
 										    $1, 
 										    $6, 
 										    $3, 
@@ -202,7 +203,7 @@ proglist: VAR '(' explist ')'
 									}
 | VAR '('')' 
 									{ 
-										$$ = newprogcall(
+										$$ = newcalllist(
 										    $1, 
 										    NULL, 
 										    NULL, 
@@ -210,7 +211,7 @@ proglist: VAR '(' explist ')'
 									}
 | VAR '('')' SHARE symlist 
 									{
-										$$ = newprogcall(
+										$$ = newcalllist(
 										    $1, 
 										    $5, 
 										    NULL, 
@@ -218,7 +219,7 @@ proglist: VAR '(' explist ')'
 									}
 | VAR '(' ')' '+' proglist 
 									{ 
-										$$ = newprogcall(
+										$$ = newcalllist(
 										    $1, 
 										    NULL, 
 										    NULL, 
@@ -226,7 +227,7 @@ proglist: VAR '(' explist ')'
 									}
 | VAR '(' ')' SHARE symlist '+' proglist 
 									{ 
-										$$ = newprogcall(
+										$$ = newcalllist(
 										    $1, 
 										    $5, 
 										    NULL, 

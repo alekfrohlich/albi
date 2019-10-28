@@ -34,7 +34,7 @@ struct program {
     struct assignlist * species;
 	struct assignlist * locals;
 
-	struct symlist * dependence;
+	struct symlist * dependence;  // ignored.
 
 	struct reactionlist * reactions;
     int reactions_size;
@@ -51,8 +51,10 @@ struct reaction {
     struct ast * rate;
 };
 
-int empty_dependencies(struct program * program);
-void newreaction(struct program *, struct rate *);
-void declare_parameter(struct program * program, struct symassign * assign);
-
+extern void progdef(struct symbol *name, struct symlist *syms, struct stmtlist *stmts);
+extern void mergeprograms(
+    struct symbol** progrefs,
+    struct symlist** export,
+    struct explist** params,
+    int size);
 #endif  // __PROGRAM__

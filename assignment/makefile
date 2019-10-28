@@ -39,7 +39,8 @@ export PERMITED = 1
 ALBI_SRC = $(patsubst $(GRODIR)/%, %, $(gro))
 
 # Test macro
-DOTEST = ($(TRANSLATOR) $(gro) $(ALBI_SRC)) || (echo "TEST $(ALBI_SRC) FAILED!"; exit 1);
+DOTEST = ($(TRANSLATOR) $(gro) $(ALBI_SRC)) \
+		 || (echo "TEST $(ALBI_SRC) FAILED!"; exit 1);
 
 # Builds the parser.
 albi:

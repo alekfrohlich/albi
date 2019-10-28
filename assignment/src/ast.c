@@ -35,7 +35,7 @@ struct ast * newast(enum nodetypes type, struct ast *l, struct ast *r)
     return a;
 }
 
-struct ast *newcompart(char *sym, struct progcall *params) {
+struct ast *newcompart(char *sym, struct calllist *params) {
     struct compart *a = malloc(sizeof(struct compart*));
     a->type = COMPART;
     a->sym = sym;

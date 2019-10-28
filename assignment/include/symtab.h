@@ -33,9 +33,13 @@ struct symbol {
     struct program *prog;
 };
 
+struct ast;
+
 // forward defined.
 extern struct symbol* env[2];
 extern int curr_env;
-extern struct symbol *lookup(char *);
-void freesymbol(struct symbol * sym);
+extern struct symbol *lookup(char *sym);
+extern void symdef(struct symbol *sym, struct ast *val);
+extern void freesymbol(struct symbol * sym);
+
 #endif  // __SYMTAB__

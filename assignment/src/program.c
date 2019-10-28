@@ -23,10 +23,74 @@
 #include <stdio.h>
 #include <string.h>
 #include "program.h"
+#include "structures.h"
 
+// Begin Output
+static void printspecies(struct assignlist * species, struct maplist * map, char * compart)
+{
+    //DECLARE VALUES
+    struct assignlist * specie = species;
+    while (specie != NULL) {
+        printf("Specie %s in %s\n", getmap(map, specie->assign->sym->name), compart);
+        specie = specie->next;
+    }
+
+    //PRINT VALUES
+    specie = species;
+    while (specie != NULL) {
+        printf("%s = %0.4lf\n", getmap(map, specie->assign->sym->name), specie->assign->sym->value);
+        specie = specie->next;
+    }
+}
+
+static void printlocals(struct assignlist* locals, struct maplist * map, char * compart) {
+    //DECLARE VALUES
+    struct assignlist * local = locals;
+    while (local != NULL) {
+        printf("var %s in %s\n", getmap(map, local->assign->sym->name), compart);
+        local = local->next;        
+    }
+
+    //PRINT VALUES
+    local = locals;
+    while (local != NULL) {
+        printf("%s = %0.4lf\n", getmap(map, local->assign->sym->name), local->assign->sym->value);
+        local = local->next;
+    }
+}
+
+static void printreaction(struct reaction * reac, struct maplist * map) {
+    struct assignlist * reactant = reac->reactant;
+    struct assignlist * product = reac->product;
+    int first = 1;
+    while (reactant != NULL) {
+        if (!first)
+            printf(" ");
+        else
+            first = 0;
+        printf("%s", getmap(map, reactant->assign->sym->name));
+        reactant = reactant->next;
+    }
+    printf("-> ");
+    while (product != NULL) {
+        printf("%s", getmap(map, product->assign->sym->name));
+
+        if(product->next != NULL)
+            printf(" ");
+        product = product->next;
+    }
+    printf("; %s;\n", "RATE");
+}
+
+static void printreactionlist(struct reactionlist * reactions, struct maplist* map) {
+    struct reactionlist * element = reactions;
+    while (element != NULL) {
+        printreaction(element->reac, map);
+        element = element->next;
+    }
+}
 
 // BEGIN PRIVATE INTERFACE.
-
 
 /**
  * Move a specie from local's list to
@@ -103,15 +167,27 @@ static struct reactionlist * newreactionlist(struct reaction * reaction, struct 
 
 // BEGIN PUBLIC INTERFACE.
 
+static void push_parameter(struct program * program, struct assignlist * local)
+{
+    local->next = program->locals;
+    program->locals = local;
+}
+
+static void push_specie(struct program * program, struct assignlist * specie)
+{
+    specie->next = program->species;
+    program->species = specie;
+}
+
 /**
  * Merged succesfully?
  */
-int empty_dependencies(struct program * program)
+static int empty_dependencies(struct program * program)
 {
 	return program->dependence == NULL;
 }
 
-void declare_parameter(struct program * program, struct symassign * assign)
+static void declare_parameter(struct program * program, struct symassign * assign)
 {
     struct assignlist * locals = program->locals;
 
@@ -122,7 +198,7 @@ void declare_parameter(struct program * program, struct symassign * assign)
 /**
  * Add new reaction to program's reaction list.
  */
-void newreaction(struct program * program, struct rate * rate)
+static void newreaction(struct program * program, struct rate * rate)
 {
     struct reaction * reac = (struct reaction *) malloc(sizeof(struct reaction));
  
@@ -156,5 +232,103 @@ void newreaction(struct program * program, struct rate * rate)
         {
             yyerror("Invalid expression");
         }
+    }
+}
+
+static char *namemergedvar(char *progname, char * varname)
+{
+    char *name = (char *) malloc(100);
+    char *count = (char *) malloc(20);
+
+    snprintf(count, 20, "%d", curr_compart);
+    strcat(name, "ECOLI");
+    strcat(name, count);
+    strcat(name, "_");
+    strcat(name, progname);
+    strcat(name, "_");
+    strcat(name, varname);
+
+    return name;
+}
+
+/**
+ * 
+ * 
+ * 
+ * 
+ */
+void mergeprograms(
+    struct symbol** progrefs,
+    struct symlist** export,
+    struct explist** params,
+    int size)
+ {
+    struct maplist ** map = (struct maplist **) malloc(sizeof(struct maplist*)*size);
+
+    for (int i = 0; i < size; i++)
+    {
+        struct program *prog = progrefs[i]->prog;
+
+        for (struct assignlist * specie = prog->species; specie != NULL;
+             specie = specie->next)
+        {
+            char *name = namemergedvar(progrefs[i]->name, specie->assign->sym->name);
+            map[i] = newmaplist(specie->assign->sym->name, name, map[i]);
+        }
+
+        for (struct assignlist * local = prog->locals; local != NULL;
+               local = local->next)
+        {
+            char * name = namemergedvar(progrefs[i]->name, local->assign->sym->name);
+            map[i] = newmaplist(local->assign->sym->name, name, map[i]);
+        }
+
+        printspecies(prog->species, map[i], "ECOLIE");
+        printlocals(prog->locals, map[i], "ECOLIE");
+    }
+
+    for (int i = 0; i < size; i++) {
+        struct program * prog = progrefs[i]->prog;
+        printreactionlist(prog->reactions, map[i]);
+    }
+ }
+
+ /**
+ * Define new program.
+ */
+void progdef(struct symbol *name, struct symlist *syms, struct stmtlist * stmts)
+{
+    struct program * program = (struct program *) malloc(sizeof(struct program));
+
+    /**
+     * Store parsing context.
+     */
+    program->symtab = env[curr_env];
+
+    /**
+     * Save formal parameters.
+     */
+    program->parameters = syms;
+
+    struct stmtlist * iter = stmts;
+    while (iter != NULL)
+    {
+        if (iter->stmt->type == SYM_ASSIGN)
+        {
+            declare_parameter(program, (struct symassign *) iter->stmt);
+        }
+        
+        else if (iter->stmt->type == RATESTATEMENT)
+        {
+            newreaction(program, (struct rate *) iter->stmt);
+        }
+        
+        else
+        {
+            //incorrect format
+            //GENERATE ERROR
+        }
+    
+        iter = iter->next;
     }
 }

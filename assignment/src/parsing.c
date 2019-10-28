@@ -26,9 +26,12 @@
 #include "program.h"
 
 struct symbol* env[2];
-static int curr_compart = 0;
+int curr_compart = 0;
 
-static double eval(struct ast *a)
+/**
+ * Evaluate arithmetic expression tree.
+ */
+double eval(struct ast *a)
 {
     double v;
 
@@ -58,48 +61,7 @@ static double eval(struct ast *a)
     return v;
 }
 
-static void mergeprograms(
-    struct program* programs,
-    struct symlist** export,
-    struct explist** params,
-    int size,
-    char * id)
- {
- 
- }
-
-void symdef(struct symbol *sym, struct ast *val)
-{
-    sym->value = eval(val);
-}
-
-/**
- * Define new program.
- */
-void progdef(struct symbol *name, struct symlist *syms, struct stmtlist * stmts)
-{
-    struct program * program = (struct program *) malloc(sizeof(struct program));
-
-    /**
-     * Store parsing context.
-     */
-    program->symtab = env[curr_env];
-    
-    // program->depedences = syms;
-
-    struct stmtlist * iter = stmts;
-    while (iter != NULL) {
-        if (iter->stmt->type == SYM_ASSIGN) {
-            declare_parameter(program, (struct symassign *) iter->stmt);
-        } else if (iter->stmt->type == RATESTATEMENT) {
-            newreaction(program, (struct rate *) iter->stmt);
-        } else {
-            //incorrect format
-            //GENERATE ERROR
-        }
-        iter = iter->next;
-    }
-}
+// SBML GENERATION FUNCTIONS.
 
 void genparam(char *name, struct ast *val)
 {
@@ -108,33 +70,33 @@ void genparam(char *name, struct ast *val)
  
 void gencompart(struct compart * compartment) 
 {
-    // curr_compart++;
-    // struct progcall * call = compartment->params;
+    curr_compart++;
+    struct calllist * call = compartment->params;
 
-    // int size = 0;
-    // while (call != NULL)
-    // {
-    //     call = call->next;
-    //     size++;
-    // }
+    int size = 0;
+    while (call != NULL)
+    {
+        call = call->next;
+        size++;
+    }
 
-    // struct program * prog[size];
-    // struct symlist * export[size];
-    // struct explist * params[size];
+    struct symbol * prog[size];
+    struct symlist * export[size];
+    struct explist * params[size];
 
-    // call  = compartment->params;
-    // int index = 0;
-    // while (call != NULL) {
-    //     struct progcall * aux = call;
-    //     call = call->next;
-    //     prog[index] = lookup(call->sym->name)->prog;
-    //     export[index] = call->list;
-    //     params[index] = call->exp;
-    //     index++;
-    // }
+    call  = compartment->params;
+    int index = 0;
+    while (call != NULL)
+    {
+        struct calllist * aux = call;
+        call = call->next;
+        prog[index] = aux->sym;
+        export[index] = aux->list;
+        params[index] = aux->exp;
+        index++;
+    }
     
-    // char * id = strcat(compartment->sym, itoa(curr_compart, 10));
-    // mergeprograms(prog, export, params, size, compartment->sym);
+    mergeprograms(prog, export, params, size);
 }
 
 // PARSING STRUCTURES INITIALIZATION.
@@ -158,10 +120,8 @@ struct assignlist *newassignlist(struct symassign *assign, struct assignlist *ne
 struct symlist * newsymlist(struct symbol *sym, struct symlist *next)
 {
     struct symlist *sl = malloc(sizeof(struct symlist));
-
     sl->sym = sym;
     sl->next = next;
-
     return sl;
 }
 
@@ -173,13 +133,13 @@ struct explist * newexplist(struct ast* exp, struct explist* next)
     return a;
 }
 
-struct progcall *newprogcall(
+struct calllist *newcalllist(
     struct symbol* sym, 
     struct symlist * symlist, 
     struct explist* explist, 
-    struct progcall* next) 
+    struct calllist* next) 
 {
-    struct progcall * p = (struct progcall *) malloc(sizeof(struct progcall)); 
+    struct calllist * p = (struct calllist *) malloc(sizeof(struct calllist)); 
     p->sym = sym;
     p->list = symlist;
     p->exp = explist;
@@ -188,12 +148,6 @@ struct progcall *newprogcall(
 
 // FREE PARSING STRUCTURES.
 
-static void symbolfree(struct symbol * sym)
-{
-    free(sym->name);
-    free(sym->prog);
-}
-
 static void symlistfree(struct symlist *sl)
 {
     struct symlist *nsl;
@@ -201,7 +155,6 @@ static void symlistfree(struct symlist *sl)
     while(sl)
     {
         nsl = sl->next;
-        symbolfree(sl->sym);
         free(sl);
         sl = nsl;
     }
@@ -237,14 +190,13 @@ static void stmtlistfree(struct stmtlist * l)
     }
 }
 
-static void progcallfree(struct progcall * prog)
+static void calllistfree(struct calllist * prog)
 {
     while (prog != NULL) {
-        struct progcall * aux = prog;
+        struct calllist * aux = prog;
         prog = prog->next;
         symlistfree(aux->list);
         explistfree(aux->exp);
-        symbolfree(aux->sym);
         free(aux);
     }
 }
@@ -253,7 +205,6 @@ void treefree(struct ast *a)
 {
     switch (a->type)
     {
-
     // two subtrees.
     case PLUS:
     case MINUS:
@@ -262,18 +213,18 @@ void treefree(struct ast *a)
         treefree(a->left);
         treefree(a->right);
         break;
+
     // one subtree.
     case SYM_ASSIGN:
         treefree(((struct symassign*)a)->val);
-        // freesymbol(((struct symassign *) a)->sym);
         break;
     case EXPLIST:
         treefree(a->left);
         treefree(a->right);
         break;
+
     // no subtree.
     case SYM_REF:
-        // freesymbol(((struct symref *) a)->sym);
         break;
     case RATESTATEMENT:
         ;
@@ -282,10 +233,11 @@ void treefree(struct ast *a)
         assignlistfree(rate->assigns);
     case COMPART: // double free problem?
         ;
-        progcallfree(((struct compart *)a)->params);
+        calllistfree(((struct compart *)a)->params);
         break;
     case CONSLIT:
         break;
+
     default:
         printf("internal error: bad node %c\n", a->type);
     }

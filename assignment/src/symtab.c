@@ -24,52 +24,111 @@
 #include "symtab.h"
 #include "parsing.h"
 
-int curr_env = 1;
-
-struct symbol symtab[SYMTAB_SIZE];
+/**
+ * Start saving to global context.
+ */
+int curr_env = 0;
+struct symbol globals[SYMTAB_SIZE];
 
 struct symbol *env[2] = {
-    symtab,
+    globals,
     NULL
 };
 
+/**
+ * Hashes a symbol by multiplying by 9
+ * and xor'ing with the last result.
+ */
 static unsigned symhash(char *sym)
 {
     unsigned int hash = 0;
     unsigned c;
 
-    while (c = *sym++) hash = hash*9 ^ c;
+    while (c = *sym++)
+        hash = hash*9 ^ c;
 
     return hash;
 }
 
-struct symbol * lookup(char *sym)
-{
-    struct symbol *sp = &symtab[symhash(sym) % SYMTAB_SIZE];
-    int scount = SYMTAB_SIZE;
+/**
+ * Look-up key in hash table.
+ */
+struct symbol *lookup(char *sym)
+{   
 
-    while (--scount >= 0)
+    for (int i = curr_env; i >= 0; i--)
     {
-        if (sp->name && !strcmp(sp->name, sym)) { return sp; }
+        struct symbol *entry = &env[i][symhash(sym) % SYMTAB_SIZE];
+        int iter = SYMTAB_SIZE;
 
-        // new entry.
-        if (!sp->name)
+        /**
+         * Try all entries on global symbol table.
+         */
+        while (--iter >= 0)
         {
-            sp->name = strdup(sym);
-            sp->value = 0;
+            /**
+             * Key already exists, so return it!
+             */
+            if (entry->name && !strcmp(entry->name, sym))
+                return entry;
 
-            return sp;
+            /**
+             * Loop back to start of table.
+             */
+            if (++entry >= env[i] + SYMTAB_SIZE)
+                entry = env[i];
         }
 
-        if (++sp >= symtab + SYMTAB_SIZE) sp = symtab;
+        /**
+         * Tried all global entries whilst
+         * not inside a program.
+         */
     }
-    
+
+    struct symbol *entry = &env[curr_env][symhash(sym) % SYMTAB_SIZE];
+    int iter = SYMTAB_SIZE;
+
+    /**
+     * Key doesn't exist,
+     * create new entry for it!
+     */
+    while (--iter >= 0)
+    {
+        if (!entry->name)
+        {
+            entry->name = strdup(sym);
+            entry->value = 0;
+
+            return entry;
+        }
+
+        /**
+         * Loop back to start of table.
+         */
+        if (++entry >= env[curr_env] + SYMTAB_SIZE)
+            entry = env[curr_env];
+    }
+
+    /**
+     * Tried all local entries, symbol table full.
+     */
     yyerror("symbol table overflow\n");
-    abort(); // tried them all, table is full.
 }
 
-void freesymbol(struct symbol * sym) {
+/**
+ * Define new symbol.
+ */
+void symdef(struct symbol *sym, struct ast *val)
+{
+    sym->value = eval(val);
+}
+
+/**
+ * Clean's a symbol dynamic memory
+ * consumption.
+ */
+void symbolfree(struct symbol * sym)
+{
     free(sym->name);
     free(sym->prog);
-    // free(sym);
 }

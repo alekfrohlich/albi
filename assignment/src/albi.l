@@ -112,8 +112,8 @@ int yyerror(const char *s)
     if (yylloc.first_line)
     {
         BEGIN_BOLD;
-        fprintf(stderr, "%s:[%d-%d,%d-%d]: ", filename, yylloc.first_line,
-            yylloc.first_column, yylloc.last_line, yylloc.last_column);
+        fprintf(stderr, "%s:%d:%d: ", filename, yylloc.last_line,
+                yylloc.last_column);
         COLOR_RESET;
     }
 
