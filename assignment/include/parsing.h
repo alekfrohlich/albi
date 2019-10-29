@@ -29,11 +29,6 @@
 		struct nodelist *next;
 	};
 
-	struct stmtlist {
-		struct ast * stmt;
-		struct stmtlist * next;
-	};
-
 	/**
 	 * Program call list.
 	 */
@@ -46,13 +41,9 @@
 
 	// forward defined.
 	extern double eval(struct ast *a);
-
 	extern void genparam(char *name, struct ast *val);
 	extern void gencompart(struct compart* compartment);
-
 	extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
-	extern struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next);					// Shall be merged into nodelist.
-
 	extern struct calllist *newcalllist(struct symbol*, struct nodelist *symlist, struct nodelist* parameters, struct calllist*);
 
 	extern void treefree(struct ast *a); // Shall be moved to ast.h

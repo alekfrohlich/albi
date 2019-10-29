@@ -50,7 +50,7 @@
     };
 
     // Forward definitions.
-    extern void progdef(struct symbol *name, struct nodelist *syms, struct stmtlist *stmts);
+    extern void progdef(struct symbol *name, struct nodelist *syms, struct nodelist *stmts);
     extern void mergeprograms(
         struct symbol** progrefs,
         struct nodelist** export,

@@ -39,7 +39,7 @@ export PERMITED = 1
 ALBI_SRC = $(patsubst $(GRODIR)/%, %, $(gro))
 
 # Test macro
-DOTEST = (echo "\nBeggining test$(ALBI_SRC)...\n") \
+DOTEST = (echo "\nTesting$(ALBI_SRC)...\n") \
 		 && ($(TRANSLATOR) $(gro) $(ALBI_SRC)) \
 		 || (echo "TEST $(ALBI_SRC) FAILED!"; exit 1);
 

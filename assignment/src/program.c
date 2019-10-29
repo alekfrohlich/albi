@@ -218,7 +218,7 @@ void mergeprograms(
  /**
  * Define new program.
  */
-void progdef(struct symbol *name, struct nodelist *syms, struct stmtlist * stmts)
+void progdef(struct symbol *name, struct nodelist *syms, struct nodelist * stmts)
 {
     #ifdef DEBUG
         for(int i = 0; i < 9997; i++)
@@ -242,17 +242,17 @@ void progdef(struct symbol *name, struct nodelist *syms, struct stmtlist * stmts
      * Save formal parameters.
      */
     program->parameters = syms;
-    struct stmtlist * iter = stmts;
+    struct nodelist * iter = stmts;
     while (iter != NULL)
     {
-        if (iter->stmt->type == SYM_ASSIGN)
+        if (iter->node->type == SYM_ASSIGN)
         {
-            declare_parameter(program, (struct symassign *) iter->stmt);
+            declare_parameter(program, (struct symassign *)iter->node);
         }
         
-        else if (iter->stmt->type == RATESTATEMENT)
+        else if (iter->node->type == RATESTATEMENT)
         {
-            newreaction(program, (struct rate *) iter->stmt);
+            newreaction(program, (struct rate *) iter->node);
         }
         
         else

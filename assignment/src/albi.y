@@ -35,7 +35,6 @@
     double double_t;
     struct symbol *sym_tok;   // which symbol?  
 	struct calllist *callparams;
-	struct stmtlist * statements;
 	struct nodelist *list;
 }
 
@@ -49,9 +48,8 @@
 %left '*' '/'
 
 %type <node> exp statement assignment ecoli
-%type <statements> list
 %type <sym_tok> progdef
-%type <list> assignment_list explist symlist
+%type <list> assignment_list explist symlist list
 %type <callparams> proglist
 
 %%
@@ -142,9 +140,9 @@ list: %empty
 | statement list
 									{
 										if ($2 == NULL)
-											$$ = newstmtlist($1, NULL);
+											$$ = newnodelist($1, NULL);
 										else
-											$$ = newstmtlist($1, $2);
+											$$ = newnodelist($1, $2);
 									}
 ;
 

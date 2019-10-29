@@ -101,22 +101,12 @@ void gencompart(struct compart * compartment)
     mergeprograms(prog, export, params, size);
 }
 
-// PARSING STRUCTURES INITIALIZATION.
-
 struct nodelist *newnodelist(struct ast *node, struct nodelist *next)
 {
     struct nodelist * list = (struct nodelist *) malloc(sizeof(struct nodelist));
     list->node = node;
     list->next = next;
     return list;
-}
-
-struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next)
-{
-    struct stmtlist * sl = (struct stmtlist *) malloc(sizeof(struct stmtlist));
-    sl->stmt = stmt;
-    sl->next = next;
-    return sl;
 }
 
 struct calllist *newcalllist(
@@ -130,18 +120,6 @@ struct calllist *newcalllist(
     p->symlist = symlist;
     p->explist = explist;
     p->next = next;
-}
-
-// FREE PARSING STRUCTURES.
-
-static void stmtlistfree(struct stmtlist * l)
-{
-    while (l != NULL) {
-        struct stmtlist * aux = l;
-        l = l->next;
-        treefree(aux->stmt);
-        free(aux);
-    }
 }
 
 static void calllistfree(struct calllist * prog)
