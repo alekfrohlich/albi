@@ -89,7 +89,7 @@
     struct rate {
         enum nodetypes type;
         struct ast *exp;
-        struct assignlist *assigns;
+        struct nodelist *assigns;
     };
 
     // forward defined.
@@ -98,6 +98,6 @@
     extern struct ast *newnum(double d);
     extern struct ast *newref(struct symbol *sym);
     extern struct ast *newassign(struct symbol *s, struct ast *v);
-    extern struct ast *newrate(struct ast* exp, struct assignlist *assigns);
+    extern struct ast *newrate(struct ast* exp, struct nodelist *assigns);
 
 #endif  // AST_H

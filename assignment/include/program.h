@@ -29,8 +29,8 @@
         struct symbol * symtab;
         struct symlist * parameters;
         
-        struct assignlist * species;
-        struct assignlist * locals;
+        struct nodelist * species;
+        struct nodelist * locals;
 
         struct symlist * dependence;  // ignored.
 
@@ -39,8 +39,8 @@
     };
 
     struct reaction {
-        struct assignlist * reactant;
-        struct assignlist * product;
+        struct nodelist * reactant;
+        struct nodelist * product;
         struct ast * rate;
     };
 

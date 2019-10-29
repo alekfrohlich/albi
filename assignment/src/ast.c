@@ -74,7 +74,7 @@ struct ast * newassign(struct symbol *sym, struct ast *val)
     return (struct ast *) a;
 }
 
-struct ast *newrate(struct ast* exp, struct assignlist *assigns) {
+struct ast *newrate(struct ast* exp, struct nodelist *assigns) {
     struct rate * r = malloc(sizeof(struct rate));
     r->assigns = assigns;
     r->type = RATESTATEMENT;

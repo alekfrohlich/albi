@@ -27,8 +27,8 @@
 
     // Forward definitions.
     extern FILE * yyout;
-    extern void printspecies(struct assignlist * species, struct maplist * map, char * compart);
-    extern void printlocals(struct assignlist* locals, struct maplist * map, char * compart);
+    extern void printspecies(struct nodelist * species, struct maplist * map, char * compart);
+    extern void printlocals(struct nodelist* locals, struct maplist * map, char * compart);
     extern void printreaction(struct reaction * reac, struct maplist * map);
     extern void printreactionlist(struct reactionlist * reactions, struct maplist* map);
 

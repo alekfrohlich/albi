@@ -36,13 +36,13 @@
 static void declare_specie(struct program * program, struct symassign * assign)
 {
     char * name = assign->sym->name;
-    struct assignlist * iter = program->locals; /* Who is to be removed, if any. */
+    struct nodelist * iter = program->locals; /* Who is to be removed, if any. */
     
     /**
      * Removing head?
      */
     if (iter != NULL && 
-        strcmp(iter->assign->sym->name, name) == 0)
+        strcmp(((struct symassign *) iter->node)->sym->name, name) == 0)
     {
         program->locals = program->locals->next;
     } 
@@ -57,7 +57,7 @@ static void declare_specie(struct program * program, struct symassign * assign)
          * Find symbol in specie's list.
          */
         while (iter->next != NULL && 
-            strcmp(iter->next->assign->sym->name, name) != 0)
+            strcmp(((struct symassign *)iter->next->node)->sym->name, name) != 0)
         {
             iter = iter->next;
         }
@@ -69,7 +69,7 @@ static void declare_specie(struct program * program, struct symassign * assign)
         if (iter->next == NULL)
             yyerror("Undeclared variable");
 
-        struct assignlist * aux = iter->next;
+        struct nodelist * aux = iter->next;
         iter->next = iter->next->next;
         iter = aux;
     }
@@ -105,13 +105,13 @@ static struct reactionlist * newreactionlist(struct reaction * reaction, struct 
 // BEGIN PUBLIC INTERFACE.
 
 
-static void push_parameter(struct program * program, struct assignlist * local)
+static void push_parameter(struct program * program, struct nodelist * local)
 {
     local->next = program->locals;
     program->locals = local;
 }
 
-static void push_specie(struct program * program, struct assignlist * specie)
+static void push_specie(struct program * program, struct nodelist * specie)
 {
     specie->next = program->species;
     program->species = specie;
@@ -127,9 +127,9 @@ static int empty_dependencies(struct program * program)
 
 static void declare_parameter(struct program * program, struct symassign * assign)
 {
-    struct assignlist * locals = program->locals;
+    struct nodelist * locals = program->locals;
 
-    locals = newassignlist(assign, locals);
+    locals = newnodelist((struct ast *) assign, locals);
     program->locals = locals;
 }
 
@@ -148,18 +148,18 @@ static void newreaction(struct program * program, struct rate * rate)
      * reactans and products. Also move them from
      * the local's list to the specie's list.
      */
-    for (struct assignlist * iter = rate->assigns; iter != NULL; iter = iter->next)
+    for (struct nodelist * iter = rate->assigns; iter != NULL; iter = iter->next)
     {
-        if (iter->assign->val->type == MINUS)
+        if (((struct symassign *)iter->node)->val->type == MINUS)
         {
-            reac->reactant = newassignlist(iter->assign, reac->reactant);
-            declare_specie(program, iter->assign);
+            reac->reactant = newnodelist((struct ast *) iter->node, reac->reactant);
+            declare_specie(program, (struct symassign *)iter->node);
         } 
         
-        else if (iter->assign->val->type == PLUS)
+        else if (((struct symassign *)iter->node)->val->type == PLUS)
         {
-            reac->product = newassignlist(iter->assign, reac->product);
-            declare_specie(program, iter->assign);
+            reac->product = newnodelist((struct ast *) iter->node, reac->product);
+            declare_specie(program, (struct symassign *)iter->node);
         }
         
         /**
@@ -202,17 +202,17 @@ void mergeprograms(
     for (int i = 0; i < size; i++)
     {
         struct program *prog = progrefs[i]->prog;
-        for (struct assignlist * specie = prog->species; specie != NULL;
+        for (struct nodelist *specie = prog->species; specie != NULL;
              specie = specie->next)
         {
-            char *name = namemergedvar(progrefs[i]->name, specie->assign->sym->name);
-            map[i] = newmaplist(specie->assign->sym->name, name, map[i]);
+            char *name = namemergedvar(progrefs[i]->name, ((struct symassign *)specie->node)->sym->name);
+            map[i] = newmaplist(((struct symassign *)specie->node)->sym->name, name, map[i]);
         }
-        for (struct assignlist * local = prog->locals; local != NULL;
+        for (struct nodelist * local = prog->locals; local != NULL;
                local = local->next)
         {
-            char * name = namemergedvar(progrefs[i]->name, local->assign->sym->name);
-            map[i] = newmaplist(local->assign->sym->name, name, map[i]);
+            char * name = namemergedvar(progrefs[i]->name, ((struct symassign *)local->node)->sym->name);
+            map[i] = newmaplist(((struct symassign *)local->node)->sym->name, name, map[i]);
         }
         printspecies(prog->species, map[i], "ECOLIE");
         printlocals(prog->locals, map[i], "ECOLIE");

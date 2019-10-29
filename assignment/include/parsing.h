@@ -24,6 +24,11 @@
 
 	#include "ast.h"
 
+	struct nodelist {
+		struct ast *node;
+		struct nodelist *next;
+	};
+
 	struct explist {
 		struct ast * exp;
 		struct explist * next;
@@ -32,11 +37,6 @@
 	struct symlist {
 		struct symbol *sym;
 		struct symlist *next;
-	};
-
-	struct assignlist {
-		struct symassign *assign;
-		struct assignlist *next;
 	};
 
 	struct stmtlist {
@@ -60,7 +60,7 @@
 	extern void genparam(char *name, struct ast *val);
 	extern void gencompart(struct compart* compartment);
 
-	extern struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next); 	// Shall be merged into nodelist.
+	extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
 	extern struct symlist *newsymlist(struct symbol *sym, struct symlist *next);					// Shall be merged into nodelist.
 	extern struct explist *newexplist(struct ast* exp, struct explist* next);						// Shall be merged into nodelist.
 	extern struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next);					// Shall be merged into nodelist.

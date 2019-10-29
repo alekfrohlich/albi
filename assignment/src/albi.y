@@ -35,10 +35,10 @@
     double double_t;
     struct symbol *sym_tok;   // which symbol?  
     struct symlist *symlist_tok;
-	struct assignlist *assigns;
 	struct explist * expressions;
 	struct calllist *callparams;
 	struct stmtlist * statements;
+	struct nodelist *list;
 }
 
 // declare tokens.
@@ -54,7 +54,7 @@
 %type <statements> list
 %type <sym_tok> progdef
 %type <symlist_tok> symlist
-%type <assigns> assignment_list
+%type <list> assignment_list
 %type <callparams> proglist
 %type <expressions> explist
 
@@ -166,9 +166,9 @@ assignment_list: %empty
 | assignment assignment_list
 									{
 										if ($2 == NULL)
-											$$ = newassignlist((struct symassign *) $1, NULL);
+											$$ = newnodelist($1, NULL);
 										else
-										 	$$ = newassignlist((struct symassign *) $1, $2);
+										 	$$ = newnodelist($1, $2);
 									}
 ;
 

@@ -24,56 +24,59 @@
 #include "output.h"
 
 // Begin Output
-void printspecies(struct assignlist * species, struct maplist * map, char * compart)
+void printspecies(struct nodelist * species, struct maplist * map, char * compart)
 {
     //DECLARE VALUES
-    struct assignlist * specie = species;
+    struct nodelist * specie = species;
     while (specie != NULL) {
-        fprintf( yyout, "Specie %s in %s\n", getmap(map, specie->assign->sym->name), compart);
+        fprintf(yyout, "Specie %s in %s\n", getmap(map, ((struct symassign *)specie->node)->sym->name), compart);
         specie = specie->next;
     }
 
     //PRINT VALUES
     specie = species;
     while (specie != NULL) {
-        fprintf( yyout, "%s = %0.4lf\n", getmap(map, specie->assign->sym->name), specie->assign->sym->value);
+        fprintf(yyout, "%s = %0.4lf\n", getmap(map, ((struct symassign *)specie->node)->sym->name),
+                ((struct symassign *)specie->node)->sym->value);
         specie = specie->next;
     }
 }
 
-void printlocals(struct assignlist* locals, struct maplist * map, char * compart)
+void printlocals(struct nodelist* locals, struct maplist * map, char * compart)
 {
     //DECLARE VALUES
-    struct assignlist * local = locals;
+    struct nodelist * local = locals;
     while (local != NULL) {
-        fprintf(yyout, "var %s in %s\n", getmap(map, local->assign->sym->name), compart);
+        fprintf(yyout, "var %s in %s\n",
+                getmap(map, ((struct symassign *)local->node)->sym->name), compart);
         local = local->next;        
     }
 
     //PRINT VALUES
     local = locals;
     while (local != NULL) {
-        fprintf( yyout, "%s = %0.4lf\n", getmap(map, local->assign->sym->name), local->assign->sym->value);
+        fprintf(yyout, "%s = %0.4lf\n", getmap(map, ((struct symassign *)local->node)->sym->name),
+                ((struct symassign*)local->node)->sym->value);
         local = local->next;
     }
 }
 
 void printreaction(struct reaction * reac, struct maplist * map)
 {
-    struct assignlist * reactant = reac->reactant;
-    struct assignlist * product = reac->product;
+    struct nodelist *reactant = reac->reactant;
+    struct nodelist *product = reac->product;
     int first = 1;
     while (reactant != NULL) {
         if (!first)
             fprintf(yyout, " ");
         else
             first = 0;
-        fprintf(yyout, "%s", getmap(map, reactant->assign->sym->name));
+        fprintf(yyout, "%s", getmap(map, ((struct symassign *)reactant->node)->sym->name));
         reactant = reactant->next;
     }
     fprintf(yyout, "-> ");
     while (product != NULL) {
-        fprintf(yyout, "%s", getmap(map, product->assign->sym->name));
+        fprintf(yyout, "%s", getmap(map, ((struct symassign *)product->node)->sym->name));
 
         if(product->next != NULL)
             fprintf(yyout, " ");

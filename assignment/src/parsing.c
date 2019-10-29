@@ -103,20 +103,20 @@ void gencompart(struct compart * compartment)
 
 // PARSING STRUCTURES INITIALIZATION.
 
+struct nodelist *newnodelist(struct ast *node, struct nodelist *next)
+{
+    struct nodelist * list = (struct nodelist *) malloc(sizeof(struct nodelist));
+    list->node = node;
+    list->next = next;
+    return list;
+}
+
 struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next)
 {
     struct stmtlist * sl = (struct stmtlist *) malloc(sizeof(struct stmtlist));
     sl->stmt = stmt;
     sl->next = next;
     return sl;
-}
-
-struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next)
-{
-    struct assignlist * al = (struct assignlist *) malloc(sizeof(struct assignlist));
-    al->assign = assign;
-    al->next = next;
-    return al; 
 }
 
 struct symlist * newsymlist(struct symbol *sym, struct symlist *next)
@@ -172,16 +172,6 @@ static void explistfree(struct explist * el)
     }
 }
 
-static void assignlistfree(struct assignlist *sl)
-{
-    while (sl != NULL) {
-        struct assignlist * aux = sl;
-        sl = sl->next;
-        treefree((struct ast *) aux->assign);
-        free(aux);
-    }
-}
-
 static void stmtlistfree(struct stmtlist * l)
 {
     while (l != NULL) {
@@ -232,7 +222,7 @@ void treefree(struct ast *a)
         ;
         struct rate * rate = (struct rate *) a;
         treefree(rate->exp);
-        assignlistfree(rate->assigns);
+        // nodelistfree?
     case COMPART: // double free problem?
         ;
         calllistfree(((struct compart *)a)->params);
