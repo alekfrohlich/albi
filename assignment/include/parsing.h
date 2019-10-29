@@ -45,12 +45,10 @@
 	extern void gencompart(struct compart* compartment);
 	extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
 	extern struct calllist *newcalllist(struct symbol*, struct nodelist *symlist, struct nodelist* parameters, struct calllist*);
-
-	extern void treefree(struct ast *a); // Shall be moved to ast.h
+	void calllistfree(struct calllist * prog);
 
 	// toolchain defined.
 	extern int yyerror(const char *s);
-	extern int yylex(void);
 	extern int curr_compart;
 
 #endif  // _PARSING_H

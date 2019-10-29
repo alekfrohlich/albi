@@ -24,10 +24,13 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "ast.h"
 #include "symtab.h"
 #include "parsing.h"
 #include "program.h"
+
+extern int yylex();
 %}
 
 %union {

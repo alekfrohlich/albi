@@ -122,7 +122,7 @@ struct calllist *newcalllist(
     p->next = next;
 }
 
-static void calllistfree(struct calllist * prog)
+void calllistfree(struct calllist * prog)
 {
     while (prog != NULL) {
         struct calllist * aux = prog;
@@ -131,48 +131,4 @@ static void calllistfree(struct calllist * prog)
         // explistfree(aux->exp);  |
         free(aux);
     }
-}
-
-void treefree(struct ast *a)
-{
-    switch (a->type)
-    {
-    // two subtrees.
-    case PLUS:
-    case MINUS:
-    case TIMES:
-    case DIV:
-        treefree(a->left);
-        treefree(a->right);
-        break;
-
-    // one subtree.
-    case SYM_ASSIGN:
-        treefree(((struct symassign*)a)->val);
-        break;
-    case EXPLIST:
-        treefree(a->left);
-        treefree(a->right);
-        break;
-
-    // no subtree.
-    case SYM_REF:
-        break;
-    case RATESTATEMENT:
-        ;
-        struct rate * rate = (struct rate *) a;
-        treefree(rate->exp);
-        // nodelistfree?
-    case COMPART: // double free problem?
-        ;
-        calllistfree(((struct compart *)a)->params);
-        break;
-    case CONSLIT:
-        break;
-
-    default:
-        yyerror("internal error: bad node");
-    }
-
-    free(a);
 }

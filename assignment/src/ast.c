@@ -20,7 +20,7 @@
  */
 
 #include <stdlib.h>
-#include <stdio.h>
+
 #include "ast.h"
 #include "parsing.h"
 
@@ -35,7 +35,8 @@ struct ast * newast(enum nodetypes type, struct ast *l, struct ast *r)
     return a;
 }
 
-struct ast *newcompart(char *sym, struct calllist *params) {
+struct ast *newcompart(char *sym, struct calllist *params)
+{
     struct compart *a = malloc(sizeof(struct compart*));
     a->type = COMPART;
     a->sym = sym;
@@ -74,10 +75,55 @@ struct ast * newassign(struct symbol *sym, struct ast *val)
     return (struct ast *) a;
 }
 
-struct ast *newrate(struct ast* exp, struct nodelist *assigns) {
+struct ast *newrate(struct ast* exp, struct nodelist *assigns)
+{
     struct rate * r = malloc(sizeof(struct rate));
     r->assigns = assigns;
     r->type = RATESTATEMENT;
 
     return (struct ast *) r;
+}
+
+void treefree(struct ast *a)
+{
+    switch (a->type)
+    {
+    // two subtrees.
+    case PLUS:
+    case MINUS:
+    case TIMES:
+    case DIV:
+        treefree(a->left);
+        treefree(a->right);
+        break;
+
+    // one subtree.
+    case SYM_ASSIGN:
+        treefree(((struct symassign*)a)->val);
+        break;
+    case EXPLIST:
+        treefree(a->left);
+        treefree(a->right);
+        break;
+
+    // no subtree.
+    case SYM_REF:
+        break;
+    case RATESTATEMENT:
+        ;
+        struct rate * rate = (struct rate *) a;
+        treefree(rate->exp);
+        // nodelistfree?
+    case COMPART: // double free problem?
+        ;
+        calllistfree(((struct compart *)a)->params);
+        break;
+    case CONSLIT:
+        break;
+
+    default:
+        yyerror("internal error: bad node");
+    }
+
+    free(a);
 }

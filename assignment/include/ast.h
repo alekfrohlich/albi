@@ -99,5 +99,6 @@
     extern struct ast *newref(struct symbol *sym);
     extern struct ast *newassign(struct symbol *s, struct ast *v);
     extern struct ast *newrate(struct ast* exp, struct nodelist *assigns);
+	extern void treefree(struct ast *a);
 
 #endif  // AST_H
