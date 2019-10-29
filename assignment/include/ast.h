@@ -28,16 +28,25 @@
      * AST node types.
      */
     enum nodetypes {
-        CONSLIT = 1,
-        PLUS,
-        MINUS,
-        TIMES,
-        DIV,
-        EXPLIST,
-        SYM_REF,
-        SYM_ASSIGN,
-        COMPART,
-        RATESTATEMENT,
+        CONSLIT = 1,    // Constant literal.
+        PLUS,           // Arithmetic expression: +.
+        MINUS,          // Arithmetic expression: -.
+        TIMES,          // Arithmetic expression: *.
+        DIV,            // Arithmetic expression: /.
+        EXPLIST,        // Grouping of nodes.
+        SYM_REF,        // Symbol reference.
+        SYM_ASSIGN,     // Symbol assignment.
+        T_SYM_ASSIGN,   // Typed symbol assignment.
+        COMPART,        // Compartment.
+        RATESTATEMENT,  // Reaction rate.
+    };
+
+    /**
+     * SBML types.
+     */
+    enum sbmltypes {
+        SPECIE = 1,
+        LOCAL,
     };
 
     /**
@@ -84,6 +93,16 @@
     };
 
     /**
+     * Typed symbol assignment node.
+     */
+    struct tsymassign {
+        enum nodetypes type;
+        enum sbmltypes _type;
+        struct symbol *sym;
+        struct ast *val;
+    };
+
+    /**
      * Rate expresion node.
      */
     struct rate {
@@ -98,6 +117,7 @@
     extern struct ast *newnum(double d);
     extern struct ast *newref(struct symbol *sym);
     extern struct ast *newassign(struct symbol *s, struct ast *v);
+    extern struct ast *newtassign(enum sbmltypes type, struct symbol *s, struct ast *v);
     extern struct ast *newrate(struct ast* exp, struct nodelist *assigns);
 	extern void treefree(struct ast *a);
 

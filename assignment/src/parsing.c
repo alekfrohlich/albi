@@ -98,7 +98,7 @@ void gencompart(struct compart * compartment)
         index++;
     }
     
-    mergeprograms(prog, export, params, size, curr_compart);
+    // mergeprograms(prog, export, params, size, curr_compart);
 }
 
 struct nodelist *newnodelist(struct ast *node, struct nodelist *next)

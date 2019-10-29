@@ -75,6 +75,18 @@ struct ast * newassign(struct symbol *sym, struct ast *val)
     return (struct ast *) a;
 }
 
+struct ast *newtassign(enum sbmltypes type, struct symbol *sym, struct ast *val)
+{
+    struct tsymassign *a = malloc(sizeof(struct tsymassign));
+
+    a->type = T_SYM_ASSIGN;
+    a->_type = type;
+    a->sym = sym;
+    a->val = val;
+
+    return (struct ast *) a;
+}
+
 struct ast *newrate(struct ast* exp, struct nodelist *assigns)
 {
     struct rate * r = malloc(sizeof(struct rate));

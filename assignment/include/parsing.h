@@ -48,7 +48,7 @@
 	extern void gencompart(struct compart* compartment);
 	extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
 	extern struct calllist *newcalllist(struct symbol*, struct nodelist *symlist, struct nodelist* parameters, struct calllist*);
-	void calllistfree(struct calllist * prog);
+	extern void calllistfree(struct calllist * prog);
 
 	// Toolchain definitions.
 	extern int yyerror(const char *s);

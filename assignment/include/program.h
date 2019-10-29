@@ -32,6 +32,7 @@
         int reactions_size;
         struct nodelist *body;
         struct symbol *symtab;
+        struct nodelist *declarations;
         struct nodelist *parameters;
         struct nodelist *dependences;  // ignored.
         struct reactionlist *reactions;
