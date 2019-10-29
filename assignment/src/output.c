@@ -73,12 +73,14 @@ void printreaction(struct reaction * reac, struct maplist * map)
             fprintf(yyout, " ");
         else
             first = 0;
-        fprintf(yyout, "%s", getmap(map, ((struct symassign *)reactant->node)->sym->name));
+        fprintf(yyout, "%s",
+                getmap(map, ((struct symassign *)reactant->node)->sym->name));
         reactant = reactant->next;
     }
     fprintf(yyout, "-> ");
     while (product != NULL) {
-        fprintf(yyout, "%s", getmap(map, ((struct symassign *)product->node)->sym->name));
+        fprintf(yyout, "%s",
+                getmap(map, ((struct symassign *)product->node)->sym->name));
 
         if(product->next != NULL)
             fprintf(yyout, " ");

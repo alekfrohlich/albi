@@ -83,7 +83,7 @@ void gencompart(struct compart * compartment)
     }
 
     struct symbol * prog[size];
-    struct nodelist * export[size];
+    struct nodelist * export[size];  // ignore.
     struct nodelist * params[size];
 
     call  = compartment->params;

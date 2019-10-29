@@ -29,16 +29,12 @@
      * 
      */
     struct program {
-        struct symbol * symtab;
-        struct nodelist * parameters;
-        
-        struct nodelist * species;
-        struct nodelist * locals;
-
-        struct nodelist * dependences;  // ignored.
-
-        struct reactionlist * reactions;
         int reactions_size;
+        struct nodelist *body;
+        struct symbol *symtab;
+        struct nodelist *parameters;
+        struct nodelist *dependences;  // ignored.
+        struct reactionlist *reactions;
     };
 
     /**
