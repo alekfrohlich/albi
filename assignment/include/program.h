@@ -25,6 +25,9 @@
     #include "symtab.h"
     #include "parsing.h"
 
+    /**
+     * 
+     */
     struct program {
         struct symbol * symtab;
         struct nodelist * parameters;
@@ -38,12 +41,18 @@
         int reactions_size;
     };
 
+    /**
+     * 
+     */
     struct reaction {
         struct nodelist * reactant;
         struct nodelist * product;
         struct ast * rate;
     };
 
+    /**
+     * 
+     */
     struct reactionlist {
         struct reaction * reac;
         struct reactionlist * next;

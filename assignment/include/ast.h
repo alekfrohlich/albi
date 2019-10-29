@@ -84,7 +84,7 @@
     };
 
     /**
-     * rate expresion node.
+     * Rate expresion node.
      */
     struct rate {
         enum nodetypes type;
@@ -92,7 +92,7 @@
         struct nodelist *assigns;
     };
 
-    // forward defined.
+    // Forward definitions.
     extern struct ast *newast(enum nodetypes type, struct ast *l, struct ast *r);
     extern struct ast *newcompart(char *sym, struct calllist *params);
     extern struct ast *newnum(double d);

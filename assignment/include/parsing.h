@@ -42,7 +42,7 @@
 		struct nodelist * explist;
 	};
 
-	// forward defined.
+	// Forward definitions.
 	extern double eval(struct ast *a);
 	extern void genparam(char *name, struct ast *val);
 	extern void gencompart(struct compart* compartment);
@@ -50,7 +50,7 @@
 	extern struct calllist *newcalllist(struct symbol*, struct nodelist *symlist, struct nodelist* parameters, struct calllist*);
 	void calllistfree(struct calllist * prog);
 
-	// toolchain defined.
+	// Toolchain definitions.
 	extern int yyerror(const char *s);
 
 #endif  // _PARSING_H
