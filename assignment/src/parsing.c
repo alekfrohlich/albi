@@ -22,8 +22,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
 #include "parsing.h"
 #include "program.h"
+#include "output.h"
 
 struct symbol* env[2];
 int curr_compart = 0;

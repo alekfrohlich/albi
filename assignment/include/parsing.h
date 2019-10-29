@@ -19,63 +19,59 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __PARSING__
-#define __PARSING__
+#ifndef PARSING_H
+#define PARSING_H
 
-#include "ast.h"
-#include <stdio.h>
+	#include "ast.h"
 
-// BEGIN INTERMEDIATE NODES
+	struct explist {
+		struct ast * exp;
+		struct explist * next;
+	};
 
-struct explist {
-	struct ast * exp;
-	struct explist * next;
-};
+	struct symlist {
+		struct symbol *sym;
+		struct symlist *next;
+	};
 
-struct symlist {
-    struct symbol *sym;
-    struct symlist *next;
-};
+	struct assignlist {
+		struct symassign *assign;
+		struct assignlist *next;
+	};
 
-struct assignlist {
-    struct symassign *assign;
-    struct assignlist *next;
-};
+	struct stmtlist {
+		struct ast * stmt;
+		struct stmtlist * next;
+	};
 
-struct stmtlist {
-	struct ast * stmt;
-	struct stmtlist * next;
-};
+	/**
+	 * 
+	 */
+	struct calllist {
+		struct symbol * sym;
+		struct calllist * next;
+		struct symlist * list;
+		struct explist * exp;
+	};
 
-struct calllist {
-	struct symbol * sym;
-	struct calllist * next;
-	struct symlist * list;
-	struct explist * exp;
-};
+	// forward defined.
+	extern double eval(struct ast *a);
 
-// END INTERMEDIATE NODES
+	extern void genparam(char *name, struct ast *val);
+	extern void gencompart(struct compart* compartment);
 
-// forward defined.
-extern double eval(struct ast *a);
+	extern struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next); 	// Shall be merged into nodelist.
+	extern struct symlist *newsymlist(struct symbol *sym, struct symlist *next);					// Shall be merged into nodelist.
+	extern struct explist *newexplist(struct ast* exp, struct explist* next);						// Shall be merged into nodelist.
+	extern struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next);					// Shall be merged into nodelist.
 
-extern void genparam(char *name, struct ast *val);
-extern void gencompart(struct compart* compartment);
+	extern struct calllist *newcalllist(struct symbol*, struct symlist *, struct explist*, struct calllist*);
 
-extern struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next); 	// Shall be merged into nodelist.
-extern struct symlist *newsymlist(struct symbol *sym, struct symlist *next);					// Shall be merged into nodelist.
-extern struct explist *newexplist(struct ast* exp, struct explist* next);						// Shall be merged into nodelist.
-extern struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next);					// Shall be merged into nodelist.
+	extern void treefree(struct ast *a); // Shall be moved to ast.h
 
-extern struct calllist *newcalllist(struct symbol*, struct symlist *, struct explist*, struct calllist*);
+	// toolchain defined.
+	extern int yyerror(const char *s);
+	extern int yylex(void);
+	extern int curr_compart;
 
-extern void treefree(struct ast *a); // Shall be moved to ast.h
-
-// toolchain defined.
-extern int yyerror(const char *s);
-extern int yylex(void);
-extern void abort(void);
-extern FILE * yyout;
-extern int curr_compart;
-
-#endif  // __PARSING__
+#endif  // _PARSING_H

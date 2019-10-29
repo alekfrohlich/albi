@@ -22,73 +22,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
 #include "program.h"
 #include "structures.h"
-
-// Begin Output
-static void printspecies(struct assignlist * species, struct maplist * map, char * compart)
-{
-    //DECLARE VALUES
-    struct assignlist * specie = species;
-    while (specie != NULL) {
-        fprintf( yyout, "Specie %s in %s\n", getmap(map, specie->assign->sym->name), compart);
-        specie = specie->next;
-    }
-
-    //PRINT VALUES
-    specie = species;
-    while (specie != NULL) {
-        fprintf( yyout, "%s = %0.4lf\n", getmap(map, specie->assign->sym->name), specie->assign->sym->value);
-        specie = specie->next;
-    }
-}
-
-static void printlocals(struct assignlist* locals, struct maplist * map, char * compart) {
-    //DECLARE VALUES
-    struct assignlist * local = locals;
-    while (local != NULL) {
-        fprintf(yyout, "var %s in %s\n", getmap(map, local->assign->sym->name), compart);
-        local = local->next;        
-    }
-
-    //PRINT VALUES
-    local = locals;
-    while (local != NULL) {
-        fprintf( yyout, "%s = %0.4lf\n", getmap(map, local->assign->sym->name), local->assign->sym->value);
-        local = local->next;
-    }
-}
-
-static void printreaction(struct reaction * reac, struct maplist * map) {
-    struct assignlist * reactant = reac->reactant;
-    struct assignlist * product = reac->product;
-    int first = 1;
-    while (reactant != NULL) {
-        if (!first)
-            fprintf(yyout, " ");
-        else
-            first = 0;
-        fprintf(yyout, "%s", getmap(map, reactant->assign->sym->name));
-        reactant = reactant->next;
-    }
-    fprintf(yyout, "-> ");
-    while (product != NULL) {
-        fprintf(yyout, "%s", getmap(map, product->assign->sym->name));
-
-        if(product->next != NULL)
-            fprintf(yyout, " ");
-        product = product->next;
-    }
-    fprintf(yyout, "; %s;\n", "RATE");
-}
-
-static void printreactionlist(struct reactionlist * reactions, struct maplist* map) {
-    struct reactionlist * element = reactions;
-    while (element != NULL) {
-        printreaction(element->reac, map);
-        element = element->next;
-    }
-}
+#include "output.h"
 
 // BEGIN PRIVATE INTERFACE.
 

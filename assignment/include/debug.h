@@ -18,30 +18,3 @@
  *    with this program; if not, write to the Free Software Foundation, Inc.,
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
-#ifndef SYMTAB_H
-#define SYMTAB_H
-
-    /**
-     * Size of symbol table.
-     */
-    #define SYMTAB_SIZE 9997
-
-    /**
-     * Symbol table entry.
-     */
-    struct symbol {
-        char *name;
-        double value;           
-        struct program *prog;
-    };
-
-    // forward defined.
-    struct ast;
-    extern int curr_env;
-    extern struct symbol* env[2];
-    extern struct symbol *lookup(char *sym);
-    extern void symdef(struct symbol *sym, struct ast *val);
-    extern void freesymbol(struct symbol * sym);
-
-#endif  // SYMTAB_H

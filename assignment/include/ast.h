@@ -19,89 +19,85 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __AST_H__
-#define __AST_H__
+#ifndef AST_H
+#define AST_H
 
-#include "symtab.h"
+    #include "symtab.h"
 
-/**
- * AST node types.
- */
-enum nodetypes {
-    CONSLIT = 1,
-    PLUS,
-    MINUS,
-    TIMES,
-    DIV,
-    EXPLIST,
-    SYM_REF,
-    SYM_ASSIGN,
-    COMPART,
-    RATESTATEMENT,
-};
+    /**
+     * AST node types.
+     */
+    enum nodetypes {
+        CONSLIT = 1,
+        PLUS,
+        MINUS,
+        TIMES,
+        DIV,
+        EXPLIST,
+        SYM_REF,
+        SYM_ASSIGN,
+        COMPART,
+        RATESTATEMENT,
+    };
 
-// BEGIN AST NODES
+    /**
+     * Generic expression node.
+     */
+    struct ast {
+        enum nodetypes type;
+        struct ast * left;
+        struct ast * right;
+    };
 
-/**
- * Generic expression node.
- */
-struct ast {
-	enum nodetypes type;
-	struct ast * left;
-	struct ast * right;
-};
+    /**
+     * Compartment instantiation node.
+     */
+    struct compart {
+        enum nodetypes type;
+        char *sym;
+        struct calllist *params;
+    };
 
-/**
- * Compartment instantiation node.
- */
-struct compart {
- 	enum nodetypes type;
-    char *sym;
-    struct calllist *params;
-};
+    /**
+     * Numeric value node.
+     */
+    struct numval {
+        enum nodetypes type;
+        double number;
+    };
 
-/**
- * Numeric value node.
- */
-struct numval {
-	enum nodetypes type;
-    double number;
-};
+    /**
+     * Reference to symbol node.
+     */
+    struct symref {
+        enum nodetypes type;
+        struct symbol *sym;
+    };
 
-/**
- * Reference to symbol node.
- */
-struct symref {
- 	enum nodetypes type;
-    struct symbol *sym;
-};
+    /**
+     * Symbol assignment node.
+     */
+    struct symassign {
+        enum nodetypes type;
+        struct symbol *sym;
+        struct ast *val;
+    };
 
-/**
- * Symbol assignment node.
- */
-struct symassign {
-	enum nodetypes type;
-    struct symbol *sym;
-    struct ast *val;
-};
+    /**
+     * rate expresion node.
+     */
+    struct rate {
+        enum nodetypes type;
+        struct ast *exp;
+        struct assignlist *assigns;
+    };
 
-/**
- * rate expresion node.
- */
-struct rate {
-	enum nodetypes type;
-    struct ast *exp;
-    struct assignlist *assigns;
-};
+    // forward defined.
+    extern struct ast *newast(enum nodetypes type, struct ast *l, struct ast *r);
+    extern struct ast *newcompart(char *sym, struct calllist *params);
+    extern struct ast *newnum(double d);
+    extern struct ast *newref(struct symbol *sym);
+    extern struct ast *newassign(struct symbol *s, struct ast *v);
+    extern struct ast *newrate(struct ast* exp, struct assignlist *assigns);
 
-// END AST NODES
-
-// forward defined.
-extern struct ast *newast(enum nodetypes type, struct ast *l, struct ast *r);
-extern struct ast *newcompart(char *sym, struct calllist *params);
-extern struct ast *newnum(double d);
-extern struct ast *newref(struct symbol *sym);
-extern struct ast *newassign(struct symbol *s, struct ast *v);
-extern struct ast *newrate(struct ast* exp, struct assignlist *assigns);
-
-#endif // __AST_H__
+#endif  // AST_H

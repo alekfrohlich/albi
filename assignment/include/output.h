@@ -19,42 +19,17 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef PROGRAM_H
-#define PROGRAM_H
+#ifndef OUTPUT_H
+#define OUTPUT_H
 
-    #include "symtab.h"
-    #include "parsing.h"
-
-    struct program {
-        struct symbol * symtab;
-        struct symlist * parameters;
-        
-        struct assignlist * species;
-        struct assignlist * locals;
-
-        struct symlist * dependence;  // ignored.
-
-        struct reactionlist * reactions;
-        int reactions_size;
-    };
-
-    struct reaction {
-        struct assignlist * reactant;
-        struct assignlist * product;
-        struct ast * rate;
-    };
-
-    struct reactionlist {
-        struct reaction * reac;
-        struct reactionlist * next;
-    };
+    #include "program.h"
+    #include "structures.h"
 
     // Forward definitions.
-    extern void progdef(struct symbol *name, struct symlist *syms, struct stmtlist *stmts);
-    extern void mergeprograms(
-        struct symbol** progrefs,
-        struct symlist** export,
-        struct explist** params,
-        int size);
+    extern FILE * yyout;
+    extern void printspecies(struct assignlist * species, struct maplist * map, char * compart);
+    extern void printlocals(struct assignlist* locals, struct maplist * map, char * compart);
+    extern void printreaction(struct reaction * reac, struct maplist * map);
+    extern void printreactionlist(struct reactionlist * reactions, struct maplist* map);
 
-#endif  // PROGRAM_H
+#endif  // OUTPUT_H
