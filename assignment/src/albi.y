@@ -49,8 +49,8 @@
 
 %type <node> exp statement assignment ecoli
 %type <sym_tok> progdef
-%type <list> assignment_list explist symlist list
-%type <callparams> proglist
+%type <list> assignlist explist symlist stmtlist
+%type <callparams> calllist
 
 %%
 
@@ -105,11 +105,11 @@ exp: exp '+' exp
 									}
 ;
 
-program: progdef '(' symlist ')' ASSIGN '{' list '}' ';'
+program: progdef '(' symlist ')' ASSIGN '{' stmtlist '}' ';'
 									{
 										progdef($1, $3, $7);
 									}
-| progdef '(' ')' ASSIGN '{' list '}' ';'
+| progdef '(' ')' ASSIGN '{' stmtlist '}' ';'
 									{
 										progdef($1, NULL, $6);
 									}
@@ -133,11 +133,11 @@ symlist: VAR
 									}
 ;
 
-list: %empty
+stmtlist: %empty
 									{
 										$$ = NULL;
 									}
-| statement list
+| statement stmtlist
 									{
 										if ($2 == NULL)
 											$$ = newnodelist($1, NULL);
@@ -147,17 +147,17 @@ list: %empty
 ;
 
 statement: assignment
-| RATE '(' exp ')' ':' '{' assignment_list '}'
+| RATE '(' exp ')' ':' '{' assignlist '}'
 									{
 										$$ = newrate($3, $7);
 									}
 ;
 
-assignment_list: %empty
+assignlist: %empty
 									{
 										$$ = NULL;
 									}
-| assignment assignment_list
+| assignment assignlist
 									{
 										if ($2 == NULL)
 											$$ = newnodelist($1, NULL);
@@ -166,13 +166,13 @@ assignment_list: %empty
 									}
 ;
 
-ecoli: ECOLI '(' '[' ']' ',' PROG proglist ')' ';'
+ecoli: ECOLI '(' '[' ']' ',' PROG calllist ')' ';'
 									{
 										$$ = newcompart("ECOLI", $7);
 									}
 ;
 
-proglist: VAR '(' explist ')' 
+calllist: VAR '(' explist ')' 
 									{ 
 										$$ = newcalllist(
 										    $1, 
@@ -188,7 +188,7 @@ proglist: VAR '(' explist ')'
 										    (struct nodelist*) $3, 
 										    NULL);
 									}
-| VAR '(' explist ')' '+' proglist 
+| VAR '(' explist ')' '+' calllist 
 									{ 
 										$$ = newcalllist(
 										    $1, 
@@ -196,7 +196,7 @@ proglist: VAR '(' explist ')'
 										    (struct nodelist*) $3, 
 										    $6);
 									}
-| VAR '(' explist ')' SHARE symlist '+' proglist 
+| VAR '(' explist ')' SHARE symlist '+' calllist 
 									{ 
 										$$ = newcalllist(
 										    $1, 
@@ -220,7 +220,7 @@ proglist: VAR '(' explist ')'
 										    NULL, 
 										    NULL);
 									}
-| VAR '(' ')' '+' proglist 
+| VAR '(' ')' '+' calllist 
 									{ 
 										$$ = newcalllist(
 										    $1, 
@@ -228,7 +228,7 @@ proglist: VAR '(' explist ')'
 										    NULL, 
 										    $5);
 									}
-| VAR '(' ')' SHARE symlist '+' proglist 
+| VAR '(' ')' SHARE symlist '+' calllist 
 									{ 
 										$$ = newcalllist(
 										    $1, 
