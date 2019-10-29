@@ -29,11 +29,6 @@
 		struct nodelist *next;
 	};
 
-	struct explist {
-		struct ast * exp;
-		struct explist * next;
-	};
-
 	struct symlist {
 		struct symbol *sym;
 		struct symlist *next;
@@ -51,7 +46,7 @@
 		struct symbol * sym;
 		struct calllist * next;
 		struct symlist * list;
-		struct explist * exp;
+		struct nodelist * exp;
 	};
 
 	// forward defined.
@@ -62,10 +57,9 @@
 
 	extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
 	extern struct symlist *newsymlist(struct symbol *sym, struct symlist *next);					// Shall be merged into nodelist.
-	extern struct explist *newexplist(struct ast* exp, struct explist* next);						// Shall be merged into nodelist.
 	extern struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next);					// Shall be merged into nodelist.
 
-	extern struct calllist *newcalllist(struct symbol*, struct symlist *, struct explist*, struct calllist*);
+	extern struct calllist *newcalllist(struct symbol*, struct symlist *, struct nodelist* parameters, struct calllist*);
 
 	extern void treefree(struct ast *a); // Shall be moved to ast.h
 

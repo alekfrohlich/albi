@@ -195,7 +195,7 @@ static char *namemergedvar(char *progname, char * varname)
 void mergeprograms(
     struct symbol** progrefs,
     struct symlist** export,
-    struct explist** params,
+    struct nodelist** params,
     int size)
  {
     struct maplist ** map = (struct maplist **) malloc(sizeof(struct maplist*)*size);

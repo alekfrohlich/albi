@@ -54,7 +54,7 @@
     extern void mergeprograms(
         struct symbol** progrefs,
         struct symlist** export,
-        struct explist** params,
+        struct nodelist** params,
         int size);
 
 #endif  // PROGRAM_H

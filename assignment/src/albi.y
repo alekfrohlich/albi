@@ -35,7 +35,6 @@
     double double_t;
     struct symbol *sym_tok;   // which symbol?  
     struct symlist *symlist_tok;
-	struct explist * expressions;
 	struct calllist *callparams;
 	struct stmtlist * statements;
 	struct nodelist *list;
@@ -56,7 +55,7 @@
 %type <symlist_tok> symlist
 %type <list> assignment_list
 %type <callparams> proglist
-%type <expressions> explist
+%type <list> explist
 
 %%
 
@@ -183,7 +182,7 @@ proglist: VAR '(' explist ')'
 										$$ = newcalllist(
 										    $1, 
 										    NULL, 
-										    (struct explist*) $3, 
+										    (struct nodelist*) $3, 
 										    NULL);
 									}
 | VAR '(' explist ')' SHARE symlist 
@@ -191,7 +190,7 @@ proglist: VAR '(' explist ')'
 										$$ = newcalllist(
 										    $1, 
 										    $6, 
-										    (struct explist*) $3, 
+										    (struct nodelist*) $3, 
 										    NULL);
 									}
 | VAR '(' explist ')' '+' proglist 
@@ -199,7 +198,7 @@ proglist: VAR '(' explist ')'
 										$$ = newcalllist(
 										    $1, 
 										    NULL, 
-										    (struct explist*) $3, 
+										    (struct nodelist*) $3, 
 										    $6);
 									}
 | VAR '(' explist ')' SHARE symlist '+' proglist 
@@ -246,14 +245,14 @@ proglist: VAR '(' explist ')'
 
 explist: exp 						{
 										if ($1 != NULL) {
-											$$ = newexplist($1, NULL);
+											$$ = newnodelist($1, NULL);
 										} else {
 											$$ = NULL;
 										}
 									}
 | exp ',' explist
 									{
-										$$ = newexplist($1, $3);
+										$$ = newnodelist($1, $3);
 									}
 ;
 %%

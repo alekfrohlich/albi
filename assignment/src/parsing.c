@@ -84,7 +84,7 @@ void gencompart(struct compart * compartment)
 
     struct symbol * prog[size];
     struct symlist * export[size];
-    struct explist * params[size];
+    struct nodelist * params[size];
 
     call  = compartment->params;
     int index = 0;
@@ -127,18 +127,10 @@ struct symlist * newsymlist(struct symbol *sym, struct symlist *next)
     return sl;
 }
 
-struct explist * newexplist(struct ast* exp, struct explist* next)
-{
-    struct explist *a = (struct explist *) malloc(sizeof(struct explist));
-    a->exp = exp;
-    a->next = (struct explist*) next;
-    return a;
-}
-
 struct calllist *newcalllist(
     struct symbol* sym, 
     struct symlist * symlist, 
-    struct explist* explist, 
+    struct nodelist* explist, 
     struct calllist* next) 
 {
     struct calllist * p = (struct calllist *) malloc(sizeof(struct calllist)); 
@@ -162,16 +154,6 @@ static void symlistfree(struct symlist *sl)
     }
 }
 
-static void explistfree(struct explist * el) 
-{
-    while (el != NULL) {
-        struct explist * aux = el;
-        el = el->next;
-        treefree(aux->exp);
-        free(aux);
-    }
-}
-
 static void stmtlistfree(struct stmtlist * l)
 {
     while (l != NULL) {
@@ -188,7 +170,7 @@ static void calllistfree(struct calllist * prog)
         struct calllist * aux = prog;
         prog = prog->next;
         symlistfree(aux->list);
-        explistfree(aux->exp);
+        // nodelistfree?
         free(aux);
     }
 }
