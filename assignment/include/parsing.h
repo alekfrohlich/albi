@@ -24,6 +24,9 @@
 
 	#include "ast.h"
 
+	/**
+	 * List of AST nodes.
+	 */
 	struct nodelist {
 		struct ast *node;
 		struct nodelist *next;
@@ -49,6 +52,5 @@
 
 	// toolchain defined.
 	extern int yyerror(const char *s);
-	extern int curr_compart;
 
 #endif  // _PARSING_H

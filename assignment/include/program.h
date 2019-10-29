@@ -55,6 +55,7 @@
         struct symbol** progrefs,
         struct nodelist** export,
         struct nodelist** params,
+        int compartnum,
         int size);
 
 #endif  // PROGRAM_H

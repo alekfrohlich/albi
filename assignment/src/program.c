@@ -165,12 +165,12 @@ static void newreaction(struct program * program, struct rate * rate)
     }
 }
 
-static char *namemergedvar(char *progname, char * varname)
+static char *namemergedvar(char *progname, char * varname, int compartnum)
 {
     char *name = (char *) malloc(100);
     char *count = (char *) malloc(20);
 
-    snprintf(count, 20, "%d", curr_compart);
+    snprintf(count, 20, "%d", compartnum);
     strcat(name, "ECOLI");
     strcat(name, count);
     strcat(name, "_");
@@ -188,6 +188,7 @@ void mergeprograms(
     struct symbol** progrefs,
     struct nodelist** export,
     struct nodelist** params,
+    int compartnum,
     int size)
  {
     struct maplist ** map = (struct maplist **) malloc(sizeof(struct maplist*)*size);
@@ -197,13 +198,13 @@ void mergeprograms(
         for (struct nodelist *specie = prog->species; specie != NULL;
              specie = specie->next)
         {
-            char *name = namemergedvar(progrefs[i]->name, ((struct symassign *)specie->node)->sym->name);
+            char *name = namemergedvar(progrefs[i]->name, ((struct symassign *)specie->node)->sym->name, compartnum);
             map[i] = newmaplist(((struct symassign *)specie->node)->sym->name, name, map[i]);
         }
         for (struct nodelist * local = prog->locals; local != NULL;
                local = local->next)
         {
-            char * name = namemergedvar(progrefs[i]->name, ((struct symassign *)local->node)->sym->name);
+            char * name = namemergedvar(progrefs[i]->name, ((struct symassign *)local->node)->sym->name, compartnum);
             map[i] = newmaplist(((struct symassign *)local->node)->sym->name, name, map[i]);
         }
         printspecies(prog->species, map[i], "ECOLIE");
