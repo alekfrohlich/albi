@@ -29,14 +29,16 @@ void printspecies(struct nodelist * species, struct maplist * map, char * compar
     //DECLARE VALUES
     struct nodelist * specie = species;
     while (specie != NULL) {
-        fprintf(yyout, "Specie %s in %s\n", getmap(map, ((struct symassign *)specie->node)->sym->name), compart);
+        fprintf(yyout, "Specie %s in %s\n",
+                getmap(map, ((struct symassign *)specie->node)->sym->name), compart);
         specie = specie->next;
     }
 
     //PRINT VALUES
     specie = species;
     while (specie != NULL) {
-        fprintf(yyout, "%s = %0.4lf\n", getmap(map, ((struct symassign *)specie->node)->sym->name),
+        fprintf(yyout, "%s = %0.4lf\n",
+                getmap(map, ((struct symassign *)specie->node)->sym->name),
                 ((struct symassign *)specie->node)->sym->value);
         specie = specie->next;
     }

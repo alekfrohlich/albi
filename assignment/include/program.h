@@ -27,12 +27,12 @@
 
     struct program {
         struct symbol * symtab;
-        struct symlist * parameters;
+        struct nodelist * parameters;
         
         struct nodelist * species;
         struct nodelist * locals;
 
-        struct symlist * dependence;  // ignored.
+        struct nodelist * dependences;  // ignored.
 
         struct reactionlist * reactions;
         int reactions_size;
@@ -50,10 +50,10 @@
     };
 
     // Forward definitions.
-    extern void progdef(struct symbol *name, struct symlist *syms, struct stmtlist *stmts);
+    extern void progdef(struct symbol *name, struct nodelist *syms, struct stmtlist *stmts);
     extern void mergeprograms(
         struct symbol** progrefs,
-        struct symlist** export,
+        struct nodelist** export,
         struct nodelist** params,
         int size);
 

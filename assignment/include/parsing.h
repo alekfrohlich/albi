@@ -29,24 +29,19 @@
 		struct nodelist *next;
 	};
 
-	struct symlist {
-		struct symbol *sym;
-		struct symlist *next;
-	};
-
 	struct stmtlist {
 		struct ast * stmt;
 		struct stmtlist * next;
 	};
 
 	/**
-	 * 
+	 * Program call list.
 	 */
 	struct calllist {
 		struct symbol * sym;
 		struct calllist * next;
-		struct symlist * list;
-		struct nodelist * exp;
+		struct nodelist * symlist;
+		struct nodelist * explist;
 	};
 
 	// forward defined.
@@ -56,10 +51,9 @@
 	extern void gencompart(struct compart* compartment);
 
 	extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
-	extern struct symlist *newsymlist(struct symbol *sym, struct symlist *next);					// Shall be merged into nodelist.
 	extern struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next);					// Shall be merged into nodelist.
 
-	extern struct calllist *newcalllist(struct symbol*, struct symlist *, struct nodelist* parameters, struct calllist*);
+	extern struct calllist *newcalllist(struct symbol*, struct nodelist *symlist, struct nodelist* parameters, struct calllist*);
 
 	extern void treefree(struct ast *a); // Shall be moved to ast.h
 

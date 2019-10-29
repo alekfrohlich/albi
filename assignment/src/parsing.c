@@ -83,7 +83,7 @@ void gencompart(struct compart * compartment)
     }
 
     struct symbol * prog[size];
-    struct symlist * export[size];
+    struct nodelist * export[size];
     struct nodelist * params[size];
 
     call  = compartment->params;
@@ -93,8 +93,8 @@ void gencompart(struct compart * compartment)
         struct calllist * aux = call;
         call = call->next;
         prog[index] = aux->sym;
-        export[index] = aux->list;
-        params[index] = aux->exp;
+        export[index] = aux->symlist;
+        params[index] = aux->explist;
         index++;
     }
     
@@ -119,40 +119,20 @@ struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next)
     return sl;
 }
 
-struct symlist * newsymlist(struct symbol *sym, struct symlist *next)
-{
-    struct symlist *sl = malloc(sizeof(struct symlist));
-    sl->sym = sym;
-    sl->next = next;
-    return sl;
-}
-
 struct calllist *newcalllist(
     struct symbol* sym, 
-    struct symlist * symlist, 
+    struct nodelist * symlist, 
     struct nodelist* explist, 
     struct calllist* next) 
 {
     struct calllist * p = (struct calllist *) malloc(sizeof(struct calllist)); 
     p->sym = sym;
-    p->list = symlist;
-    p->exp = explist;
+    p->symlist = symlist;
+    p->explist = explist;
     p->next = next;
 }
 
 // FREE PARSING STRUCTURES.
-
-static void symlistfree(struct symlist *sl)
-{
-    struct symlist *nsl;
-
-    while(sl)
-    {
-        nsl = sl->next;
-        free(sl);
-        sl = nsl;
-    }
-}
 
 static void stmtlistfree(struct stmtlist * l)
 {
@@ -169,8 +149,8 @@ static void calllistfree(struct calllist * prog)
     while (prog != NULL) {
         struct calllist * aux = prog;
         prog = prog->next;
-        symlistfree(aux->list);
-        // nodelistfree?
+        // symlistfree(aux->list); | nodelistfree?
+        // explistfree(aux->exp);  |
         free(aux);
     }
 }

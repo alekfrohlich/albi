@@ -34,7 +34,6 @@
     struct ast *node;
     double double_t;
     struct symbol *sym_tok;   // which symbol?  
-    struct symlist *symlist_tok;
 	struct calllist *callparams;
 	struct stmtlist * statements;
 	struct nodelist *list;
@@ -52,10 +51,8 @@
 %type <node> exp statement assignment ecoli
 %type <statements> list
 %type <sym_tok> progdef
-%type <symlist_tok> symlist
-%type <list> assignment_list
+%type <list> assignment_list explist symlist
 %type <callparams> proglist
-%type <list> explist
 
 %%
 
@@ -130,11 +127,11 @@ progdef: PROG VAR
 
 symlist: VAR
 									{
-										$$ = newsymlist($1, NULL);
+										$$ = newnodelist((struct ast *)$1, NULL);
 									}
 | VAR ',' symlist              
 									{
-										$$ = newsymlist($1, $3);
+										$$ = newnodelist((struct ast *)$1, $3);
 									}
 ;
 

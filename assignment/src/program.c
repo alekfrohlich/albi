@@ -117,14 +117,6 @@ static void push_specie(struct program * program, struct nodelist * specie)
     program->species = specie;
 }
 
-/**
- * Merged succesfully?
- */
-static int empty_dependencies(struct program * program)
-{
-	return program->dependence == NULL;
-}
-
 static void declare_parameter(struct program * program, struct symassign * assign)
 {
     struct nodelist * locals = program->locals;
@@ -194,7 +186,7 @@ static char *namemergedvar(char *progname, char * varname)
  */
 void mergeprograms(
     struct symbol** progrefs,
-    struct symlist** export,
+    struct nodelist** export,
     struct nodelist** params,
     int size)
  {
@@ -226,7 +218,7 @@ void mergeprograms(
  /**
  * Define new program.
  */
-void progdef(struct symbol *name, struct symlist *syms, struct stmtlist * stmts)
+void progdef(struct symbol *name, struct nodelist *syms, struct stmtlist * stmts)
 {
     #ifdef DEBUG
         for(int i = 0; i < 9997; i++)
