@@ -59,7 +59,7 @@ ignore              "include gro"
 {ecoli_keyword}     { return ECOLI; }
 
 {float}             { yylval.double_t = atof(yytext); return NUM; }
-{variable}          { yylval.sym_tok = lookup(yytext); return VAR; }
+{variable}          { yylval.sym_t = lookup(yytext); return VAR; }
 {assignment}        { return ASSIGN;  }
 
 ","                 |

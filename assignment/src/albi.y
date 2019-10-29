@@ -34,24 +34,29 @@ extern int yylex();
 %}
 
 %union {
-    struct ast *node;
-    double double_t;
-    struct symbol *sym_tok;   // which symbol?  
-	struct calllist *callparams;
-	struct nodelist *list;
+    // Exported by Flex.
+	double double_t;				// Double.
+    struct symbol *sym_t;   		// Symbol.
+	
+	// Intermediate structures.
+    struct ast *node;				// AST node.
+	struct calllist *callparams;	// Compartment creation node.
+	struct nodelist *list;			// List of AST nodes.
 }
 
-// declare tokens.
+// Token types.
 %token <double_t> NUM
-%token <sym_tok> VAR
+%token <sym_t> VAR
 %token ASSIGN PROG RATE SHARE ECOLI
 
+// Precendences and associativity.
 %right '='
 %left '+' '-'
 %left '*' '/'
 
+// Rule types.
+%type <sym_t> progdef
 %type <node> exp statement assignment ecoli
-%type <sym_tok> progdef
 %type <list> assignlist explist symlist stmtlist
 %type <callparams> calllist
 
