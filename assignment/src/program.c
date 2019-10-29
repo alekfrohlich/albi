@@ -31,14 +31,14 @@ static void printspecies(struct assignlist * species, struct maplist * map, char
     //DECLARE VALUES
     struct assignlist * specie = species;
     while (specie != NULL) {
-        printf("Specie %s in %s\n", getmap(map, specie->assign->sym->name), compart);
+        fprintf( yyout, "Specie %s in %s\n", getmap(map, specie->assign->sym->name), compart);
         specie = specie->next;
     }
 
     //PRINT VALUES
     specie = species;
     while (specie != NULL) {
-        printf("%s = %0.4lf\n", getmap(map, specie->assign->sym->name), specie->assign->sym->value);
+        fprintf( yyout, "%s = %0.4lf\n", getmap(map, specie->assign->sym->name), specie->assign->sym->value);
         specie = specie->next;
     }
 }
@@ -47,14 +47,14 @@ static void printlocals(struct assignlist* locals, struct maplist * map, char * 
     //DECLARE VALUES
     struct assignlist * local = locals;
     while (local != NULL) {
-        printf("var %s in %s\n", getmap(map, local->assign->sym->name), compart);
+        fprintf(yyout, "var %s in %s\n", getmap(map, local->assign->sym->name), compart);
         local = local->next;        
     }
 
     //PRINT VALUES
     local = locals;
     while (local != NULL) {
-        printf("%s = %0.4lf\n", getmap(map, local->assign->sym->name), local->assign->sym->value);
+        fprintf( yyout, "%s = %0.4lf\n", getmap(map, local->assign->sym->name), local->assign->sym->value);
         local = local->next;
     }
 }
@@ -65,21 +65,21 @@ static void printreaction(struct reaction * reac, struct maplist * map) {
     int first = 1;
     while (reactant != NULL) {
         if (!first)
-            printf(" ");
+            fprintf(yyout, " ");
         else
             first = 0;
-        printf("%s", getmap(map, reactant->assign->sym->name));
+        fprintf(yyout, "%s", getmap(map, reactant->assign->sym->name));
         reactant = reactant->next;
     }
-    printf("-> ");
+    fprintf(yyout, "-> ");
     while (product != NULL) {
-        printf("%s", getmap(map, product->assign->sym->name));
+        fprintf(yyout, "%s", getmap(map, product->assign->sym->name));
 
         if(product->next != NULL)
-            printf(" ");
+            fprintf(yyout, " ");
         product = product->next;
     }
-    printf("; %s;\n", "RATE");
+    fprintf(yyout, "; %s;\n", "RATE");
 }
 
 static void printreactionlist(struct reactionlist * reactions, struct maplist* map) {
@@ -167,6 +167,7 @@ static struct reactionlist * newreactionlist(struct reaction * reaction, struct 
 
 // BEGIN PUBLIC INTERFACE.
 
+
 static void push_parameter(struct program * program, struct assignlist * local)
 {
     local->next = program->locals;
@@ -253,9 +254,6 @@ static char *namemergedvar(char *progname, char * varname)
 
 /**
  * 
- * 
- * 
- * 
  */
 void mergeprograms(
     struct symbol** progrefs,
@@ -264,29 +262,24 @@ void mergeprograms(
     int size)
  {
     struct maplist ** map = (struct maplist **) malloc(sizeof(struct maplist*)*size);
-
     for (int i = 0; i < size; i++)
     {
         struct program *prog = progrefs[i]->prog;
-
         for (struct assignlist * specie = prog->species; specie != NULL;
              specie = specie->next)
         {
             char *name = namemergedvar(progrefs[i]->name, specie->assign->sym->name);
             map[i] = newmaplist(specie->assign->sym->name, name, map[i]);
         }
-
         for (struct assignlist * local = prog->locals; local != NULL;
                local = local->next)
         {
             char * name = namemergedvar(progrefs[i]->name, local->assign->sym->name);
             map[i] = newmaplist(local->assign->sym->name, name, map[i]);
         }
-
         printspecies(prog->species, map[i], "ECOLIE");
         printlocals(prog->locals, map[i], "ECOLIE");
     }
-
     for (int i = 0; i < size; i++) {
         struct program * prog = progrefs[i]->prog;
         printreactionlist(prog->reactions, map[i]);
@@ -298,7 +291,18 @@ void mergeprograms(
  */
 void progdef(struct symbol *name, struct symlist *syms, struct stmtlist * stmts)
 {
+    #ifdef DEBUG
+        for(int i = 0; i < 9997; i++)
+        {
+            if ((env[0]+i)->name != 0)
+                printf("%d, table 0, Symbol of name %s, value %lf and program %p\n", i, (env[0]+i)->name, (env[0]+i)->value, (env[0]+i)->prog);
+            if (env[1] && (env[1]+i)->name != 0)
+                printf("%d, table 1, Symbol of name %s, value %lf and program %p\n", i, (env[1]+i)->name, (env[1]+i)->value, (env[1]+i)->prog);
+        }
+    #endif  // DEBUG
+
     struct program * program = (struct program *) malloc(sizeof(struct program));
+    name->prog = program;
 
     /**
      * Store parsing context.
@@ -309,7 +313,6 @@ void progdef(struct symbol *name, struct symlist *syms, struct stmtlist * stmts)
      * Save formal parameters.
      */
     program->parameters = syms;
-
     struct stmtlist * iter = stmts;
     while (iter != NULL)
     {
@@ -325,8 +328,7 @@ void progdef(struct symbol *name, struct symlist *syms, struct stmtlist * stmts)
         
         else
         {
-            //incorrect format
-            //GENERATE ERROR
+            yyerror("Invalid expression inside rate block");
         }
     
         iter = iter->next;

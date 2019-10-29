@@ -55,7 +55,6 @@ static unsigned symhash(char *sym)
  */
 struct symbol *lookup(char *sym)
 {   
-
     for (int i = curr_env; i >= 0; i--)
     {
         struct symbol *entry = &env[i][symhash(sym) % SYMTAB_SIZE];
@@ -70,7 +69,12 @@ struct symbol *lookup(char *sym)
              * Key already exists, so return it!
              */
             if (entry->name && !strcmp(entry->name, sym))
+            {
+                #ifdef DEBUG
+                    printf("entry %s found at context %d\n", sym, i);
+                #endif
                 return entry;
+            }
 
             /**
              * Loop back to start of table.
@@ -98,7 +102,9 @@ struct symbol *lookup(char *sym)
         {
             entry->name = strdup(sym);
             entry->value = 0;
-
+            #ifdef DEBUG
+                printf("entry %s added at context %d\n", sym, curr_env);
+            #endif
             return entry;
         }
 
@@ -108,7 +114,7 @@ struct symbol *lookup(char *sym)
         if (++entry >= env[curr_env] + SYMTAB_SIZE)
             entry = env[curr_env];
     }
-
+    
     /**
      * Tried all local entries, symbol table full.
      */

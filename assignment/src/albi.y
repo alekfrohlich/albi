@@ -123,6 +123,7 @@ program: progdef '(' symlist ')' ASSIGN '{' list '}' ';'
 
 progdef: PROG VAR
 									{
+										$$ = $2;
 										env[1] = (struct symbol *) malloc(sizeof(struct symbol) * SYMTAB_SIZE);
 										curr_env = 1;
 									}

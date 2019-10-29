@@ -239,7 +239,7 @@ void treefree(struct ast *a)
         break;
 
     default:
-        printf("internal error: bad node %c\n", a->type);
+        yyerror("internal error: bad node");
     }
 
     free(a);
