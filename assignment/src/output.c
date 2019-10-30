@@ -25,17 +25,55 @@
 #include "output.h"
 #include "structures.h"
 
+void printinorder(struct ast * ast, struct maplist * map) {
+    if (ast == NULL)
+        return;
+
+    switch (ast->type) {
+        case PLUS:
+        printinorder(ast->left, map);
+        fprintf(yyout, "+" );
+        printinorder(ast->right, map);
+        break;
+        case MINUS:
+        printinorder(ast->left, map);
+        fprintf(yyout, "-" );
+        printinorder(ast->right, map);
+        break;
+        case DIV:
+        printinorder(ast->left, map);
+        fprintf(yyout, "/" );
+        printinorder(ast->right, map);
+        break;
+        case TIMES:
+        printinorder(ast->left, map);
+        fprintf(yyout, "*");
+        printinorder(ast->right, map);
+        break;
+        case SYM_REF:
+        fprintf(yyout, "%s", getmap(map, ((struct symref*)ast)->sym->name));
+        break;
+        case CONSLIT:
+        fprintf(yyout, "%0.4lf", ((struct numval*)ast)->number);
+        break;
+        default:
+        ;
+        //GENERATE ERROR OR WARN
+        // yyerror()
+    }
+}
+
 /**
  * Declare and define program variables.
  */
-void outdecls(struct nodelist *decls, MAP namemap)
+void outdecls(struct nodelist *decls, MAP namemap, int compartnum)
 {
     for (struct nodelist *it = decls; it != NULL; it = it->next)
     {
         // Declare it.
-        fprintf(yyout, "%s %s in ALOCAR\n",
-                ((struct tsymassign*)it->node)->_type == SPECIE? "Specie" : "Local", 
-                getmap(namemap, ((struct tsymassign*)it->node)->sym->name));
+        fprintf(yyout, "%s %s in ECOLI%d\n",
+                ((struct tsymassign*)it->node)->_type == SPECIE? "Specie" : "Var", 
+                getmap(namemap, ((struct tsymassign*)it->node)->sym->name), compartnum);
 
         // Define it.
         fprintf(yyout, "%s = %0.4lf\n",
@@ -67,7 +105,9 @@ static void printreaction(struct reaction * reac, struct maplist * map)
             fprintf(yyout, " ");
         product = product->next;
     }
-    fprintf(yyout, "; %s;\n", "RATE");
+    fprintf(yyout, ";");
+    printinorder(reac->rate, map);
+    fprintf(yyout, ";\n");
 }
 
 /**

@@ -27,7 +27,7 @@
 
     // Forward definitions.
     extern FILE * yyout;
-    extern void outdecls(struct nodelist *declarations, MAP namemap);
+    extern void outdecls(struct nodelist *declarations, MAP namemap, int compartnum);
     extern void outreacs(struct reactionlist *reactions, MAP namemap);
 
 #endif  // OUTPUT_H

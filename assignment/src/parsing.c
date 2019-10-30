@@ -99,13 +99,14 @@ void gencompart(struct compart * compartment)
         params[index] = aux->explist;
         index++;
     }
-    
+
     /**
      * Eval & Apply, will also check
      * for dependences in the future.
      */
-    maplist = mergeprograms(prog, export, params, size, curr_compart);
+    maplist = mergeprograms(prog, export, params, curr_compart, size);
 
+    fprintf(yyout, "Compartment ECOLI%d\n", curr_compart);
     /**
      * Generate corresponding Tellurium.
      */
@@ -113,7 +114,7 @@ void gencompart(struct compart * compartment)
     {
         // Working program.
         struct program *wp = prog[i]->prog;
-        outdecls(wp->declarations, maplist[i]);
+        outdecls(wp->declarations, maplist[i], curr_compart);
         outreacs(wp->reactions, maplist[i]);
     }
 }
