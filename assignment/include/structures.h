@@ -1,6 +1,8 @@
 #ifndef STRUCTS__H
 #define STRUCTS__H
 
+	typedef struct maplist * MAP;
+
 	/**
 	 * Dictionary implemented
 	 * as linked list.

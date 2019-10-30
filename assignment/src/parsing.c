@@ -25,6 +25,7 @@
 
 #include "parsing.h"
 #include "program.h"
+#include "structures.h"
 #include "output.h"
 
 struct symbol* env[2];
@@ -74,6 +75,7 @@ void gencompart(struct compart * compartment)
 {
     curr_compart++;
     struct calllist * call = compartment->params;
+    MAP* maplist;
 
     int size = 0;
     while (call != NULL)
@@ -98,7 +100,22 @@ void gencompart(struct compart * compartment)
         index++;
     }
     
-    mergeprograms(prog, export, params, size, curr_compart);
+    /**
+     * Eval & Apply, will also check
+     * for dependences in the future.
+     */
+    maplist = mergeprograms(prog, export, params, size, curr_compart);
+
+    /**
+     * Generate corresponding Tellurium.
+     */
+    for (int i = 0; i < size; i++)
+    {
+        // Working program.
+        struct program *wp = prog[i]->prog;
+        outdecls(wp->declarations, maplist[i]);
+        outreacs(wp->reactions, maplist[i]);
+    }
 }
 
 struct nodelist *newnodelist(struct ast *node, struct nodelist *next)

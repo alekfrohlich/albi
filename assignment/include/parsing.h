@@ -24,6 +24,10 @@
 
 	#include "ast.h"
 
+	typedef struct nodelist* stmtlist;
+	typedef struct nodelist* explist;
+	typedef struct nodelist* assignlist;
+
 	/**
 	 * List of AST nodes.
 	 */

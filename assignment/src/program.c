@@ -161,7 +161,7 @@ static char *namemergedvar(char *progname, char *varname, int compartnum)
 /**
  * Merge program list's of declarations.
  */
-void mergeprograms(
+MAP* mergeprograms(
     struct symbol** progrefs,
     struct nodelist** export,
     struct nodelist** explist,
@@ -203,7 +203,8 @@ void mergeprograms(
         }
 
         /**
-         * Map wp variables to compartment namespace.
+         * Map working program variables
+         * to compartment namespace.
          */
         for (struct nodelist *decl = prog->declarations; decl != NULL; decl = decl->next)
         {
@@ -212,6 +213,8 @@ void mergeprograms(
             map[i] = newmaplist(((struct tsymassign *)decl->node)->sym->name, name, map[i]);
         }
     }
+
+    return map;
  }
 
 /**

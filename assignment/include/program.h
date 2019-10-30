@@ -24,6 +24,7 @@
 
     #include "symtab.h"
     #include "parsing.h"
+    #include "structures.h"
 
     /**
      * 
@@ -57,7 +58,7 @@
 
     // Forward definitions.
     extern void progdef(struct symbol *name, struct nodelist *syms, struct nodelist *stmts);
-    extern void mergeprograms(
+    extern MAP* mergeprograms(
         struct symbol** progrefs,
         struct nodelist** export,
         struct nodelist** params,

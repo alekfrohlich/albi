@@ -21,49 +21,30 @@
 
 #include <stdio.h>
 
+#include "ast.h"
 #include "output.h"
+#include "structures.h"
 
-// Begin Output
-void printspecies(struct nodelist * species, struct maplist * map, char * compart)
+/**
+ * Declare and define program variables.
+ */
+void outdecls(struct nodelist *decls, MAP namemap)
 {
-    //DECLARE VALUES
-    struct nodelist * specie = species;
-    while (specie != NULL) {
-        fprintf(yyout, "Specie %s in %s\n",
-                getmap(map, ((struct symassign *)specie->node)->sym->name), compart);
-        specie = specie->next;
-    }
+    for (struct nodelist *it = decls; it != NULL; it = it->next)
+    {
+        // Declare it.
+        fprintf(yyout, "%s %s in ALOCAR\n",
+                ((struct tsymassign*)it->node)->_type == SPECIE? "Specie" : "Local", 
+                getmap(namemap, ((struct tsymassign*)it->node)->sym->name));
 
-    //PRINT VALUES
-    specie = species;
-    while (specie != NULL) {
+        // Define it.
         fprintf(yyout, "%s = %0.4lf\n",
-                getmap(map, ((struct symassign *)specie->node)->sym->name),
-                ((struct symassign *)specie->node)->sym->value);
-        specie = specie->next;
+                getmap(namemap, ((struct tsymassign*)it->node)->sym->name),
+                ((struct tsymassign*)it->node)->sym->value);
     }
 }
 
-void printlocals(struct nodelist* locals, struct maplist * map, char * compart)
-{
-    //DECLARE VALUES
-    struct nodelist * local = locals;
-    while (local != NULL) {
-        fprintf(yyout, "var %s in %s\n",
-                getmap(map, ((struct symassign *)local->node)->sym->name), compart);
-        local = local->next;        
-    }
-
-    //PRINT VALUES
-    local = locals;
-    while (local != NULL) {
-        fprintf(yyout, "%s = %0.4lf\n", getmap(map, ((struct symassign *)local->node)->sym->name),
-                ((struct symassign*)local->node)->sym->value);
-        local = local->next;
-    }
-}
-
-void printreaction(struct reaction * reac, struct maplist * map)
+static void printreaction(struct reaction * reac, struct maplist * map)
 {
     struct nodelist *reactant = reac->reactant;
     struct nodelist *product = reac->product;
@@ -89,11 +70,14 @@ void printreaction(struct reaction * reac, struct maplist * map)
     fprintf(yyout, "; %s;\n", "RATE");
 }
 
-void printreactionlist(struct reactionlist * reactions, struct maplist* map)
+/**
+ * List program reactions.
+ */
+void outreacs(struct reactionlist *reacs, MAP namemap)
 {
-    struct reactionlist * element = reactions;
+    struct reactionlist * element = reacs;
     while (element != NULL) {
-        printreaction(element->reac, map);
+        printreaction(element->reac, namemap);
         element = element->next;
     }
 }
