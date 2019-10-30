@@ -70,7 +70,6 @@ start_of_prog: %empty
 										struct symassign *assign = (struct symassign *) $2;
 										symdef(assign->sym, assign->val);
 										genparam(assign->sym->name, assign->val);
-										// treefree($2);
 									}
 | start_of_prog program
 									{
@@ -79,7 +78,6 @@ start_of_prog: %empty
 | start_of_prog ecoli
 									{
 										gencompart((struct compart *) $2);
-										// treefree($2);
 									}
 ;
 

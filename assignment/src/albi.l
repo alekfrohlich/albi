@@ -25,10 +25,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "symtab.h"    // lookup, currenv.
-#include "albi.tab.h"  // tokens, yylval.
+#include "symtab.h"    // lookup, currenv
+#include "albi.tab.h"  // tokens, yylval
 
-// Bison location.
+// Bison location
 int yycolumn = 1;
 #define YY_USER_ACTION \
     yylloc.first_line = yylloc.last_line = yylineno; \
@@ -53,13 +53,13 @@ ignore              "include gro"
 {white}             { }
 {ignore}            { }
 
-{program_keyword}	{ return PROG; }
-{rate_keyword}		{ return RATE; }
-{sharing_keyword}   { return SHARE;  }
+{program_keyword}	{ return PROG;  }
+{rate_keyword}		{ return RATE;  }
+{sharing_keyword}   { return SHARE; }
 {ecoli_keyword}     { return ECOLI; }
 
 {float}             { yylval.double_t = atof(yytext); return NUM; }
-{variable}          { yylval.sym_t = lookup(yytext); return VAR; }
+{variable}          { yylval.sym_t = lookup(yytext); return VAR;  }
 {assignment}        { return ASSIGN;  }
 
 ","                 |
@@ -81,11 +81,11 @@ ignore              "include gro"
 
 %%
 
-// Current yyin file name.
+// Current yyin file name
 char *filename;
 
 /**
- * Entry point.
+ * Entry point
  */
 int main(int argc, char **argv)
 {
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
 }
 
 /**
- * Display error message and exit.
+ * Display error message and exit
  */
 int yyerror(const char *s)
 {
