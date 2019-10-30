@@ -28,12 +28,7 @@
 #include "structures.h"
 #include "output.h"
 
-/**
- * TODO: gencompartg,
- * progcallfree?
- *      symlistfree(aux->list); | nodelistfree?
- *      explistfree(aux->exp);  |
- */
+// TODO: gencompartg,
 
 struct symbol* env[2];          // (Global, Local) parsing tables.
 int currcompart = 0;           // Current compartment count.
@@ -76,7 +71,8 @@ double eval(struct ast *a)
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
- * Generate intermediate representation of parameter.
+ * Generate intermediate
+ * representation of parameter (print)
  */
 void genparam(char *name, struct ast *val)
 {
@@ -84,7 +80,8 @@ void genparam(char *name, struct ast *val)
 }
 
  /**
-  * Generate intermediate representation of compartment.
+  * Generate intermediate
+  * representation of compartment (print)
   */
 void gencompart(struct compart *compartment)
 {
@@ -138,6 +135,9 @@ void gencompart(struct compart *compartment)
 //                          STRUCTURE MANINPULATION                          //
 ///////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Create new list of AST nodes
+ */
 struct nodelist *newnodelist(struct ast *node, struct nodelist *next)
 {
     struct nodelist * list = (struct nodelist *) malloc(sizeof(struct nodelist));
@@ -146,11 +146,18 @@ struct nodelist *newnodelist(struct ast *node, struct nodelist *next)
     return list;
 }
 
+/**
+ * Free list of AST nodes
+ */
 void nodelistfree(struct nodelist *list)
 {
     // TODO: free nodelist.
 }
 
+/**
+ * Create new list of program
+ * call parameters
+ */
 struct progcall *newprogcall(
     struct symbol *progref,
     struct symlist *shares,
@@ -164,6 +171,10 @@ struct progcall *newprogcall(
     p->next = next;
 }
 
+/**
+ * Free list of program
+ * call parameters.
+ */
 void progcallfree(struct progcall *progcall)
 {
     while (progcall != NULL)
