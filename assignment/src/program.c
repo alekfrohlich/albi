@@ -39,12 +39,6 @@ static struct nodelist *declare_specie(
 {
     char * name = assign->sym->name;
     struct nodelist * iter = locals; /* Who is to be removed, if any. */
-    printf("Declaring %s\n", name);
-    printf("BEGIN PUSH SPECIE\n\n");
-    for (struct nodelist *it = locals; it != NULL; it = it->next)
-        printf("LOCAL: %s\n", ((struct symassign *)it->node)->sym->name);
-    for (struct nodelist *it = species; it != NULL; it = it->next)
-        printf("SPECIE: %s\n", ((struct symassign *)it->node)->sym->name);
     
     /**
      * Removing head?
@@ -95,11 +89,6 @@ static struct nodelist *declare_specie(
      */
     iter->next = species;
     species = iter;
-    printf("END PUSH SPECIE\n\n");
-    for (struct nodelist *it = locals; it != NULL; it = it->next)
-        printf("LOCAL: %s\n", ((struct symassign *)it->node)->sym->name);
-    for (struct nodelist *it = species; it != NULL; it = it->next)
-        printf("SPECIE: %s\n", ((struct symassign *)it->node)->sym->name);
     return species;
 }
 
@@ -157,6 +146,7 @@ static struct nodelist *newreaction(
             yyerror("Invalid expression");
         }
     }
+    return species;
 }
 
 /**
@@ -213,7 +203,6 @@ static void makedecls(struct program *prog)
     struct nodelist *species = NULL;
     struct nodelist *locals = NULL;
     struct nodelist *decls = NULL;
-    printf("BEGINNING\n");
 
     /**
      * Build locals, species and reactions.
@@ -227,7 +216,6 @@ static void makedecls(struct program *prog)
         
         else if (iter->node->type == RATESTATEMENT)
         {
-            printf("RATESTATEMENT\n");
             species = newreaction(prog, (struct rate *) iter->node, species, locals);
         }
         
@@ -237,32 +225,15 @@ static void makedecls(struct program *prog)
         }
     }
 
-    printf("MIDDLE\n");
+    for (struct nodelist *it = species; it != NULL; it = it->next)
+        printf("sp: %s\n", ((struct symassign *)it->node)->sym->name);    
+    for (struct nodelist *it = locals; it != NULL; it = it->next)
+        printf("lo: %s\n", ((struct symassign *)it->node)->sym->name);
 
     struct nodelist *it1 = prog->body;
     struct nodelist *it2 = species;
     struct nodelist *it3 = locals;
-    struct nodelist *it4 = decls;
 
-    printf("\n\nLISTS\n\n");
-    for (struct nodelist *it = it2; it != NULL; it = it->next)
-        printf("SPECIE: %s\n", ((struct symassign *)it->node)->sym->name);
-    printf("AF\n");
-    
-    printf("%p%p\n", locals, locals->next);
-    struct nodelist *it = locals;
-    while (it)
-    {
-        printf("LOCAL: %s\n", ((struct symassign *)it->node)->sym->name);
-        printf("it %p\n", it);
-        it = it->next;
-        printf("it %p\n", it);
-        if (it == NULL)
-            break;
-        printf("it %p\n", it);
-
-    }
-    printf("AF");
     /**
      * Build decls.
      */
@@ -272,11 +243,7 @@ static void makedecls(struct program *prog)
          * Skip non-assignment nodes.
          */
         if (it1->node->type != SYM_ASSIGN)
-        {
-            printf("1\n");
-            it1 = it1->next;
-            continue;
-        }
+            goto move;
 
         /**
          * Add locals to declarations.
@@ -284,14 +251,13 @@ static void makedecls(struct program *prog)
         if (it2 != NULL && strcmp(((struct symassign *) it2->node)->sym->name,
             ((struct symassign *) it1->node)->sym->name) == 0)
         {
-            printf("2\n");
             struct ast *a = newtassign(SPECIE, ((struct symassign *) it2->node)->sym,
                     ((struct symassign *) it2->node)->val);
             // free(it2->node); ?
-            it4 = newnodelist(a, it4);
+            decls = newnodelist(a, decls);
             it2 = it2->next;
             it1 = it1->next;
-            continue;
+            goto move;
         }
 
         /**
@@ -300,20 +266,24 @@ static void makedecls(struct program *prog)
         if (it3 != NULL && strcmp(((struct symassign *) it3->node)->sym->name,
             ((struct symassign *) it1->node)->sym->name) == 0)
         {
-            printf("3\n");
             struct ast *a = newtassign(LOCAL, ((struct symassign *) it3->node)->sym,
                     ((struct symassign *) it3->node)->val);
             // free(it3->node); ?
-            it4 = newnodelist(a, it4);
+            decls = newnodelist(a, decls);
             it3 = it3->next;
             it1 = it1->next;
-            continue;
+            goto move;
         }
-        // printf("%p, %p, %p ,%p\n", it1, it2, it3, it4);
+
+move:
+        it1 = it1->next;
+        if ((it2 || it3) && !it1)
+            it1 = prog->body;
+        printf("%p,%p,%p\n",it1,it2,it3);
     }
 
-    printf("END\n");
-
+    for (struct nodelist *it = decls; it != NULL; it = it->next)
+        printf("%s %s\n",((struct tsymassign *)it->node)->_type == 1? "SPECIE" : "LOCAL" , ((struct tsymassign *)it->node)->sym->name);
     prog->declarations = decls;
 }
 

@@ -145,12 +145,12 @@ stmtlist: %empty
 									{
 										$$ = NULL;
 									}
-| statement stmtlist
+| stmtlist statement
 									{
-										if ($2 == NULL)
-											$$ = newnodelist($1, NULL);
+										if ($1 == NULL)
+											$$ = newnodelist($2, NULL);
 										else
-											$$ = newnodelist($1, $2);
+											$$ = newnodelist($2, $1);
 									}
 ;
 
