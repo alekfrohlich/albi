@@ -64,7 +64,7 @@
     struct compart {
         enum nodetypes type;
         char *sym;
-        struct calllist *params;
+        struct calllist *calllist;
     };
 
     /**
@@ -113,7 +113,7 @@
 
     // Forward definitions.
     extern struct ast *newast(enum nodetypes type, struct ast *l, struct ast *r);
-    extern struct ast *newcompart(char *sym, struct calllist *params);
+    extern struct ast *newcompart(char *sym, struct calllist *calllist);
     extern struct ast *newnum(double d);
     extern struct ast *newref(struct symbol *sym);
     extern struct ast *newassign(struct symbol *s, struct ast *v);

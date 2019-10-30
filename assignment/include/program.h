@@ -31,11 +31,11 @@
      */
     struct program {
         int reactions_size;
-        struct nodelist *body;
         struct symbol *symtab;
+        struct nodelist *body;
         struct nodelist *declarations;
-        struct nodelist *parameters;
         struct nodelist *dependences;  // ignored.
+        struct symlist *parameters;
         struct reactionlist *reactions;
     };
 
@@ -57,10 +57,10 @@
     };
 
     // Forward definitions.
-    extern void progdef(struct symbol *name, struct nodelist *syms, struct nodelist *stmts);
+    extern void progdef(struct symbol *name, struct symlist *syms, struct nodelist *stmts);
     extern MAP* mergeprograms(
         struct symbol** progrefs,
-        struct nodelist** export,
+        struct symlist** export,
         struct nodelist** params,
         int compartnum,
         int size);

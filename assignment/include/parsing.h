@@ -42,7 +42,7 @@
 	struct calllist {
 		struct symbol * sym;
 		struct calllist * next;
-		struct nodelist * symlist;
+		struct symlist * symlist;
 		struct nodelist * explist;
 	};
 
@@ -51,7 +51,7 @@
 	extern void genparam(char *name, struct ast *val);
 	extern void gencompart(struct compart* compartment);
 	extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
-	extern struct calllist *newcalllist(struct symbol*, struct nodelist *symlist, struct nodelist* parameters, struct calllist*);
+	extern struct calllist *newcalllist(struct symbol*, struct symlist *symlist, struct nodelist* parameters, struct calllist*);
 	extern void calllistfree(struct calllist * prog);
 
 	// Toolchain definitions.

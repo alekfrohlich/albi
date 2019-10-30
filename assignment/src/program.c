@@ -163,7 +163,7 @@ static char *namemergedvar(char *progname, char *varname, int compartnum)
  */
 MAP* mergeprograms(
     struct symbol** progrefs,
-    struct nodelist** export,
+    struct symlist** export,
     struct nodelist** explist,
     int compartnum,
     int size)
@@ -184,16 +184,17 @@ MAP* mergeprograms(
         /**
          * Evaluate call parameters.
          */
-        struct nodelist *param = prog->parameters, *exp = explist[i];
-        while (param != NULL)
+        struct symlist *param = prog->parameters;
+        struct nodelist *exp = explist[i];
+        while (param != NULL && exp != NULL)
         {
-            ((struct symbol *) param->node)->value = eval(exp); // recover symlist.
+            param->sym->value = eval(exp->node); // recover symlist.
             param = param->next;
+            exp = exp->next;
         }
 
         if (param || exp)
             yyerror("Wrong number of arguments to program!");
-
         /**
          * Apply call parameters.
          */
@@ -214,7 +215,7 @@ MAP* mergeprograms(
         }
     }
 
-    return map;
+    return map; 
  }
 
 /**
@@ -301,7 +302,7 @@ static void makedecls(struct program *prog)
  /**
   * Define new program.
   */
-void progdef(struct symbol *name, struct nodelist *syms, struct nodelist * stmts)
+void progdef(struct symbol *name, struct symlist *syms, struct nodelist * stmts)
 {
     struct program * program = (struct program *) malloc(sizeof(struct program));
     name->prog = program;

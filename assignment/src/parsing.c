@@ -58,7 +58,7 @@ double eval(struct ast *a)
     case DIV:   v = eval(a->left) / eval(a->right); break;
 
     default:
-        printf("internal error: bad node %c\n", a->type);
+        printf("internal error: bad node at eval, type %u\n", a->type);
     }
 
     return v;
@@ -74,7 +74,7 @@ void genparam(char *name, struct ast *val)
 void gencompart(struct compart * compartment) 
 {
     curr_compart++;
-    struct calllist * call = compartment->params;
+    struct calllist * call = compartment->calllist; // call params.
     MAP* maplist;
 
     int size = 0;
@@ -85,10 +85,10 @@ void gencompart(struct compart * compartment)
     }
 
     struct symbol * prog[size];
-    struct nodelist * export[size];  // ignore.
+    struct symlist * export[size];  // ignore.
     struct nodelist * params[size];
 
-    call  = compartment->params;
+    call  = compartment->calllist;
     int index = 0;
     while (call != NULL)
     {
@@ -127,10 +127,10 @@ struct nodelist *newnodelist(struct ast *node, struct nodelist *next)
 }
 
 struct calllist *newcalllist(
-    struct symbol* sym, 
-    struct nodelist * symlist, 
-    struct nodelist* explist, 
-    struct calllist* next) 
+    struct symbol *sym, 
+    struct symlist *symlist, 
+    struct nodelist *explist, 
+    struct calllist *next) 
 {
     struct calllist * p = (struct calllist *) malloc(sizeof(struct calllist)); 
     p->sym = sym;

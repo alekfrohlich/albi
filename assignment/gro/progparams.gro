@@ -1,10 +1,10 @@
 include gro
 
-program prog() := {
+program prog(x) := {
     E := 25;
-    F := 75 + E;
+    F := 75 + x;
     K := 2;
     rate (K) : { E := E + 1; F := F - 1; }
 };
 
-ecoli([], program prog());
+ecoli([], program prog(10));

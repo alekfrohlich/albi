@@ -1,0 +1,16 @@
+program prog() := {
+    E := 25;
+    F := 75 + E;
+    K := 2 + F + E;
+    rate(K) : { E := E + 1; F := F - 1; }
+};
+
+program dupl() := {
+    E := 25;
+    F := 75 + E;
+    K := 2 + F + E;
+    rate(K) : { E := E + 1; F := F - 1; }    
+};
+
+ecoli([], program prog() + dupl());
+ecoli([], program prog() + dupl());

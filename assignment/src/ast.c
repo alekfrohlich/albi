@@ -35,12 +35,14 @@ struct ast * newast(enum nodetypes type, struct ast *l, struct ast *r)
     return a;
 }
 
-struct ast *newcompart(char *sym, struct calllist *params)
+struct ast *newcompart(char *sym, struct calllist *calllist)
 {
     struct compart *a = malloc(sizeof(struct compart*));
+
     a->type = COMPART;
     a->sym = sym;
-    a->params = params;
+    a->calllist = calllist;
+
     return (struct ast*) a;
 }
 
@@ -90,8 +92,10 @@ struct ast *newtassign(enum sbmltypes type, struct symbol *sym, struct ast *val)
 struct ast *newrate(struct ast* exp, struct nodelist *assigns)
 {
     struct rate * r = malloc(sizeof(struct rate));
-    r->assigns = assigns;
+
     r->type = RATESTATEMENT;
+    r->assigns = assigns;
+    r->exp = exp;
 
     return (struct ast *) r;
 }
@@ -128,13 +132,13 @@ void treefree(struct ast *a)
         // nodelistfree?
     case COMPART: // double free problem?
         ;
-        calllistfree(((struct compart *)a)->params);
+        calllistfree(((struct compart *)a)->calllist);
         break;
     case CONSLIT:
         break;
 
     default:
-        yyerror("internal error: bad node");
+        yyerror("internal error: bad node at treefree");
     }
 
     free(a);

@@ -138,3 +138,11 @@ void symbolfree(struct symbol * sym)
     free(sym->name);
     free(sym->prog);
 }
+
+struct symlist* newslist(struct symbol *sym, struct symlist *next)
+{
+    struct symlist *list = (struct symlist*) malloc(sizeof(struct symlist));
+    list->sym = sym;
+    list->next = next;
+    return list;
+}

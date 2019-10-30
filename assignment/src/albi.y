@@ -42,6 +42,7 @@ extern int yylex();
     struct ast *node;				// AST node.
 	struct calllist *callparams;	// Compartment creation node.
 	struct nodelist *list;			// List of AST nodes.
+	struct symlist *slist;			// List of symbols.
 }
 
 // Token types.
@@ -57,7 +58,8 @@ extern int yylex();
 // Rule types.
 %type <sym_t> progdef
 %type <node> exp statement assignment ecoli
-%type <list> assignlist explist symlist stmtlist
+%type <list> assignlist explist stmtlist
+%type <slist> symlist
 %type <callparams> calllist
 
 %%
@@ -68,7 +70,7 @@ start_of_prog: %empty
 										struct symassign *assign = (struct symassign *) $2;
 										symdef(assign->sym, assign->val);
 										genparam(assign->sym->name, assign->val);
-										treefree($2);
+										// treefree($2);
 									}
 | start_of_prog program
 									{
@@ -77,7 +79,7 @@ start_of_prog: %empty
 | start_of_prog ecoli				
 									{
 										gencompart((struct compart *) $2);
-										treefree($2);
+										// treefree($2);
 									}
 ;
 
@@ -133,11 +135,11 @@ progdef: PROG VAR
 
 symlist: VAR
 									{
-										$$ = newnodelist((struct ast *)$1, NULL);
+										$$ = newslist($1, NULL);
 									}
 | VAR ',' symlist              
 									{
-										$$ = newnodelist((struct ast *)$1, $3);
+										$$ = newslist($1, $3);
 									}
 ;
 
