@@ -117,8 +117,8 @@
     extern struct ast *newnum(double d);
     extern struct ast *newref(struct symbol *sym);
     extern struct ast *newassign(struct symbol *sym, struct ast *val);
-    extern struct ast *newtassign(enum sbmltypes type, struct symbol *syn, struct ast *val);
-    extern struct ast *newrate(struct ast* exp, struct nodelist *assigns);
-	extern void treefree(struct ast *a);
+    extern struct ast *newtassign(enum sbmltypes type, struct symbol *sym, struct ast *val);
+    extern struct ast *newrate(struct ast *exp, struct nodelist *assigns);
+    extern void treefree(struct ast *a);
 
 #endif  // AST_H

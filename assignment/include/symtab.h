@@ -51,6 +51,6 @@
     extern struct symbol *lookup(char *sym);
     extern struct symlist *newslist(struct symbol *sym, struct symlist *next);
     extern void symdef(struct symbol *sym, struct ast *val);
-    extern void freesymbol(struct symbol * sym);
+    extern void freesymbol(struct symbol *sym);
 
 #endif  // SYMTAB_H

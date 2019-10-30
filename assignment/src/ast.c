@@ -27,76 +27,62 @@
 struct ast * newast(enum nodetypes type, struct ast *left, struct ast *right)
 {
     struct ast *a = malloc(sizeof(struct ast));
-
     a->type = type;
     a->left = left;
     a->right = right;
-
     return a;
 }
 
 struct ast *newcompart(char *name, struct progcall *call)
 {
     struct compart *a = malloc(sizeof(struct compart*));
-
     a->type = COMPART;
     a->name = name;
     a->call = call;
-
     return (struct ast*) a;
 }
 
 struct ast * newnum(double d)
 {
     struct numval *a = malloc(sizeof(struct numval));
-
     a->type = CONSLIT;
     a->number = d;
-    
     return (struct ast *) a;
 }
 
 struct ast * newref(struct symbol *sym)
 {
     struct symref *a = malloc(sizeof(struct symref));
-
     a->type = SYM_REF;
     a->sym = sym;
-
     return (struct ast *) a;
 }
 
 struct ast * newassign(struct symbol *sym, struct ast *val)
 {
     struct symassign *a = malloc(sizeof(struct symassign));
-
     a->type = SYM_ASSIGN;
     a->sym = sym;
     a->val = val;
-
     return (struct ast *) a;
 }
 
 struct ast *newtassign(enum sbmltypes type, struct symbol *sym, struct ast *val)
 {
     struct tsymassign *a = malloc(sizeof(struct tsymassign));
-
     a->type = T_SYM_ASSIGN;
     a->_type = type;
     a->sym = sym;
     a->val = val;
-
     return (struct ast *) a;
 }
 
 struct ast *newrate(struct ast* exp, struct nodelist *assigns)
 {
     struct rate * r = malloc(sizeof(struct rate));
-
     r->type = RATESTATEMENT;
     r->assigns = assigns;
     r->exp = exp;
-
     return (struct ast *) r;
 }
 
@@ -104,6 +90,7 @@ void treefree(struct ast *a)
 {
     switch (a->type)
     {
+
     // two subtrees.
     case PLUS:
     case MINUS:
