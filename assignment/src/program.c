@@ -161,37 +161,58 @@ static char *namemergedvar(char *progname, char *varname, int compartnum)
 /**
  * Merge program list's of declarations.
  */
-// void mergeprograms(
-//     struct symbol** progrefs,
-//     struct nodelist** export,
-//     struct nodelist** explist,
-//     int compartnum,
-//     int size)
-//  {
-//     struct maplist ** map = (struct maplist **) malloc(sizeof(struct maplist*)*size);
-//     for (int i = 0; i < size; i++)
-//     {
-//         struct program *prog = progrefs[i]->prog;
-//         for (struct nodelist *specie = prog->species; specie != NULL;
-//              specie = specie->next)
-//         {
-//             char *name = namemergedvar(progrefs[i]->name, ((struct symassign *)specie->node)->sym->name, compartnum);
-//             map[i] = newmaplist(((struct symassign *)specie->node)->sym->name, name, map[i]);
-//         }
-//         for (struct nodelist * local = prog->locals; local != NULL;
-//                local = local->next)
-//         {
-//             char * name = namemergedvar(progrefs[i]->name, ((struct symassign *)local->node)->sym->name, compartnum);
-//             map[i] = newmaplist(((struct symassign *)local->node)->sym->name, name, map[i]);
-//         }
-//         printspecies(prog->species, map[i], "ECOLIE");
-//         printlocals(prog->locals, map[i], "ECOLIE");
-//     }
-//     for (int i = 0; i < size; i++) {
-//         struct program * prog = progrefs[i]->prog;
-//         printreactionlist(prog->reactions, map[i]);
-//     }
-//  }
+void mergeprograms(
+    struct symbol** progrefs,
+    struct nodelist** export,
+    struct nodelist** explist,
+    int compartnum,
+    int size)
+ {
+     /**
+      * Program to compartment variable name dictionary.
+      */
+    struct maplist ** map = (struct maplist **) malloc(sizeof(struct maplist*)*size);
+
+    /**
+     * Iterate over all programs in call list.
+     */
+    for (int i = 0; i < size; i++)
+    {
+        // Working program.
+        struct program *prog = progrefs[i]->prog;
+
+        /**
+         * Evaluate call parameters.
+         */
+        struct nodelist *param = prog->parameters, *exp = explist[i];
+        while (param != NULL)
+        {
+            ((struct symbol *) param->node)->value = eval(exp); // recover symlist.
+            param = param->next;
+        }
+
+        if (param || exp)
+            yyerror("Wrong number of arguments to program!");
+
+        /**
+         * Apply call parameters.
+         */
+        for (struct nodelist *decl = prog->declarations; decl != NULL; decl = decl->next)
+        {
+            ((struct tsymassign*) decl->node)->sym->value = eval(((struct tsymassign*) decl->node)->val);
+        }
+
+        /**
+         * Map wp variables to compartment namespace.
+         */
+        for (struct nodelist *decl = prog->declarations; decl != NULL; decl = decl->next)
+        {
+            char *name = namemergedvar(progrefs[i]->name,
+                    ((struct tsymassign *)decl->node)->sym->name, compartnum);
+            map[i] = newmaplist(((struct tsymassign *)decl->node)->sym->name, name, map[i]);
+        }
+    }
+ }
 
 /**
  * Make list of declarations.
