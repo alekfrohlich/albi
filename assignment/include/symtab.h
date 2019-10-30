@@ -36,11 +36,20 @@
         struct program *prog;
     };
 
+    /**
+     * List of symbols.
+     */
+    struct symlist {
+        struct symbol *sym;
+        struct symlist *next;
+    };
+
     // forward defined.
     struct ast;
     extern int curr_env;
     extern struct symbol* env[2];
     extern struct symbol *lookup(char *sym);
+    extern struct symlist *newslist(struct symbol *sym, struct symlist *next);
     extern void symdef(struct symbol *sym, struct ast *val);
     extern void freesymbol(struct symbol * sym);
 

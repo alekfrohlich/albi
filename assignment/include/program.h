@@ -24,37 +24,45 @@
 
     #include "symtab.h"
     #include "parsing.h"
+    #include "structures.h"
 
+    /**
+     * 
+     */
     struct program {
-        struct symbol * symtab;
-        struct symlist * parameters;
-        
-        struct assignlist * species;
-        struct assignlist * locals;
-
-        struct symlist * dependence;  // ignored.
-
-        struct reactionlist * reactions;
         int reactions_size;
+        struct symbol *symtab;
+        struct nodelist *body;
+        struct nodelist *declarations;
+        struct nodelist *dependences;  // ignored.
+        struct symlist *parameters;
+        struct reactionlist *reactions;
     };
 
+    /**
+     * 
+     */
     struct reaction {
-        struct assignlist * reactant;
-        struct assignlist * product;
+        struct nodelist * reactant;
+        struct nodelist * product;
         struct ast * rate;
     };
 
+    /**
+     * 
+     */
     struct reactionlist {
         struct reaction * reac;
         struct reactionlist * next;
     };
 
     // Forward definitions.
-    extern void progdef(struct symbol *name, struct symlist *syms, struct stmtlist *stmts);
-    extern void mergeprograms(
+    extern void progdef(struct symbol *name, struct symlist *syms, struct nodelist *stmts);
+    extern MAP* mergeprograms(
         struct symbol** progrefs,
         struct symlist** export,
-        struct explist** params,
+        struct nodelist** params,
+        int compartnum,
         int size);
 
 #endif  // PROGRAM_H

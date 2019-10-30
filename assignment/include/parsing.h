@@ -24,54 +24,37 @@
 
 	#include "ast.h"
 
-	struct explist {
-		struct ast * exp;
-		struct explist * next;
-	};
+	typedef struct nodelist* stmtlist;
+	typedef struct nodelist* explist;
+	typedef struct nodelist* assignlist;
 
-	struct symlist {
-		struct symbol *sym;
-		struct symlist *next;
-	};
-
-	struct assignlist {
-		struct symassign *assign;
-		struct assignlist *next;
-	};
-
-	struct stmtlist {
-		struct ast * stmt;
-		struct stmtlist * next;
+	/**
+	 * List of AST nodes.
+	 */
+	struct nodelist {
+		struct ast *node;
+		struct nodelist *next;
 	};
 
 	/**
-	 * 
+	 * Program call list.
 	 */
 	struct calllist {
 		struct symbol * sym;
 		struct calllist * next;
-		struct symlist * list;
-		struct explist * exp;
+		struct symlist * symlist;
+		struct nodelist * explist;
 	};
 
-	// forward defined.
+	// Forward definitions.
 	extern double eval(struct ast *a);
-
 	extern void genparam(char *name, struct ast *val);
 	extern void gencompart(struct compart* compartment);
+	extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
+	extern struct calllist *newcalllist(struct symbol*, struct symlist *symlist, struct nodelist* parameters, struct calllist*);
+	extern void calllistfree(struct calllist * prog);
 
-	extern struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next); 	// Shall be merged into nodelist.
-	extern struct symlist *newsymlist(struct symbol *sym, struct symlist *next);					// Shall be merged into nodelist.
-	extern struct explist *newexplist(struct ast* exp, struct explist* next);						// Shall be merged into nodelist.
-	extern struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next);					// Shall be merged into nodelist.
-
-	extern struct calllist *newcalllist(struct symbol*, struct symlist *, struct explist*, struct calllist*);
-
-	extern void treefree(struct ast *a); // Shall be moved to ast.h
-
-	// toolchain defined.
+	// Toolchain definitions.
 	extern int yyerror(const char *s);
-	extern int yylex(void);
-	extern int curr_compart;
 
 #endif  // _PARSING_H

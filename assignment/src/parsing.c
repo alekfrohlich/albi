@@ -25,6 +25,7 @@
 
 #include "parsing.h"
 #include "program.h"
+#include "structures.h"
 #include "output.h"
 
 struct symbol* env[2];
@@ -57,7 +58,7 @@ double eval(struct ast *a)
     case DIV:   v = eval(a->left) / eval(a->right); break;
 
     default:
-        printf("internal error: bad node %c\n", a->type);
+        printf("internal error: bad node at eval, type %u\n", a->type);
     }
 
     return v;
@@ -73,7 +74,8 @@ void genparam(char *name, struct ast *val)
 void gencompart(struct compart * compartment) 
 {
     curr_compart++;
-    struct calllist * call = compartment->params;
+    struct calllist * call = compartment->calllist; // call params.
+    MAP* maplist;
 
     int size = 0;
     while (call != NULL)
@@ -83,166 +85,68 @@ void gencompart(struct compart * compartment)
     }
 
     struct symbol * prog[size];
-    struct symlist * export[size];
-    struct explist * params[size];
+    struct symlist * export[size];  // ignore.
+    struct nodelist * params[size];
 
-    call  = compartment->params;
+    call  = compartment->calllist;
     int index = 0;
     while (call != NULL)
     {
         struct calllist * aux = call;
         call = call->next;
         prog[index] = aux->sym;
-        export[index] = aux->list;
-        params[index] = aux->exp;
+        export[index] = aux->symlist;
+        params[index] = aux->explist;
         index++;
     }
-    
-    mergeprograms(prog, export, params, size);
+
+    /**
+     * Eval & Apply, will also check
+     * for dependences in the future.
+     */
+    maplist = mergeprograms(prog, export, params, curr_compart, size);
+
+    fprintf(yyout, "Compartment ECOLI%d\n", curr_compart);
+    /**
+     * Generate corresponding Tellurium.
+     */
+    for (int i = 0; i < size; i++)
+    {
+        // Working program.
+        struct program *wp = prog[i]->prog;
+        outdecls(wp->declarations, maplist[i], curr_compart);
+        outreacs(wp->reactions, maplist[i]);
+    }
 }
 
-// PARSING STRUCTURES INITIALIZATION.
-
-struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next)
+struct nodelist *newnodelist(struct ast *node, struct nodelist *next)
 {
-    struct stmtlist * sl = (struct stmtlist *) malloc(sizeof(struct stmtlist));
-    sl->stmt = stmt;
-    sl->next = next;
-    return sl;
-}
-
-struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next)
-{
-    struct assignlist * al = (struct assignlist *) malloc(sizeof(struct assignlist));
-    al->assign = assign;
-    al->next = next;
-    return al; 
-}
-
-struct symlist * newsymlist(struct symbol *sym, struct symlist *next)
-{
-    struct symlist *sl = malloc(sizeof(struct symlist));
-    sl->sym = sym;
-    sl->next = next;
-    return sl;
-}
-
-struct explist * newexplist(struct ast* exp, struct explist* next)
-{
-    struct explist *a = (struct explist *) malloc(sizeof(struct explist));
-    a->exp = exp;
-    a->next = (struct explist*) next;
-    return a;
+    struct nodelist * list = (struct nodelist *) malloc(sizeof(struct nodelist));
+    list->node = node;
+    list->next = next;
+    return list;
 }
 
 struct calllist *newcalllist(
-    struct symbol* sym, 
-    struct symlist * symlist, 
-    struct explist* explist, 
-    struct calllist* next) 
+    struct symbol *sym, 
+    struct symlist *symlist, 
+    struct nodelist *explist, 
+    struct calllist *next) 
 {
     struct calllist * p = (struct calllist *) malloc(sizeof(struct calllist)); 
     p->sym = sym;
-    p->list = symlist;
-    p->exp = explist;
+    p->symlist = symlist;
+    p->explist = explist;
     p->next = next;
 }
 
-// FREE PARSING STRUCTURES.
-
-static void symlistfree(struct symlist *sl)
-{
-    struct symlist *nsl;
-
-    while(sl)
-    {
-        nsl = sl->next;
-        free(sl);
-        sl = nsl;
-    }
-}
-
-static void explistfree(struct explist * el) 
-{
-    while (el != NULL) {
-        struct explist * aux = el;
-        el = el->next;
-        treefree(aux->exp);
-        free(aux);
-    }
-}
-
-static void assignlistfree(struct assignlist *sl)
-{
-    while (sl != NULL) {
-        struct assignlist * aux = sl;
-        sl = sl->next;
-        treefree((struct ast *) aux->assign);
-        free(aux);
-    }
-}
-
-static void stmtlistfree(struct stmtlist * l)
-{
-    while (l != NULL) {
-        struct stmtlist * aux = l;
-        l = l->next;
-        treefree(aux->stmt);
-        free(aux);
-    }
-}
-
-static void calllistfree(struct calllist * prog)
+void calllistfree(struct calllist * prog)
 {
     while (prog != NULL) {
         struct calllist * aux = prog;
         prog = prog->next;
-        symlistfree(aux->list);
-        explistfree(aux->exp);
+        // symlistfree(aux->list); | nodelistfree?
+        // explistfree(aux->exp);  |
         free(aux);
     }
-}
-
-void treefree(struct ast *a)
-{
-    switch (a->type)
-    {
-    // two subtrees.
-    case PLUS:
-    case MINUS:
-    case TIMES:
-    case DIV:
-        treefree(a->left);
-        treefree(a->right);
-        break;
-
-    // one subtree.
-    case SYM_ASSIGN:
-        treefree(((struct symassign*)a)->val);
-        break;
-    case EXPLIST:
-        treefree(a->left);
-        treefree(a->right);
-        break;
-
-    // no subtree.
-    case SYM_REF:
-        break;
-    case RATESTATEMENT:
-        ;
-        struct rate * rate = (struct rate *) a;
-        treefree(rate->exp);
-        assignlistfree(rate->assigns);
-    case COMPART: // double free problem?
-        ;
-        calllistfree(((struct compart *)a)->params);
-        break;
-    case CONSLIT:
-        break;
-
-    default:
-        yyerror("internal error: bad node");
-    }
-
-    free(a);
 }

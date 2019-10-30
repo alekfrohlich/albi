@@ -27,24 +27,26 @@
 #include "structures.h"
 #include "output.h"
 
-// BEGIN PRIVATE INTERFACE.
-
 /**
  * Move a specie from local's list to
- * the specie's list.
+ * the specie's list and returns it.
  */
-static void declare_specie(struct program * program, struct symassign * assign)
+static struct nodelist *declare_specie(
+    struct program *program,
+    struct symassign *assign,
+    struct nodelist *species,
+    struct nodelist *locals)
 {
     char * name = assign->sym->name;
-    struct assignlist * iter = program->locals; /* Who is to be removed, if any. */
+    struct nodelist * iter = locals; /* Who is to be removed, if any. */
     
     /**
      * Removing head?
      */
     if (iter != NULL && 
-        strcmp(iter->assign->sym->name, name) == 0)
+        strcmp(((struct symassign *) iter->node)->sym->name, name) == 0)
     {
-        program->locals = program->locals->next;
+        locals = locals->next;
     } 
     
     /**
@@ -52,12 +54,11 @@ static void declare_specie(struct program * program, struct symassign * assign)
      */
     else if (iter != NULL)
     {
-        
         /**
          * Find symbol in specie's list.
          */
         while (iter->next != NULL && 
-            strcmp(iter->next->assign->sym->name, name) != 0)
+            strcmp(((struct symassign *)iter->next->node)->sym->name, name) != 0)
         {
             iter = iter->next;
         }
@@ -69,7 +70,7 @@ static void declare_specie(struct program * program, struct symassign * assign)
         if (iter->next == NULL)
             yyerror("Undeclared variable");
 
-        struct assignlist * aux = iter->next;
+        struct nodelist * aux = iter->next;
         iter->next = iter->next->next;
         iter = aux;
     }
@@ -86,8 +87,9 @@ static void declare_specie(struct program * program, struct symassign * assign)
     /**
      * Add new specie.
      */
-    iter->next = program->species;
-    program->species = iter;
+    iter->next = species;
+    species = iter;
+    return species;
 }
 
 /**
@@ -101,45 +103,16 @@ static struct reactionlist * newreactionlist(struct reaction * reaction, struct 
     return rl;
 }
 
-
-// BEGIN PUBLIC INTERFACE.
-
-
-static void push_parameter(struct program * program, struct assignlist * local)
-{
-    local->next = program->locals;
-    program->locals = local;
-}
-
-static void push_specie(struct program * program, struct assignlist * specie)
-{
-    specie->next = program->species;
-    program->species = specie;
-}
-
-/**
- * Merged succesfully?
- */
-static int empty_dependencies(struct program * program)
-{
-	return program->dependence == NULL;
-}
-
-static void declare_parameter(struct program * program, struct symassign * assign)
-{
-    struct assignlist * locals = program->locals;
-
-    locals = newassignlist(assign, locals);
-    program->locals = locals;
-}
-
 /**
  * Add new reaction to program's reaction list.
  */
-static void newreaction(struct program * program, struct rate * rate)
+static struct nodelist *newreaction(
+    struct program *program,
+    struct rate *rate,
+    struct nodelist *species,
+    struct nodelist *locals)
 {
     struct reaction * reac = (struct reaction *) malloc(sizeof(struct reaction));
- 
     program->reactions = newreactionlist(reac, program->reactions);
     reac->rate = rate->exp;
     
@@ -148,18 +121,18 @@ static void newreaction(struct program * program, struct rate * rate)
      * reactans and products. Also move them from
      * the local's list to the specie's list.
      */
-    for (struct assignlist * iter = rate->assigns; iter != NULL; iter = iter->next)
+    for (struct nodelist * iter = rate->assigns; iter != NULL; iter = iter->next)
     {
-        if (iter->assign->val->type == MINUS)
+        if (((struct symassign *)iter->node)->val->type == MINUS)
         {
-            reac->reactant = newassignlist(iter->assign, reac->reactant);
-            declare_specie(program, iter->assign);
+            reac->reactant = newnodelist(((struct ast *) iter->node), reac->reactant);
+            species = declare_specie(program, ((struct symassign *) iter->node), species, locals);
         } 
         
-        else if (iter->assign->val->type == PLUS)
+        else if (((struct symassign *)iter->node)->val->type == PLUS)
         {
-            reac->product = newassignlist(iter->assign, reac->product);
-            declare_specie(program, iter->assign);
+            reac->product = newnodelist(((struct ast *) iter->node), reac->product);
+            species = declare_specie(program, ((struct symassign *) iter->node), species, locals);
         }
         
         /**
@@ -171,103 +144,170 @@ static void newreaction(struct program * program, struct rate * rate)
             yyerror("Invalid expression");
         }
     }
+    return species;
 }
 
-static char *namemergedvar(char *progname, char * varname)
+/**
+ * Rename variables to avoid
+ * namespace collisions.
+ */
+static char *namemergedvar(char *progname, char *varname, int compartnum)
 {
     char *name = (char *) malloc(100);
-    char *count = (char *) malloc(20);
-
-    snprintf(count, 20, "%d", curr_compart);
-    strcat(name, "ECOLI");
-    strcat(name, count);
-    strcat(name, "_");
-    strcat(name, progname);
-    strcat(name, "_");
-    strcat(name, varname);
-
+    snprintf(name, 100, "ECOLI%d_%s_%s", compartnum, progname, varname);
     return name;
 }
 
 /**
- * 
+ * Merge program list's of declarations.
  */
-void mergeprograms(
+MAP* mergeprograms(
     struct symbol** progrefs,
     struct symlist** export,
-    struct explist** params,
+    struct nodelist** explist,
+    int compartnum,
     int size)
  {
+     /**
+      * Program to compartment variable name dictionary.
+      */
     struct maplist ** map = (struct maplist **) malloc(sizeof(struct maplist*)*size);
+
+    /**
+     * Iterate over all programs in call list.
+     */
     for (int i = 0; i < size; i++)
     {
+        // Working program.
         struct program *prog = progrefs[i]->prog;
-        for (struct assignlist * specie = prog->species; specie != NULL;
-             specie = specie->next)
+
+        /**
+         * Evaluate call parameters.
+         */
+        struct symlist *param = prog->parameters;
+        struct nodelist *exp = explist[i];
+        while (param != NULL && exp != NULL)
         {
-            char *name = namemergedvar(progrefs[i]->name, specie->assign->sym->name);
-            map[i] = newmaplist(specie->assign->sym->name, name, map[i]);
+            param->sym->value = eval(exp->node); // recover symlist.
+            param = param->next;
+            exp = exp->next;
         }
-        for (struct assignlist * local = prog->locals; local != NULL;
-               local = local->next)
+
+        if (param || exp)
+            yyerror("Wrong number of arguments to program!");
+        /**
+         * Apply call parameters.
+         */
+        for (struct nodelist *decl = prog->declarations; decl != NULL; decl = decl->next)
         {
-            char * name = namemergedvar(progrefs[i]->name, local->assign->sym->name);
-            map[i] = newmaplist(local->assign->sym->name, name, map[i]);
+            ((struct tsymassign*) decl->node)->sym->value = eval(((struct tsymassign*) decl->node)->val);
         }
-        printspecies(prog->species, map[i], "ECOLIE");
-        printlocals(prog->locals, map[i], "ECOLIE");
+
+        /**
+         * Map working program variables
+         * to compartment namespace.
+         */
+        for (struct nodelist *decl = prog->declarations; decl != NULL; decl = decl->next)
+        {
+            char *name = namemergedvar(progrefs[i]->name,
+                    ((struct tsymassign *)decl->node)->sym->name, compartnum);
+            map[i] = newmaplist(((struct tsymassign *)decl->node)->sym->name, name, map[i]);
+        }
     }
-    for (int i = 0; i < size; i++) {
-        struct program * prog = progrefs[i]->prog;
-        printreactionlist(prog->reactions, map[i]);
-    }
+
+    return map; 
  }
 
- /**
- * Define new program.
+/**
+ * Make list of declarations.
  */
-void progdef(struct symbol *name, struct symlist *syms, struct stmtlist * stmts)
+static void makedecls(struct program *prog)
 {
-    #ifdef DEBUG
-        for(int i = 0; i < 9997; i++)
-        {
-            if ((env[0]+i)->name != 0)
-                printf("%d, table 0, Symbol of name %s, value %lf and program %p\n", i, (env[0]+i)->name, (env[0]+i)->value, (env[0]+i)->prog);
-            if (env[1] && (env[1]+i)->name != 0)
-                printf("%d, table 1, Symbol of name %s, value %lf and program %p\n", i, (env[1]+i)->name, (env[1]+i)->value, (env[1]+i)->prog);
-        }
-    #endif  // DEBUG
-
-    struct program * program = (struct program *) malloc(sizeof(struct program));
-    name->prog = program;
+    struct nodelist *species = NULL;
+    struct nodelist *locals = NULL;
+    struct nodelist *decls = (struct nodelist*) malloc(sizeof(struct nodelist));
 
     /**
-     * Store parsing context.
+     * Build locals, species and reactions.
      */
-    program->symtab = env[curr_env];
-
-    /**
-     * Save formal parameters.
-     */
-    program->parameters = syms;
-    struct stmtlist * iter = stmts;
-    while (iter != NULL)
+    for (struct nodelist *it = prog->body; it != NULL; it = it->next)
     {
-        if (iter->stmt->type == SYM_ASSIGN)
+        if (it->node->type == SYM_ASSIGN)
         {
-            declare_parameter(program, (struct symassign *) iter->stmt);
+            locals = newnodelist((struct ast *) it->node, locals);
         }
         
-        else if (iter->stmt->type == RATESTATEMENT)
+        else if (it->node->type == RATESTATEMENT)
         {
-            newreaction(program, (struct rate *) iter->stmt);
+            species = newreaction(prog, (struct rate *) it->node, species, locals);
         }
         
         else
         {
             yyerror("Invalid expression inside rate block");
         }
-    
-        iter = iter->next;
     }
+
+    /**
+     * Build decls.
+     */
+    for (struct nodelist *it = prog->body, *itdec = decls; it != NULL; it = it->next)
+    {
+        /**
+         * Skip non-assignment nodes.
+         */
+        if (it->node->type != SYM_ASSIGN)
+            goto mov;
+
+        /**
+         * Add species to declarations.
+         */
+        for (struct nodelist *it3 = species; it3 != NULL; it3 = it3->next)
+        {
+            if (strcmp(((struct symassign *) it3->node)->sym->name,
+                ((struct symassign *) it->node)->sym->name) == 0)
+            {
+                struct ast *a = newtassign(SPECIE, ((struct symassign *) it3->node)->sym,
+                        ((struct symassign *) it3->node)->val);
+                // free(species->node); ?
+                itdec->next = newnodelist(a, NULL);
+                itdec = itdec->next;
+                goto mov;
+            }
+        }
+
+        /**
+         * Add locals to declarations.
+         */
+        for (struct nodelist *it2 = locals; it2 != NULL; it2 = it2->next)
+        {
+            if (strcmp(((struct symassign *) it2->node)->sym->name,
+                ((struct symassign *) it->node)->sym->name) == 0)
+            {
+                struct ast *a = newtassign(LOCAL, ((struct symassign *) it2->node)->sym,
+                        ((struct symassign *) it2->node)->val);
+                // free(locals->node); ?
+                itdec->next = newnodelist(a, NULL);
+                itdec = itdec->next;
+                goto mov;
+            }
+        }
+
+    mov:
+        continue;
+    } 
+    prog->declarations = decls->next;
+}
+
+ /**
+  * Define new program.
+  */
+void progdef(struct symbol *name, struct symlist *syms, struct nodelist * stmts)
+{
+    struct program * program = (struct program *) malloc(sizeof(struct program));
+    name->prog = program;
+    program->symtab = env[curr_env];
+    program->parameters = syms;
+    program->body = stmts;
+    makedecls(program);
 }

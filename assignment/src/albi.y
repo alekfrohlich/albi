@@ -24,39 +24,43 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "ast.h"
 #include "symtab.h"
 #include "parsing.h"
 #include "program.h"
+
+extern int yylex();
 %}
 
 %union {
-    struct ast *node;
-    double double_t;
-    struct symbol *sym_tok;   // which symbol?  
-    struct symlist *symlist_tok;
-	struct assignlist *assigns;
-	struct explist * expressions;
-	struct calllist *callparams;
-	struct stmtlist * statements;
+    // Exported by Flex.
+	double double_t;				// Double.
+    struct symbol *sym_t;   		// Symbol.
+	
+	// Intermediate structures.
+    struct ast *node;				// AST node.
+	struct calllist *callparams;	// Compartment creation node.
+	struct nodelist *list;			// List of AST nodes.
+	struct symlist *slist;			// List of symbols.
 }
 
-// declare tokens.
+// Token types.
 %token <double_t> NUM
-%token <sym_tok> VAR
+%token <sym_t> VAR
 %token ASSIGN PROG RATE SHARE ECOLI
 
+// Precendences and associativity.
 %right '='
 %left '+' '-'
 %left '*' '/'
 
+// Rule types.
+%type <sym_t> progdef
 %type <node> exp statement assignment ecoli
-%type <statements> list
-%type <sym_tok> progdef
-%type <symlist_tok> symlist
-%type <assigns> assignment_list
-%type <callparams> proglist
-%type <expressions> explist
+%type <list> assignlist explist stmtlist
+%type <slist> symlist
+%type <callparams> calllist
 
 %%
 
@@ -66,7 +70,7 @@ start_of_prog: %empty
 										struct symassign *assign = (struct symassign *) $2;
 										symdef(assign->sym, assign->val);
 										genparam(assign->sym->name, assign->val);
-										treefree($2);
+										// treefree($2);
 									}
 | start_of_prog program
 									{
@@ -75,7 +79,7 @@ start_of_prog: %empty
 | start_of_prog ecoli				
 									{
 										gencompart((struct compart *) $2);
-										treefree($2);
+										// treefree($2);
 									}
 ;
 
@@ -111,11 +115,11 @@ exp: exp '+' exp
 									}
 ;
 
-program: progdef '(' symlist ')' ASSIGN '{' list '}' ';'
+program: progdef '(' symlist ')' ASSIGN '{' stmtlist '}' ';'
 									{
 										progdef($1, $3, $7);
 									}
-| progdef '(' ')' ASSIGN '{' list '}' ';'
+| progdef '(' ')' ASSIGN '{' stmtlist '}' ';'
 									{
 										progdef($1, NULL, $6);
 									}
@@ -131,59 +135,59 @@ progdef: PROG VAR
 
 symlist: VAR
 									{
-										$$ = newsymlist($1, NULL);
+										$$ = newslist($1, NULL);
 									}
 | VAR ',' symlist              
 									{
-										$$ = newsymlist($1, $3);
+										$$ = newslist($1, $3);
 									}
 ;
 
-list: %empty
+stmtlist: %empty
 									{
 										$$ = NULL;
 									}
-| statement list
+| statement stmtlist
 									{
 										if ($2 == NULL)
-											$$ = newstmtlist($1, NULL);
+											$$ = newnodelist($1, NULL);
 										else
-											$$ = newstmtlist($1, $2);
+											$$ = newnodelist($1, $2);
 									}
 ;
 
 statement: assignment
-| RATE '(' exp ')' ':' '{' assignment_list '}'
+| RATE '(' exp ')' ':' '{' assignlist '}'
 									{
 										$$ = newrate($3, $7);
 									}
 ;
 
-assignment_list: %empty
+assignlist: %empty
 									{
 										$$ = NULL;
 									}
-| assignment assignment_list
+| assignment assignlist
 									{
 										if ($2 == NULL)
-											$$ = newassignlist((struct symassign *) $1, NULL);
+											$$ = newnodelist($1, NULL);
 										else
-										 	$$ = newassignlist((struct symassign *) $1, $2);
+										 	$$ = newnodelist($1, $2);
 									}
 ;
 
-ecoli: ECOLI '(' '[' ']' ',' PROG proglist ')' ';'
+ecoli: ECOLI '(' '[' ']' ',' PROG calllist ')' ';'
 									{
 										$$ = newcompart("ECOLI", $7);
 									}
 ;
 
-proglist: VAR '(' explist ')' 
+calllist: VAR '(' explist ')' 
 									{ 
 										$$ = newcalllist(
 										    $1, 
 										    NULL, 
-										    (struct explist*) $3, 
+										    (struct nodelist*) $3, 
 										    NULL);
 									}
 | VAR '(' explist ')' SHARE symlist 
@@ -191,18 +195,18 @@ proglist: VAR '(' explist ')'
 										$$ = newcalllist(
 										    $1, 
 										    $6, 
-										    (struct explist*) $3, 
+										    (struct nodelist*) $3, 
 										    NULL);
 									}
-| VAR '(' explist ')' '+' proglist 
+| VAR '(' explist ')' '+' calllist 
 									{ 
 										$$ = newcalllist(
 										    $1, 
 										    NULL, 
-										    (struct explist*) $3, 
+										    (struct nodelist*) $3, 
 										    $6);
 									}
-| VAR '(' explist ')' SHARE symlist '+' proglist 
+| VAR '(' explist ')' SHARE symlist '+' calllist 
 									{ 
 										$$ = newcalllist(
 										    $1, 
@@ -226,7 +230,7 @@ proglist: VAR '(' explist ')'
 										    NULL, 
 										    NULL);
 									}
-| VAR '(' ')' '+' proglist 
+| VAR '(' ')' '+' calllist 
 									{ 
 										$$ = newcalllist(
 										    $1, 
@@ -234,7 +238,7 @@ proglist: VAR '(' explist ')'
 										    NULL, 
 										    $5);
 									}
-| VAR '(' ')' SHARE symlist '+' proglist 
+| VAR '(' ')' SHARE symlist '+' calllist 
 									{ 
 										$$ = newcalllist(
 										    $1, 
@@ -246,14 +250,14 @@ proglist: VAR '(' explist ')'
 
 explist: exp 						{
 										if ($1 != NULL) {
-											$$ = newexplist($1, NULL);
+											$$ = newnodelist($1, NULL);
 										} else {
 											$$ = NULL;
 										}
 									}
 | exp ',' explist
 									{
-										$$ = newexplist($1, $3);
+										$$ = newnodelist($1, $3);
 									}
 ;
 %%

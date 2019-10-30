@@ -20,7 +20,7 @@
  */
 
 #include <stdlib.h>
-#include <stdio.h>
+
 #include "ast.h"
 #include "parsing.h"
 
@@ -35,11 +35,14 @@ struct ast * newast(enum nodetypes type, struct ast *l, struct ast *r)
     return a;
 }
 
-struct ast *newcompart(char *sym, struct calllist *params) {
+struct ast *newcompart(char *sym, struct calllist *calllist)
+{
     struct compart *a = malloc(sizeof(struct compart*));
+
     a->type = COMPART;
     a->sym = sym;
-    a->params = params;
+    a->calllist = calllist;
+
     return (struct ast*) a;
 }
 
@@ -74,10 +77,69 @@ struct ast * newassign(struct symbol *sym, struct ast *val)
     return (struct ast *) a;
 }
 
-struct ast *newrate(struct ast* exp, struct assignlist *assigns) {
+struct ast *newtassign(enum sbmltypes type, struct symbol *sym, struct ast *val)
+{
+    struct tsymassign *a = malloc(sizeof(struct tsymassign));
+
+    a->type = T_SYM_ASSIGN;
+    a->_type = type;
+    a->sym = sym;
+    a->val = val;
+
+    return (struct ast *) a;
+}
+
+struct ast *newrate(struct ast* exp, struct nodelist *assigns)
+{
     struct rate * r = malloc(sizeof(struct rate));
-    r->assigns = assigns;
+
     r->type = RATESTATEMENT;
+    r->assigns = assigns;
+    r->exp = exp;
 
     return (struct ast *) r;
+}
+
+void treefree(struct ast *a)
+{
+    switch (a->type)
+    {
+    // two subtrees.
+    case PLUS:
+    case MINUS:
+    case TIMES:
+    case DIV:
+        treefree(a->left);
+        treefree(a->right);
+        break;
+
+    // one subtree.
+    case SYM_ASSIGN:
+        treefree(((struct symassign*)a)->val);
+        break;
+    case EXPLIST:
+        treefree(a->left);
+        treefree(a->right);
+        break;
+
+    // no subtree.
+    case SYM_REF:
+        break;
+    case RATESTATEMENT:
+        ;
+        struct rate * rate = (struct rate *) a;
+        treefree(rate->exp);
+        // nodelistfree?
+    case COMPART: // double free problem?
+        ;
+        calllistfree(((struct compart *)a)->calllist);
+        break;
+    case CONSLIT:
+        break;
+
+    default:
+        yyerror("internal error: bad node at treefree");
+    }
+
+    free(a);
 }
