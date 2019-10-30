@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -39,16 +39,16 @@ static struct nodelist *declare_specie(
 {
     char * name = assign->sym->name;
     struct nodelist * iter = locals; /* Who is to be removed, if any. */
-    
+
     /**
      * Removing head?
      */
-    if (iter != NULL && 
+    if (iter != NULL &&
         strcmp(((struct symassign *) iter->node)->sym->name, name) == 0)
     {
         locals = locals->next;
-    } 
-    
+    }
+
     /**
      * Removing middle element?
      */
@@ -57,7 +57,7 @@ static struct nodelist *declare_specie(
         /**
          * Find symbol in specie's list.
          */
-        while (iter->next != NULL && 
+        while (iter->next != NULL &&
             strcmp(((struct symassign *)iter->next->node)->sym->name, name) != 0)
         {
             iter = iter->next;
@@ -74,7 +74,7 @@ static struct nodelist *declare_specie(
         iter->next = iter->next->next;
         iter = aux;
     }
-    
+
     /**
      * Empty list.
      * Using undeclared variable!
@@ -83,7 +83,7 @@ static struct nodelist *declare_specie(
     {
         yyerror("Undeclared variable");
     }
-    
+
     /**
      * Add new specie.
      */
@@ -115,7 +115,7 @@ static struct nodelist *newreaction(
     struct reaction * reac = (struct reaction *) malloc(sizeof(struct reaction));
     program->reactions = newreactionlist(reac, program->reactions);
     reac->rate = rate->exp;
-    
+
     /**
      * Classifying the rate assignments into
      * reactans and products. Also move them from
@@ -127,14 +127,14 @@ static struct nodelist *newreaction(
         {
             reac->reactant = newnodelist(((struct ast *) iter->node), reac->reactant);
             species = declare_specie(program, ((struct symassign *) iter->node), species, locals);
-        } 
-        
+        }
+
         else if (((struct symassign *)iter->node)->val->type == PLUS)
         {
             reac->product = newnodelist(((struct ast *) iter->node), reac->product);
             species = declare_specie(program, ((struct symassign *) iter->node), species, locals);
         }
-        
+
         /**
          * Product/reactant not expressed
          * as A := A + 1 or B := B -1.
@@ -215,7 +215,7 @@ struct maplist ** mergeprograms(
         }
     }
 
-    return map; 
+    return map;
  }
 
 /**
@@ -236,12 +236,12 @@ static void makedecls(struct program *prog)
         {
             locals = newnodelist((struct ast *) it->node, locals);
         }
-        
+
         else if (it->node->type == RATESTATEMENT)
         {
             species = newreaction(prog, (struct rate *) it->node, species, locals);
         }
-        
+
         else
         {
             yyerror("Invalid expression inside rate block");
@@ -295,7 +295,7 @@ static void makedecls(struct program *prog)
 
     mov:
         continue;
-    } 
+    }
     prog->declarations = decls->next;
 }
 

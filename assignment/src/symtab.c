@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -54,7 +54,7 @@ static unsigned symhash(char *sym)
  * Look-up key in hash table.
  */
 struct symbol *lookup(char *sym)
-{   
+{
     for (int i = currenv; i >= 0; i--)
     {
         struct symbol *entry = &env[i][symhash(sym) % SYMTAB_SIZE];
@@ -114,7 +114,7 @@ struct symbol *lookup(char *sym)
         if (++entry >= env[currenv] + SYMTAB_SIZE)
             entry = env[currenv];
     }
-    
+
     /**
      * Tried all local entries, symbol table full.
      */

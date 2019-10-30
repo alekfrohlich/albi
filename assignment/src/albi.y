@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -37,7 +37,7 @@ extern int yylex();
     // Exported by Flex
 	double double_t;				// Double
     struct symbol *sym_t;   		// Symbol
-	
+
 	// Intermediate structures
     struct ast *ast;				// AST node
 	struct progcall *progcall;		// Compartment creation node
@@ -76,40 +76,40 @@ start_of_prog: %empty
 									{
 										currenv = 0;
 									}
-| start_of_prog ecoli				
+| start_of_prog ecoli
 									{
 										gencompart((struct compart *) $2);
 										// treefree($2);
 									}
 ;
 
-assignment: VAR ASSIGN exp ';'		
+assignment: VAR ASSIGN exp ';'
 									{
 										$$ = newassign($1, $3);
 									}
 ;
 
-exp: exp '+' exp					
+exp: exp '+' exp
 									{
 										$$ = newast(PLUS, $1, $3);
 									}
-| exp '-' exp						
+| exp '-' exp
 									{
 										$$ = newast(MINUS, $1, $3);
 									}
-| exp '*' exp						
+| exp '*' exp
 									{
 										$$ = newast(TIMES, $1, $3);
 									}
-| exp '/' exp						
+| exp '/' exp
 									{
 										$$ = newast(DIV, $1, $3);
 									}
-| NUM								
+| NUM
 									{
 										$$ = newnum($1);
 									}
-| VAR								
+| VAR
 									{
 										$$ = newref($1);
 									}
@@ -137,7 +137,7 @@ symlist: VAR
 									{
 										$$ = newslist($1, NULL);
 									}
-| VAR ',' symlist              
+| VAR ',' symlist
 									{
 										$$ = newslist($1, $3);
 									}
@@ -182,68 +182,68 @@ ecoli: ECOLI '(' '[' ']' ',' PROG progcall ')' ';'
 									}
 ;
 
-progcall: VAR '(' explist ')' 
-									{ 
-										$$ = newprogcall(
-										    $1, 
-										    NULL, 
-										    (struct nodelist*) $3, 
-										    NULL);
-									}
-| VAR '(' explist ')' SHARE symlist 
+progcall: VAR '(' explist ')'
 									{
 										$$ = newprogcall(
-										    $1, 
-										    $6, 
-										    (struct nodelist*) $3, 
+										    $1,
+										    NULL,
+										    (struct nodelist*) $3,
 										    NULL);
 									}
-| VAR '(' explist ')' '+' progcall 
-									{ 
+| VAR '(' explist ')' SHARE symlist
+									{
 										$$ = newprogcall(
-										    $1, 
-										    NULL, 
-										    (struct nodelist*) $3, 
+										    $1,
+										    $6,
+										    (struct nodelist*) $3,
+										    NULL);
+									}
+| VAR '(' explist ')' '+' progcall
+									{
+										$$ = newprogcall(
+										    $1,
+										    NULL,
+										    (struct nodelist*) $3,
 										    $6);
 									}
-| VAR '(' explist ')' SHARE symlist '+' progcall 
-									{ 
-										$$ = newprogcall(
-										    $1, 
-										    $6, 
-										    $3, 
-										    $8);
-									}
-| VAR '('')' 
-									{ 
-										$$ = newprogcall(
-										    $1, 
-										    NULL, 
-										    NULL, 
-										    NULL);
-									}
-| VAR '('')' SHARE symlist 
+| VAR '(' explist ')' SHARE symlist '+' progcall
 									{
 										$$ = newprogcall(
-										    $1, 
-										    $5, 
-										    NULL, 
+										    $1,
+										    $6,
+										    $3,
+										    $8);
+									}
+| VAR '('')'
+									{
+										$$ = newprogcall(
+										    $1,
+										    NULL,
+										    NULL,
 										    NULL);
 									}
-| VAR '(' ')' '+' progcall 
-									{ 
+| VAR '('')' SHARE symlist
+									{
 										$$ = newprogcall(
-										    $1, 
-										    NULL, 
-										    NULL, 
+										    $1,
+										    $5,
+										    NULL,
+										    NULL);
+									}
+| VAR '(' ')' '+' progcall
+									{
+										$$ = newprogcall(
+										    $1,
+										    NULL,
+										    NULL,
 										    $5);
 									}
-| VAR '(' ')' SHARE symlist '+' progcall 
-									{ 
+| VAR '(' ')' SHARE symlist '+' progcall
+									{
 										$$ = newprogcall(
-										    $1, 
-										    $5, 
-										    NULL, 
+										    $1,
+										    $5,
+										    NULL,
 										    $7);
 									}
 ;

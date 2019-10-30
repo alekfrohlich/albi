@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -72,7 +72,7 @@ void outdecls(struct nodelist *decls, struct maplist *namemap, int compartnum)
     {
         // Declare it.
         fprintf(yyout, "%s %s in ECOLI%d\n",
-                ((struct tsymassign*)it->node)->_type == SPECIE? "Specie" : "Var", 
+                ((struct tsymassign*)it->node)->_type == SPECIE? "Specie" : "Var",
                 getmap(namemap, ((struct tsymassign*)it->node)->sym->name), compartnum);
 
         // Define it.
