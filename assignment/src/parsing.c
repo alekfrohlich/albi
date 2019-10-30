@@ -28,8 +28,15 @@
 #include "structures.h"
 #include "output.h"
 
-struct symbol* env[2];
-int curr_compart = 0;
+/**
+ * TODO: gencompartg,
+ * calllistfree? 
+ *      symlistfree(aux->list); | nodelistfree?
+ *      explistfree(aux->exp);  |
+ */
+
+struct symbol* env[2];          // (Global, Local) parsing tables. 
+int curr_compart = 0;           // Current compartment count.
 
 /**
  * Evaluate arithmetic expression tree.
@@ -41,17 +48,17 @@ double eval(struct ast *a)
     switch (a->type)
     {
 
-    // constants.
+    // Constants.
     case CONSLIT:
         v = ((struct numval *) a)->number;
         break;
 
-    // name reference.
+    // Symbol references.
     case SYM_REF:
         v = ((struct symref *) a)->sym->value;
         break;
 
-    // expressions:
+    // Expressions:
     case PLUS:  v = eval(a->left) + eval(a->right); break;
     case MINUS: v = eval(a->left) - eval(a->right); break;
     case TIMES: v = eval(a->left) * eval(a->right); break;
@@ -64,14 +71,22 @@ double eval(struct ast *a)
     return v;
 }
 
-// SBML GENERATION FUNCTIONS.
+///////////////////////////////////////////////////////////////////////////////
+//                       INTERMEDIATE CODE GENERATION                        //
+///////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Generate intermediate representation of parameter.
+ */
 void genparam(char *name, struct ast *val)
 {
     fprintf(yyout, "%s = %0.4lf;\n", name, eval(val));
 }
  
-void gencompart(struct compart * compartment) 
+ /**
+  * Generate intermediate representation of compartment.
+  */
+void gencompart(struct compart *compartment) 
 {
     curr_compart++;
     struct calllist * call = compartment->calllist; // call params.
@@ -119,12 +134,21 @@ void gencompart(struct compart * compartment)
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//                          STRUCTURE MANINPULATION                          //
+///////////////////////////////////////////////////////////////////////////////
+
 struct nodelist *newnodelist(struct ast *node, struct nodelist *next)
 {
     struct nodelist * list = (struct nodelist *) malloc(sizeof(struct nodelist));
     list->node = node;
     list->next = next;
     return list;
+}
+
+void nodelistfree(struct nodelist *list)
+{
+    // TODO: free nodelist.
 }
 
 struct calllist *newcalllist(
@@ -140,13 +164,12 @@ struct calllist *newcalllist(
     p->next = next;
 }
 
-void calllistfree(struct calllist * prog)
+void calllistfree(struct calllist *calllist)
 {
-    while (prog != NULL) {
-        struct calllist * aux = prog;
-        prog = prog->next;
-        // symlistfree(aux->list); | nodelistfree?
-        // explistfree(aux->exp);  |
+    while (calllist != NULL)
+    {
+        struct calllist * aux = calllist;
+        calllist = calllist->next;
         free(aux);
     }
 }
