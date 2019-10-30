@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -30,12 +30,12 @@
 
 /**
  * TODO: gencompartg,
- * progcallfree? 
+ * progcallfree?
  *      symlistfree(aux->list); | nodelistfree?
  *      explistfree(aux->exp);  |
  */
 
-struct symbol* env[2];          // (Global, Local) parsing tables. 
+struct symbol* env[2];          // (Global, Local) parsing tables.
 int currcompart = 0;           // Current compartment count.
 
 /**
@@ -82,11 +82,11 @@ void genparam(char *name, struct ast *val)
 {
     fprintf(yyout, "%s = %0.4lf;\n", name, eval(val));
 }
- 
+
  /**
   * Generate intermediate representation of compartment.
   */
-void gencompart(struct compart *compartment) 
+void gencompart(struct compart *compartment)
 {
     currcompart++;
     struct progcall * call = compartment->call; // call params.
@@ -109,8 +109,8 @@ void gencompart(struct compart *compartment)
     {
         struct progcall * aux = call;
         call = call->next;
-        prog[index] = aux->sym;
-        export[index] = aux->symlist;
+        prog[index] = aux->progref;
+        export[index] = aux->shares;
         params[index] = aux->explist;
         index++;
     }
@@ -152,14 +152,14 @@ void nodelistfree(struct nodelist *list)
 }
 
 struct progcall *newprogcall(
-    struct symbol *sym, 
-    struct symlist *symlist, 
-    struct nodelist *explist, 
-    struct progcall *next) 
+    struct symbol *progref,
+    struct symlist *shares,
+    struct nodelist *explist,
+    struct progcall *next)
 {
-    struct progcall * p = (struct progcall *) malloc(sizeof(struct progcall)); 
-    p->sym = sym;
-    p->symlist = symlist;
+    struct progcall * p = (struct progcall *) malloc(sizeof(struct progcall));
+    p->progref = progref;
+    p->shares = shares;
     p->explist = explist;
     p->next = next;
 }
