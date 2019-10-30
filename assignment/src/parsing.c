@@ -30,13 +30,13 @@
 
 /**
  * TODO: gencompartg,
- * calllistfree? 
+ * progcallfree? 
  *      symlistfree(aux->list); | nodelistfree?
  *      explistfree(aux->exp);  |
  */
 
 struct symbol* env[2];          // (Global, Local) parsing tables. 
-int curr_compart = 0;           // Current compartment count.
+int currcompart = 0;           // Current compartment count.
 
 /**
  * Evaluate arithmetic expression tree.
@@ -88,9 +88,9 @@ void genparam(char *name, struct ast *val)
   */
 void gencompart(struct compart *compartment) 
 {
-    curr_compart++;
-    struct calllist * call = compartment->calllist; // call params.
-    MAP* maplist;
+    currcompart++;
+    struct progcall * call = compartment->call; // call params.
+    struct maplist **maps;
 
     int size = 0;
     while (call != NULL)
@@ -103,11 +103,11 @@ void gencompart(struct compart *compartment)
     struct symlist * export[size];  // ignore.
     struct nodelist * params[size];
 
-    call  = compartment->calllist;
+    call  = compartment->call;
     int index = 0;
     while (call != NULL)
     {
-        struct calllist * aux = call;
+        struct progcall * aux = call;
         call = call->next;
         prog[index] = aux->sym;
         export[index] = aux->symlist;
@@ -119,9 +119,9 @@ void gencompart(struct compart *compartment)
      * Eval & Apply, will also check
      * for dependences in the future.
      */
-    maplist = mergeprograms(prog, export, params, curr_compart, size);
+    maps = mergeprograms(prog, export, params, currcompart, size);
 
-    fprintf(yyout, "Compartment ECOLI%d\n", curr_compart);
+    fprintf(yyout, "Compartment ECOLI%d\n", currcompart);
     /**
      * Generate corresponding Tellurium.
      */
@@ -129,8 +129,8 @@ void gencompart(struct compart *compartment)
     {
         // Working program.
         struct program *wp = prog[i]->prog;
-        outdecls(wp->declarations, maplist[i], curr_compart);
-        outreacs(wp->reactions, maplist[i]);
+        outdecls(wp->declarations, maps[i], currcompart);
+        outreacs(wp->reactions, maps[i]);
     }
 }
 
@@ -151,25 +151,25 @@ void nodelistfree(struct nodelist *list)
     // TODO: free nodelist.
 }
 
-struct calllist *newcalllist(
+struct progcall *newprogcall(
     struct symbol *sym, 
     struct symlist *symlist, 
     struct nodelist *explist, 
-    struct calllist *next) 
+    struct progcall *next) 
 {
-    struct calllist * p = (struct calllist *) malloc(sizeof(struct calllist)); 
+    struct progcall * p = (struct progcall *) malloc(sizeof(struct progcall)); 
     p->sym = sym;
     p->symlist = symlist;
     p->explist = explist;
     p->next = next;
 }
 
-void calllistfree(struct calllist *calllist)
+void progcallfree(struct progcall *progcall)
 {
-    while (calllist != NULL)
+    while (progcall != NULL)
     {
-        struct calllist * aux = calllist;
-        calllist = calllist->next;
+        struct progcall * aux = progcall;
+        progcall = progcall->next;
         free(aux);
     }
 }

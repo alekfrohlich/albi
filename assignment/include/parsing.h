@@ -29,7 +29,7 @@
 	typedef struct nodelist* assignlist;
 
 	/**
-	 * List of AST nodes.
+	 * List of AST nodes
 	 */
 	struct nodelist {
 		struct ast *node;
@@ -37,24 +37,28 @@
 	};
 
 	/**
-	 * Program call list.
+	 * Program call list
 	 */
-	struct calllist {
-		struct symbol * sym;
-		struct calllist * next;
-		struct symlist * symlist;
-		struct nodelist * explist;
+	struct progcall {
+		struct symbol *sym;
+		struct progcall *next;
+		struct symlist *symlist;
+		struct nodelist *explist;
 	};
 
-	// Forward definitions.
+	// Forward definitions
 	extern double eval(struct ast *a);
 	extern void genparam(char *name, struct ast *val);
 	extern void gencompart(struct compart* compartment);
 	extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
-	extern struct calllist *newcalllist(struct symbol*, struct symlist *symlist, struct nodelist* parameters, struct calllist*);
-	extern void calllistfree(struct calllist * prog);
+	extern struct progcall *newprogcall(
+			struct symbol *sym,
+			struct symlist *symlist,
+			struct nodelist *parameters,
+			struct progcall *call);
+	extern void progcallfree(struct progcall * prog);
 
-	// Toolchain definitions.
+	// Toolchain definitions
 	extern int yyerror(const char *s);
 
 #endif  // _PARSING_H

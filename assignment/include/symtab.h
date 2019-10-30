@@ -23,12 +23,12 @@
 #define SYMTAB_H
 
     /**
-     * Size of symbol table.
+     * Size of symbol table
      */
     #define SYMTAB_SIZE 9997
 
     /**
-     * Symbol table entry.
+     * Symbol table entry
      */
     struct symbol {
         char *name;
@@ -37,17 +37,17 @@
     };
 
     /**
-     * List of symbols.
+     * List of symbols
      */
     struct symlist {
         struct symbol *sym;
         struct symlist *next;
     };
 
-    // Forward definitions.
+    // Forward definitions
     struct ast;
     struct symbol* env[2];
-    extern int curr_env;
+    extern int currenv;
     extern struct symbol *lookup(char *sym);
     extern struct symlist *newslist(struct symbol *sym, struct symlist *next);
     extern void symdef(struct symbol *sym, struct ast *val);

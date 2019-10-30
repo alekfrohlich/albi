@@ -34,33 +34,33 @@ extern int yylex();
 %}
 
 %union {
-    // Exported by Flex.
-	double double_t;				// Double.
-    struct symbol *sym_t;   		// Symbol.
+    // Exported by Flex
+	double double_t;				// Double
+    struct symbol *sym_t;   		// Symbol
 	
-	// Intermediate structures.
-    struct ast *node;				// AST node.
-	struct calllist *callparams;	// Compartment creation node.
-	struct nodelist *list;			// List of AST nodes.
-	struct symlist *slist;			// List of symbols.
+	// Intermediate structures
+    struct ast *ast;				// AST node
+	struct progcall *progcall;		// Compartment creation node
+	struct nodelist *nodelist;		// List of AST nodes
+	struct symlist *symlist;		// List of symbols
 }
 
-// Token types.
+// Token types
 %token <double_t> NUM
 %token <sym_t> VAR
 %token ASSIGN PROG RATE SHARE ECOLI
 
-// Precendences and associativity.
+// Precendences and associativity
 %right '='
 %left '+' '-'
 %left '*' '/'
 
-// Rule types.
+// Rule types
 %type <sym_t> progdef
-%type <node> exp statement assignment ecoli
-%type <list> assignlist explist stmtlist
-%type <slist> symlist
-%type <callparams> calllist
+%type <ast> exp statement assignment ecoli
+%type <nodelist> assignlist explist stmtlist
+%type <symlist> symlist
+%type <progcall> progcall
 
 %%
 
@@ -74,7 +74,7 @@ start_of_prog: %empty
 									}
 | start_of_prog program
 									{
-										curr_env = 0;
+										currenv = 0;
 									}
 | start_of_prog ecoli				
 									{
@@ -129,7 +129,7 @@ progdef: PROG VAR
 									{
 										$$ = $2;
 										env[1] = (struct symbol *) malloc(sizeof(struct symbol) * SYMTAB_SIZE);
-										curr_env = 1;
+										currenv = 1;
 									}
 ;
 
@@ -176,15 +176,15 @@ assignlist: %empty
 									}
 ;
 
-ecoli: ECOLI '(' '[' ']' ',' PROG calllist ')' ';'
+ecoli: ECOLI '(' '[' ']' ',' PROG progcall ')' ';'
 									{
 										$$ = newcompart("ECOLI", $7);
 									}
 ;
 
-calllist: VAR '(' explist ')' 
+progcall: VAR '(' explist ')' 
 									{ 
-										$$ = newcalllist(
+										$$ = newprogcall(
 										    $1, 
 										    NULL, 
 										    (struct nodelist*) $3, 
@@ -192,23 +192,23 @@ calllist: VAR '(' explist ')'
 									}
 | VAR '(' explist ')' SHARE symlist 
 									{
-										$$ = newcalllist(
+										$$ = newprogcall(
 										    $1, 
 										    $6, 
 										    (struct nodelist*) $3, 
 										    NULL);
 									}
-| VAR '(' explist ')' '+' calllist 
+| VAR '(' explist ')' '+' progcall 
 									{ 
-										$$ = newcalllist(
+										$$ = newprogcall(
 										    $1, 
 										    NULL, 
 										    (struct nodelist*) $3, 
 										    $6);
 									}
-| VAR '(' explist ')' SHARE symlist '+' calllist 
+| VAR '(' explist ')' SHARE symlist '+' progcall 
 									{ 
-										$$ = newcalllist(
+										$$ = newprogcall(
 										    $1, 
 										    $6, 
 										    $3, 
@@ -216,7 +216,7 @@ calllist: VAR '(' explist ')'
 									}
 | VAR '('')' 
 									{ 
-										$$ = newcalllist(
+										$$ = newprogcall(
 										    $1, 
 										    NULL, 
 										    NULL, 
@@ -224,23 +224,23 @@ calllist: VAR '(' explist ')'
 									}
 | VAR '('')' SHARE symlist 
 									{
-										$$ = newcalllist(
+										$$ = newprogcall(
 										    $1, 
 										    $5, 
 										    NULL, 
 										    NULL);
 									}
-| VAR '(' ')' '+' calllist 
+| VAR '(' ')' '+' progcall 
 									{ 
-										$$ = newcalllist(
+										$$ = newprogcall(
 										    $1, 
 										    NULL, 
 										    NULL, 
 										    $5);
 									}
-| VAR '(' ')' SHARE symlist '+' calllist 
+| VAR '(' ')' SHARE symlist '+' progcall 
 									{ 
-										$$ = newcalllist(
+										$$ = newprogcall(
 										    $1, 
 										    $5, 
 										    NULL, 

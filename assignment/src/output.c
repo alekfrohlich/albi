@@ -25,7 +25,7 @@
 #include "output.h"
 #include "structures.h"
 
-void printinorder(struct ast * ast, struct maplist * map) {
+void printinorder(struct ast *ast, struct maplist *map) {
     if (ast == NULL)
         return;
 
@@ -66,7 +66,7 @@ void printinorder(struct ast * ast, struct maplist * map) {
 /**
  * Declare and define program variables.
  */
-void outdecls(struct nodelist *decls, MAP namemap, int compartnum)
+void outdecls(struct nodelist *decls, struct maplist *namemap, int compartnum)
 {
     for (struct nodelist *it = decls; it != NULL; it = it->next)
     {
@@ -82,7 +82,7 @@ void outdecls(struct nodelist *decls, MAP namemap, int compartnum)
     }
 }
 
-static void printreaction(struct reaction * reac, struct maplist * map)
+static void printreaction(struct reaction *reac, struct maplist *map)
 {
     struct nodelist *reactant = reac->reactant;
     struct nodelist *product = reac->product;
@@ -113,7 +113,7 @@ static void printreaction(struct reaction * reac, struct maplist * map)
 /**
  * List program reactions.
  */
-void outreacs(struct reactionlist *reacs, MAP namemap)
+void outreacs(struct reactionlist *reacs, struct maplist * namemap)
 {
     struct reactionlist * element = reacs;
     while (element != NULL) {

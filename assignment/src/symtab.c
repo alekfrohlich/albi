@@ -27,7 +27,7 @@
 /**
  * Start saving to global context.
  */
-int curr_env = 0;
+int currenv = 0;
 struct symbol globals[SYMTAB_SIZE];
 
 struct symbol *env[2] = {
@@ -55,7 +55,7 @@ static unsigned symhash(char *sym)
  */
 struct symbol *lookup(char *sym)
 {   
-    for (int i = curr_env; i >= 0; i--)
+    for (int i = currenv; i >= 0; i--)
     {
         struct symbol *entry = &env[i][symhash(sym) % SYMTAB_SIZE];
         int iter = SYMTAB_SIZE;
@@ -89,7 +89,7 @@ struct symbol *lookup(char *sym)
          */
     }
 
-    struct symbol *entry = &env[curr_env][symhash(sym) % SYMTAB_SIZE];
+    struct symbol *entry = &env[currenv][symhash(sym) % SYMTAB_SIZE];
     int iter = SYMTAB_SIZE;
 
     /**
@@ -103,7 +103,7 @@ struct symbol *lookup(char *sym)
             entry->name = strdup(sym);
             entry->value = 0;
             #ifdef DEBUG
-                printf("entry %s added at context %d\n", sym, curr_env);
+                printf("entry %s added at context %d\n", sym, currenv);
             #endif
             return entry;
         }
@@ -111,8 +111,8 @@ struct symbol *lookup(char *sym)
         /**
          * Loop back to start of table.
          */
-        if (++entry >= env[curr_env] + SYMTAB_SIZE)
-            entry = env[curr_env];
+        if (++entry >= env[currenv] + SYMTAB_SIZE)
+            entry = env[currenv];
     }
     
     /**

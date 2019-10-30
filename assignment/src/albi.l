@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "symtab.h"    // lookup, curr_env.
+#include "symtab.h"    // lookup, currenv.
 #include "albi.tab.h"  // tokens, yylval.
 
 // Bison location.

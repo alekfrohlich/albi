@@ -25,32 +25,32 @@
     #include "symtab.h"
 
     /**
-     * AST node types.
+     * AST node types
      */
     enum nodetypes {
-        CONSLIT = 1,    // Constant literal.
-        PLUS,           // Arithmetic expression: +.
-        MINUS,          // Arithmetic expression: -.
-        TIMES,          // Arithmetic expression: *.
-        DIV,            // Arithmetic expression: /.
-        EXPLIST,        // Grouping of nodes.
-        SYM_REF,        // Symbol reference.
-        SYM_ASSIGN,     // Symbol assignment.
-        T_SYM_ASSIGN,   // Typed symbol assignment.
-        COMPART,        // Compartment.
-        RATESTATEMENT,  // Reaction rate.
+        CONSLIT = 1,    // Constant literal
+        PLUS,           // Arithmetic expression: +
+        MINUS,          // Arithmetic expression: -
+        TIMES,          // Arithmetic expression: *
+        DIV,            // Arithmetic expression: /
+        NODELIST,       // Grouping of nodes
+        SYM_REF,        // Symbol reference
+        SYM_ASSIGN,     // Symbol assignment
+        T_SYM_ASSIGN,   // Typed symbol assignment
+        COMPART,        // Compartment
+        RATESTATEMENT,  // Reaction rate
     };
 
     /**
-     * SBML types.
+     * SBML types
      */
     enum sbmltypes {
-        SPECIE = 1,
-        LOCAL,
+        SPECIE = 1,     // Specie
+        LOCAL,          // Var
     };
 
     /**
-     * Generic expression node.
+     * Generic expression node
      */
     struct ast {
         enum nodetypes type;
@@ -59,16 +59,16 @@
     };
 
     /**
-     * Compartment instantiation node.
+     * Compartment instantiation node
      */
     struct compart {
         enum nodetypes type;
-        char *sym;
-        struct calllist *calllist;
+        char *name;
+        struct progcall *call;  // E. coli parameters
     };
 
     /**
-     * Numeric value node.
+     * Numeric value node
      */
     struct numval {
         enum nodetypes type;
@@ -76,7 +76,7 @@
     };
 
     /**
-     * Reference to symbol node.
+     * Reference to symbol node
      */
     struct symref {
         enum nodetypes type;
@@ -84,7 +84,7 @@
     };
 
     /**
-     * Symbol assignment node.
+     * Symbol assignment node
      */
     struct symassign {
         enum nodetypes type;
@@ -93,7 +93,7 @@
     };
 
     /**
-     * Typed symbol assignment node.
+     * Typed symbol assignment node
      */
     struct tsymassign {
         enum nodetypes type;
@@ -103,7 +103,7 @@
     };
 
     /**
-     * Rate expresion node.
+     * Rate expresion node
      */
     struct rate {
         enum nodetypes type;
@@ -111,13 +111,13 @@
         struct nodelist *assigns;
     };
 
-    // Forward definitions.
-    extern struct ast *newast(enum nodetypes type, struct ast *l, struct ast *r);
-    extern struct ast *newcompart(char *sym, struct calllist *calllist);
+    // Forward definitions
+    extern struct ast *newast(enum nodetypes type, struct ast *left, struct ast *right);
+    extern struct ast *newcompart(char *sym, struct progcall *progcall);
     extern struct ast *newnum(double d);
     extern struct ast *newref(struct symbol *sym);
-    extern struct ast *newassign(struct symbol *s, struct ast *v);
-    extern struct ast *newtassign(enum sbmltypes type, struct symbol *s, struct ast *v);
+    extern struct ast *newassign(struct symbol *sym, struct ast *val);
+    extern struct ast *newtassign(enum sbmltypes type, struct symbol *syn, struct ast *val);
     extern struct ast *newrate(struct ast* exp, struct nodelist *assigns);
 	extern void treefree(struct ast *a);
 

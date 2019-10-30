@@ -24,24 +24,24 @@
 #include "ast.h"
 #include "parsing.h"
 
-struct ast * newast(enum nodetypes type, struct ast *l, struct ast *r)
+struct ast * newast(enum nodetypes type, struct ast *left, struct ast *right)
 {
     struct ast *a = malloc(sizeof(struct ast));
 
     a->type = type;
-    a->left = l;
-    a->right = r;
+    a->left = left;
+    a->right = right;
 
     return a;
 }
 
-struct ast *newcompart(char *sym, struct calllist *calllist)
+struct ast *newcompart(char *name, struct progcall *call)
 {
     struct compart *a = malloc(sizeof(struct compart*));
 
     a->type = COMPART;
-    a->sym = sym;
-    a->calllist = calllist;
+    a->name = name;
+    a->call = call;
 
     return (struct ast*) a;
 }
@@ -117,7 +117,7 @@ void treefree(struct ast *a)
     case SYM_ASSIGN:
         treefree(((struct symassign*)a)->val);
         break;
-    case EXPLIST:
+    case NODELIST:
         treefree(a->left);
         treefree(a->right);
         break;
@@ -132,7 +132,7 @@ void treefree(struct ast *a)
         // nodelistfree?
     case COMPART: // double free problem?
         ;
-        calllistfree(((struct compart *)a)->calllist);
+        progcallfree(((struct compart *)a)->call);
         break;
     case CONSLIT:
         break;

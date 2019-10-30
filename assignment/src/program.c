@@ -161,7 +161,7 @@ static char *namemergedvar(char *progname, char *varname, int compartnum)
 /**
  * Merge program list's of declarations.
  */
-MAP* mergeprograms(
+struct maplist ** mergeprograms(
     struct symbol** progrefs,
     struct symlist** export,
     struct nodelist** explist,
@@ -306,7 +306,7 @@ void progdef(struct symbol *name, struct symlist *syms, struct nodelist * stmts)
 {
     struct program * program = (struct program *) malloc(sizeof(struct program));
     name->prog = program;
-    program->symtab = env[curr_env];
+    program->symtab = env[currenv];
     program->parameters = syms;
     program->body = stmts;
     makedecls(program);

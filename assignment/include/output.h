@@ -25,9 +25,9 @@
     #include "program.h"
     #include "structures.h"
 
-    // Forward definitions.
+    // Forward definitions
     extern FILE * yyout;
-    extern void outdecls(struct nodelist *declarations, MAP namemap, int compartnum);
-    extern void outreacs(struct reactionlist *reactions, MAP namemap);
+    extern void outdecls(struct nodelist *declarations, struct maplist *namemap, int compartnum);
+    extern void outreacs(struct reactionlist *reactions, struct maplist *namemap);
 
 #endif  // OUTPUT_H
