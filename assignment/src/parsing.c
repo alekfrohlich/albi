@@ -30,7 +30,7 @@
 
 // TODO: gencompartg,
 
-struct symbol* env[2];          // (Global, Local) parsing tables.
+struct symbol* env[2];         // (Global, Local) parsing tables.
 int currcompart = 0;           // Current compartment count.
 
 /**
@@ -76,7 +76,7 @@ double eval(struct ast *a)
  */
 void genparam(char *name, struct ast *val)
 {
-    fprintf(yyout, "%s = %0.4lf;\n", name, eval(val));
+    outparam(name, val);
 }
 
  /**

@@ -28,7 +28,7 @@
 /**
  * Generate AST with proper name corrections (print)
  */
-void outast(struct ast *a, struct maplist *namemap)
+static void outast(struct ast *a, struct maplist *namemap)
 {
     if (a == NULL)
         return;
@@ -72,6 +72,15 @@ void outast(struct ast *a, struct maplist *namemap)
             printf("internal error: bad node at eval, type %u\n", a->type);
     }
 }
+
+/**
+ * Declare and define global variable (print)
+ */
+void outparam(char *name, struct ast *val)
+{
+    fprintf(yyout, "%s = %0.4lf;\n", name, eval(val));
+}
+
 
 /**
  * Declare and define program variables (print)
