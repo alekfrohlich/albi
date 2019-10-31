@@ -32,6 +32,7 @@
 %}
 
 white               [ \t]+
+linecomment         "//".*
 digit               [0-9]
 integer             {digit}+
 variable            [a-zA-Z_]([a-zA-Z_0-9]+)?
@@ -48,6 +49,7 @@ ignore              ("include gro"|"lamba"|"true"|"false"|"let"|"in"|"foreach"|"
 
 {white}             { }
 {ignore}            { }
+{linecomment}       { }
 
 {program_keyword}	{ return PROG;  }
 {rate_keyword}		{ return RATE;  }
@@ -71,6 +73,9 @@ int main(int argc, char **argv)
 {
     yyin = fopen(argv[1],"r");
     yyout = fopen("parsed.intermediate", "w");
+
+    nowrites = 0;
+    yycolumn = 1;
     currfilename = argv[2];
 
     yyparse();
