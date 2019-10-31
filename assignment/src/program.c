@@ -57,18 +57,9 @@ static struct nodelist *declspecie(
             it = it->next;
         }
 
-        if (it->next == NULL)
-            yyerror("Undeclared variable");
-
         struct nodelist * aux = it->next;
         it->next = it->next->next;
         it = aux;
-    }
-
-    // Empty list
-    else
-    {
-        yyerror("Undeclared variable");
     }
 
     // Add located specie
@@ -103,25 +94,25 @@ static struct nodelist *newreaction(
 
     // Build-up reac's reactants and products,
     // also redeclare found species
-    for (struct nodelist * iter = rate->assigns; iter != NULL; iter = iter->next)
+    for (struct nodelist *it = rate->assigns; it != NULL; it = it->next)
     {
         // Reactant
-        if (((struct symassign *)iter->node)->val->type == MINUS)
+        if (((struct symassign *)it->node)->val->type == MINUS)
         {
-            reac->reactant = newnodelist(((struct ast *) iter->node), reac->reactant);
-            species = declspecie(program, ((struct symassign *) iter->node), species, locals);
+            reac->reactant = newnodelist(((struct ast *) it->node), reac->reactant);
+            species = declspecie(program, ((struct symassign *) it->node), species, locals);
         }
 
         // Product
-        else if (((struct symassign *)iter->node)->val->type == PLUS)
+        else if (((struct symassign *)it->node)->val->type == PLUS)
         {
-            reac->product = newnodelist(((struct ast *) iter->node), reac->product);
-            species = declspecie(program, ((struct symassign *) iter->node), species, locals);
+            reac->product = newnodelist(((struct ast *) it->node), reac->product);
+            species = declspecie(program, ((struct symassign *) it->node), species, locals);
         }
 
         else
         {
-            yyerror("Invalid expression");
+            yyerror("Invalid expression of type %d", it->node->type);
         }
     }
     return species;

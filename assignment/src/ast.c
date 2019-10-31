@@ -150,7 +150,7 @@ void treefree(struct ast *a)
         break;
 
     default:
-        yyerror("internal error: bad node at treefree");
+        yyerror("internal error: bad node at treefree %d", a->type);
     }
 
     free(a);

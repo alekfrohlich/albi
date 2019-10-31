@@ -75,7 +75,7 @@ struct symbol *lookup(char *sym)
     }
 
     if (nowrites)
-        yyerror("undeclared variable x");
+        yyerror("undeclared variable %s", sym);
 
     struct symbol *entry = &env[currenv][symhash(sym) % SYMTAB_SIZE];
     int iter = SYMTAB_SIZE;
@@ -95,7 +95,7 @@ struct symbol *lookup(char *sym)
             entry = env[currenv];
     }
 
-    yyerror("symbol table overflow\n");
+    yyerror("internal error: symbol table overflow");
 }
 
 /**

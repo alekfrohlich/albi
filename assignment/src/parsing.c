@@ -59,7 +59,7 @@ double eval(struct ast *a)
     case DIV:   v = eval(a->left) / eval(a->right); break;
 
     default:
-        yyerror("internal error: bad node at eval, type X");
+        yyerror("internal error: bad node at eval %d", a->type);
     }
 
     return v;

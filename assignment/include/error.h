@@ -35,6 +35,6 @@
     extern int nowrites;
     extern int yycolumn;
     extern char *currfilename;
-    extern int yyerror(const char *s);
+    extern int yyerror(const char *s, ...);
 
 #endif  // ERROR_H
