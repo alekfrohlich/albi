@@ -23,7 +23,8 @@
 
 #include "albi.tab.h"
 
-int yycolumn = 1;       // Bison location
+int nowrites;           // Symbol table writable?
+int yycolumn;           // Bison location
 char *currfilename;     // Current yyin file name
 
 /**

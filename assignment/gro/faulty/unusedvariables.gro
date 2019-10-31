@@ -1,0 +1,10 @@
+//a := b;
+
+program prog(X) := {
+    E := 25;
+    F := 75 + E + 2;
+    K := 2;
+    rate (K) : { E := E + 1; F := F - 1; }
+};
+
+ecoli([], program prog(C));

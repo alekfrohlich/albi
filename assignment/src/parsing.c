@@ -27,6 +27,7 @@
 #include "program.h"
 #include "structures.h"
 #include "output.h"
+#include "error.h"
 
 struct symbol* env[2];         // [ Global | Local ] parsing tables
 int currcompart = 0;           // Current compartment count
@@ -58,7 +59,7 @@ double eval(struct ast *a)
     case DIV:   v = eval(a->left) / eval(a->right); break;
 
     default:
-        printf("internal error: bad node at eval, type %u\n", a->type);
+        yyerror("internal error: bad node at eval, type X");
     }
 
     return v;

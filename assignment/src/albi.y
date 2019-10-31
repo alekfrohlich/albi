@@ -85,9 +85,10 @@ start_of_prog: %empty
 									}
 ;
 
-assignment: VAR ":=" exp ';'
+assignment: VAR ":=" { nowrites = 1; } exp ';'
 									{
-										$$ = newassign($1, $3);
+										$$ = newassign($1, $4);
+										nowrites = 0;
 									}
 ;
 
@@ -178,9 +179,10 @@ assignlist: %empty
 									}
 ;
 
-ecoli: ECOLI '(' '[' ']' ',' PROG progcall ')' ';'
+ecoli: ECOLI '(' '[' ']' ',' PROG { nowrites = 1; } progcall ')' ';'
 									{
-										$$ = newcompart("ECOLI", $7);
+										$$ = newcompart("ECOLI", $8);
+										nowrites = 0;
 									}
 ;
 

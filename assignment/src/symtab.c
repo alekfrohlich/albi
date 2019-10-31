@@ -74,6 +74,9 @@ struct symbol *lookup(char *sym)
         }
     }
 
+    if (nowrites)
+        yyerror("undeclared variable x");
+
     struct symbol *entry = &env[currenv][symhash(sym) % SYMTAB_SIZE];
     int iter = SYMTAB_SIZE;
 
