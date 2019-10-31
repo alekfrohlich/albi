@@ -20,6 +20,7 @@
  */
 
 #include <stdio.h>
+#include <stdarg.h>
 
 #include "albi.tab.h"
 
@@ -30,11 +31,15 @@ char *currfilename;     // Current yyin file name
 /**
  * Display error message and exit
  */
-int yyerror(const char *s)
+int yyerror(const char *s, ...)
 {
+    // Colorful output
     #define ERROR_RED(s)    fprintf(stderr, "\033[1;31m%s\033[0m", s)
     #define BEGIN_BOLD      fprintf(stderr, "\033[1;80m")
     #define COLOR_RESET     fprintf(stderr, "\033[0m")
+
+    va_list ap;
+    va_start(ap, s);
 
     if (yylloc.first_line)
     {
@@ -45,5 +50,6 @@ int yyerror(const char *s)
     }
 
     ERROR_RED("error: ");
-    fprintf(stderr, "%s.\n", s);
+    vfprintf(stderr, s, ap);
+    fprintf(stderr, ".\n");
 }
