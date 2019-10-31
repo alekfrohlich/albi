@@ -19,39 +19,30 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-.PHONY: albi test
+# C source files.
+C_SRC = $(wildcard *.c)
 
-# Directories.
-export INCDIR  = $(CURDIR)/include
-export SRCDIR  = $(CURDIR)/src
-export GRODIR  = $(CURDIR)/gro
+# Additional compiler flags.
+CFLAGS += -lm
 
-# Gro translator.
-export TRANSLATOR = $(SRCDIR)/translator
+ifndef PERMITED
+$(error Do not execute this makefile directly, \
+	please run make from the root directory!)
+endif
 
-# Toolchain configuration.
-export CFLAGS   = -g -I $(INCDIR)
+all: albi
 
-# Deny make calls to sub-makefikes.
-export PERMITED = 1
+albi.tab.c albi.tab.h: albi.y
+	bison -d $<
 
-# Albi input's file name.
-ALBI_SRC = $(patsubst $(GRODIR)/%, %, $(gro))
+albi.yy.c: albi.l albi.tab.h
+	flex -o $@ $<
 
-# Test macro
-DOTEST = (echo "\nTesting$(ALBI_SRC)...\n") \
-		  && ($(TRANSLATOR) $(gro) $(ALBI_SRC)) \
-		  || (echo "TEST $(ALBI_SRC) FAILED!"; exit 1);
+albi: $(C_SRC) albi.yy.c albi.tab.c
+	gcc $^ $(CFLAGS) -o translator
 
-# Builds the parser.
-albi:
-	cd $(SRCDIR) && $(MAKE) all
+.PHONY: clean
 
-test: albi
-	@$(foreach gro, $(wildcard $(GRODIR)/*.gro), $(DOTEST))
-	@echo "SUCCESS!"
-
-# Cleans compilation files.
 clean:
-	cd $(SRCDIR) && $(MAKE) clean
+	@rm -f albi.tab.* albi.yy.c translator
 	@rm -f parsed.intermediate
