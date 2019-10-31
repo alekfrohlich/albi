@@ -17,4 +17,4 @@ program s() := {
 };
 
 ecoli([], program p() + q() + r() + s());
-ecoli([], program m(32, 22) + n(22, 22) + r(2, 1) + s(1));
+ecoli([], program p() + q() + r() + s());

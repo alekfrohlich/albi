@@ -19,90 +19,106 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __AST_H__
-#define __AST_H__
+#ifndef AST_H
+#define AST_H
 
-#include "symtab.h"
+    #include "symtab.h"
 
-/**
- * AST node types.
- */
-enum nodetypes {
-    CONSLIT = 1,
-    PLUS,
-    MINUS,
-    TIMES,
-    DIV,
-    EXPLIST,
-    SYM_REF,
-    SYM_ASSIGN,
-    COMPART,
-    RATESTATEMENT,
-};
+    /**
+     * AST node types
+     */
+    enum nodetypes {
+        CONSLIT = 1,    // Constant literal
+        PLUS,           // Arithmetic expression: +
+        MINUS,          // Arithmetic expression: -
+        TIMES,          // Arithmetic expression: *
+        DIV,            // Arithmetic expression: /
+        NODELIST,       // Grouping of nodes
+        SYM_REF,        // Symbol reference
+        SYM_ASSIGN,     // Symbol assignment
+        T_SYM_ASSIGN,   // Typed symbol assignment
+        COMPART,        // Compartment
+        RATESTATEMENT,  // Reaction rate
+    };
 
-// BEGIN AST NODES
+    /**
+     * SBML types
+     */
+    enum sbmltypes {
+        SPECIE = 1,     // Specie
+        LOCAL,          // Var
+    };
 
-/**
- * Generic expression node.
- */
-struct ast {
-	enum nodetypes type;
-	struct ast * left;
-	struct ast * right;
-};
+    /**
+     * Generic expression node
+     */
+    struct ast {
+        enum nodetypes type;
+        struct ast * left;
+        struct ast * right;
+    };
 
-/**
- * Compartment instantiation node.
- */
-struct compart {
- 	enum nodetypes type;
-    char *sym;
-    struct progcall *params;
-};
+    /**
+     * Compartment instantiation node
+     */
+    struct compart {
+        enum nodetypes type;
+        char *name;
+        struct progcall *call;  // E. coli parameters
+    };
 
-/**
- * Numeric value node.
- */
-struct numval {
-	enum nodetypes type;
-    double number;
-};
+    /**
+     * Numeric value node
+     */
+    struct numval {
+        enum nodetypes type;
+        double number;
+    };
 
-/**
- * Reference to symbol node.
- */
-struct symref {
- 	enum nodetypes type;
-    struct symbol *sym;
-};
+    /**
+     * Symbol reference node
+     */
+    struct symref {
+        enum nodetypes type;
+        struct symbol *sym;
+    };
 
-/**
- * Symbol assignment node.
- */
-struct symassign {
-	enum nodetypes type;
-    struct symbol *sym;
-    struct ast *val;
-};
+    /**
+     * Symbol assignment node
+     */
+    struct symassign {
+        enum nodetypes type;
+        struct symbol *sym;
+        struct ast *val;
+    };
 
-/**
- * rate expresion node.
- */
-struct rate {
-	enum nodetypes type;
-    struct ast *exp;
-    struct assignlist *assigns;
-};
+    /**
+     * Typed symbol assignment node
+     */
+    struct tsymassign {
+        enum nodetypes type;
+        enum sbmltypes _type;
+        struct symbol *sym;
+        struct ast *val;
+    };
 
-// END AST NODES
+    /**
+     * Rate expresion node
+     */
+    struct rate {
+        enum nodetypes type;
+        struct ast *exp;
+        struct nodelist *assigns;
+    };
 
-// forward defined.
-extern struct ast *newast(enum nodetypes type, struct ast *l, struct ast *r);
-extern struct ast *newcompart(char *sym, struct progcall *params);
-extern struct ast *newnum(double d);
-extern struct ast *newref(struct symbol *sym);
-extern struct ast *newassign(struct symbol *s, struct ast *v);
-extern struct ast *newrate(struct ast* exp, struct assignlist *assigns);
-extern void treefree(struct ast *);
+    // Forward definitions
+    extern struct ast *newast(enum nodetypes type, struct ast *left, struct ast *right);
+    extern struct ast *newcompart(char *sym, struct progcall *progcall);
+    extern struct ast *newnum(double d);
+    extern struct ast *newref(struct symbol *sym);
+    extern struct ast *newassign(struct symbol *sym, struct ast *val);
+    extern struct ast *newtassign(enum sbmltypes type, struct symbol *sym, struct ast *val);
+    extern struct ast *newrate(struct ast *exp, struct nodelist *assigns);
+    extern void treefree(struct ast *a);
 
-#endif // __AST_H__
+#endif  // AST_H

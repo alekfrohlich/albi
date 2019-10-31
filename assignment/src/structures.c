@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -19,38 +19,31 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef SYMTAB_H
-#define SYMTAB_H
+#include <stdlib.h>
+#include <string.h>
 
-    /**
-     * Size of symbol table
-     */
-    #define SYMTAB_SIZE 9997
+#include "structures.h"
 
-    /**
-     * Symbol table entry
-     */
-    struct symbol {
-        char *name;
-        double value;           
-        struct program *prog;
-    };
+/**
+ * Create map
+ */
+struct maplist *newmaplist(char *key, char *value, struct maplist *next)
+{
+	struct maplist *ml = (struct maplist*) malloc(sizeof(struct maplist));
+	ml->key = key;
+	ml->value = value;
+	ml->next = next;
+	return ml;
+}
 
-    /**
-     * List of symbols
-     */
-    struct symlist {
-        struct symbol *sym;
-        struct symlist *next;
-    };
-
-    // Forward definitions
-    struct ast;
-    struct symbol* env[2];
-    extern int currenv;
-    extern struct symbol *lookup(char *sym);
-    extern struct symlist *newslist(struct symbol *sym, struct symlist *next);
-    extern void symdef(struct symbol *sym, struct ast *val);
-    extern void freesymbol(struct symbol *sym);
-
-#endif  // SYMTAB_H
+/**
+ * Get entry on map
+ */
+char *getmap(struct maplist *map, char *key)
+{
+	if (map == NULL)
+		return NULL;
+	if (strcmp(map->key, key) == 0)
+		return map->value;
+	return getmap(map->next, key);
+}

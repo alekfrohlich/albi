@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -19,38 +19,16 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef SYMTAB_H
-#define SYMTAB_H
+#ifndef OUTPUT_H
+#define OUTPUT_H
 
-    /**
-     * Size of symbol table
-     */
-    #define SYMTAB_SIZE 9997
-
-    /**
-     * Symbol table entry
-     */
-    struct symbol {
-        char *name;
-        double value;           
-        struct program *prog;
-    };
-
-    /**
-     * List of symbols
-     */
-    struct symlist {
-        struct symbol *sym;
-        struct symlist *next;
-    };
+    #include "program.h"
+    #include "structures.h"
 
     // Forward definitions
-    struct ast;
-    struct symbol* env[2];
-    extern int currenv;
-    extern struct symbol *lookup(char *sym);
-    extern struct symlist *newslist(struct symbol *sym, struct symlist *next);
-    extern void symdef(struct symbol *sym, struct ast *val);
-    extern void freesymbol(struct symbol *sym);
+    extern FILE * yyout;
+    extern void outparam(char *name, struct ast *val);
+    extern void outdecls(struct nodelist *decls, struct maplist *namemap, int compartnum);
+    extern void outreacs(struct reactionlist *reacs, struct maplist *namemap);
 
-#endif  // SYMTAB_H
+#endif  // OUTPUT_H

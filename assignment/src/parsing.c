@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -20,247 +20,143 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "parsing.h"
+#include "program.h"
+#include "structures.h"
+#include "output.h"
 
-struct symbol* env[2];
-static int curr_compart = 0;
+struct symbol* env[2];         // [ Global | Local ] parsing tables
+int currcompart = 0;           // Current compartment count
 
-static double eval(struct ast *a)
+/**
+ * Evaluate arithmetic expression tree
+ */
+double eval(struct ast *a)
 {
     double v;
 
     switch (a->type)
     {
 
-    // constants.
+    // Constants
     case CONSLIT:
         v = ((struct numval *) a)->number;
         break;
 
-    // name reference.
+    // Symbol references
     case SYM_REF:
         v = ((struct symref *) a)->sym->value;
         break;
 
-    // expressions:
+    // Expressions:
     case PLUS:  v = eval(a->left) + eval(a->right); break;
     case MINUS: v = eval(a->left) - eval(a->right); break;
     case TIMES: v = eval(a->left) * eval(a->right); break;
     case DIV:   v = eval(a->left) / eval(a->right); break;
 
     default:
-        printf("internal error: bad node %c\n", a->type);
+        printf("internal error: bad node at eval, type %u\n", a->type);
     }
 
     return v;
 }
 
-static void mergeprograms(
-    struct program* programs,
-    struct symlist** export,
-    struct explist** params,
-    int size,
-    char * id)
- {
- 
- }
+///////////////////////////////////////////////////////////////////////////////
+//                       INTERMEDIATE CODE GENERATION                        //
+///////////////////////////////////////////////////////////////////////////////
 
-void symdef(struct symbol *sym, struct ast *val)
-{
-    sym->value = eval(val);
-}
-
-void progdef(struct symbol *name, struct symlist *syms, struct stmtlist *stmts)
-{
-
-}
-
+/**
+ * Generate intermediate
+ * representation of parameter (print)
+ */
 void genparam(char *name, struct ast *val)
 {
-    fprintf(yyout, "%s = %0.4lf;\n", name, eval(val));
+    outparam(name, val);
 }
- 
-void gencompart(struct compart * compartment) 
+
+ /**
+  * Generate intermediate
+  * representation of compartment (print)
+  */
+void gencompart(struct compart *compartment)
 {
-    curr_compart++;
-    // struct progcall * call = compartment->params;
+    struct maplist **maps;
+    struct symbol **progrefs = (struct symbol**)malloc(sizeof(struct symbol*)*20);
+    struct nodelist **explists = (struct nodelist**) malloc(sizeof(struct nodelist*)*20);
 
-    // int size = 0;
-    // while (call != NULL) {
-    //     call = call->next;
-    //     size++;
-    // }
+    int progcount = 0;
+    for (struct progcall *it = compartment->call; it != NULL;
+         it = it->next, progcount++)
+    {
+        progrefs[progcount] = it->progref;
+        explists[progcount] = it->explist;
+    }
 
-    // struct program * prog[size];
-    // struct symlist * export[size];
-    // struct explist * params[size];
+    // Eval and apply explist. TODO: handle shares
+    maps = mergeprograms(progrefs, NULL, explists, currcompart, progcount);
 
-    // call  = compartment->params;
-    // int index = 0;
-    // while (call != NULL) {
-    //     struct progcall * aux = call;
-    //     call = call->next;
-    //     prog[index] = lookup(call->sym->name)->prog;
-    //     export[index] = call->list;
-    //     params[index] = call->exp;
-    //     index++;
-    // }
-    
-    // char * id = strcat(compartment->sym, itoa(curr_compart, 10));
-    // mergeprograms(prog, export, params, size, compartment->sym);
+    fprintf(yyout, "Compartment ECOLI%d\n", currcompart);
+
+    // Generate intermediate code (print)
+    for (int i = 0; i < progcount; i++)
+    {
+        outdecls(progrefs[i]->prog->declarations, maps[i], currcompart);
+        outreacs(progrefs[i]->prog->reactions, maps[i]);
+    }
+    currcompart++;
 }
-// PARSING STRUCTURES INITIALIZATION.
 
-struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next)
+///////////////////////////////////////////////////////////////////////////////
+//                          STRUCTURE MANINPULATION                          //
+///////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Create list of AST nodes
+ */
+struct nodelist *newnodelist(struct ast *node, struct nodelist *next)
 {
-    struct stmtlist * sl = (struct stmtlist *) malloc(sizeof(struct stmtlist));
-    sl->stmt = stmt;
-    sl->next = next;
-    return sl;
+    struct nodelist * list = (struct nodelist *) malloc(sizeof(struct nodelist));
+    list->node = node;
+    list->next = next;
+    return list;
 }
 
-struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next)
+/**
+ * Free list of AST nodes
+ */
+void nodelistfree(struct nodelist *list)
 {
-    struct assignlist * al = (struct assignlist *) malloc(sizeof(struct assignlist));
-    al->assign = assign;
-    al->next = next;
-    return al; 
+    // TODO
 }
 
-struct symlist * newsymlist(struct symbol *sym, struct symlist *next)
-{
-    struct symlist *sl = malloc(sizeof(struct symlist));
-
-    sl->sym = sym;
-    sl->next = next;
-
-    return sl;
-}
-
-struct explist * newexplist(struct ast* exp, struct explist* next)
-{
-    struct explist *a = (struct explist *) malloc(sizeof(struct explist));
-    a->exp = exp;
-    a->next = (struct explist*) next;
-    return a;
-}
-
+/**
+ * Create list of program call parameters
+ */
 struct progcall *newprogcall(
-    struct symbol* sym, 
-    struct symlist * symlist, 
-    struct explist* explist, 
-    struct progcall* next) 
+    struct symbol *progref,
+    struct symlist *shares,
+    struct nodelist *explist,
+    struct progcall *next)
 {
-    struct progcall * p = (struct progcall *) malloc(sizeof(struct progcall)); 
-    p->sym = sym;
-    p->list = symlist;
-    p->exp = explist;
+    struct progcall * p = (struct progcall *) malloc(sizeof(struct progcall));
+    p->progref = progref;
+    p->shares = shares;
+    p->explist = explist;
     p->next = next;
 }
 
-// FREE PARSING STRUCTURES.
-
-static void symbolfree(struct symbol * sym)
+/**
+ * Free list of program call parameters
+ */
+void progcallfree(struct progcall *progcall)
 {
-    free(sym->name);
-    free(sym->prog);
-}
-
-static void symlistfree(struct symlist *sl)
-{
-    struct symlist *nsl;
-
-    while(sl)
+    while (progcall != NULL)
     {
-        nsl = sl->next;
-        symbolfree(sl->sym);
-        free(sl);
-        sl = nsl;
-    }
-}
-
-static void explistfree(struct explist * el) 
-{
-    while (el != NULL) {
-        struct explist * aux = el;
-        el = el->next;
-        treefree(aux->exp);
+        struct progcall * aux = progcall;
+        progcall = progcall->next;
         free(aux);
     }
-}
-
-static void assignlistfree(struct assignlist *sl)
-{
-    while (sl != NULL) {
-        struct assignlist * aux = sl;
-        sl = sl->next;
-        treefree((struct ast *) aux->assign);
-        free(aux);
-    }
-}
-
-static void stmtlistfree(struct stmtlist * l)
-{
-    while (l != NULL) {
-        struct stmtlist * aux = l;
-        l = l->next;
-        treefree(aux->stmt);
-        free(aux);
-    }
-}
-
-static void progcallfree(struct progcall * prog)
-{
-    while (prog != NULL) {
-        struct progcall * aux = prog;
-        prog = prog->next;
-        symlistfree(aux->list);
-        explistfree(aux->exp);
-        symbolfree(aux->sym);
-        free(aux);
-    }
-}
-
-void treefree(struct ast *a)
-{
-    switch (a->type)
-    {
-
-    // two subtrees.
-    case PLUS:
-    case MINUS:
-    case TIMES:
-    case DIV:
-        treefree(a->left);
-        treefree(a->right);
-        break;
-    // one subtree.
-    case SYM_ASSIGN:
-        treefree(((struct symassign*)a)->val);
-        // freesymbol(((struct symassign *) a)->sym);
-        break;
-    case EXPLIST:
-        treefree(a->left);
-        treefree(a->right);
-        break;
-    // no subtree.
-    case SYM_REF:
-        // freesymbol(((struct symref *) a)->sym);
-        break;
-    case RATESTATEMENT:
-        ;
-        struct rate * rate = (struct rate *) a;
-        treefree(rate->exp);
-        assignlistfree(rate->assigns);
-    case COMPART: // double free problem?
-        ;
-        progcallfree(((struct compart *)a)->params);
-        break;
-    case CONSLIT:
-        break;
-    default:
-        printf("internal error: bad node %c\n", a->type);
-    }
-
-    free(a);
 }

@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -24,52 +24,99 @@
 #include "symtab.h"
 #include "parsing.h"
 
-int curr_env = 1;
+int currenv = 0;                            // Current parsing environment
+struct symbol globals[SYMTAB_SIZE];         // Global symbol table
 
-struct symbol symtab[SYMTAB_SIZE];
-
+/**
+ * Parsing environments
+ */
 struct symbol *env[2] = {
-    symtab,
+    globals,
     NULL
 };
 
+/**
+ * Hash function for symbol tables
+ */
 static unsigned symhash(char *sym)
 {
     unsigned int hash = 0;
     unsigned c;
 
-    while (c = *sym++) hash = hash*9 ^ c;
+    while (c = *sym++)
+        hash = hash*9 ^ c;
 
     return hash;
 }
 
-struct symbol * lookup(char *sym)
+/**
+ * Look-up key in hash table
+ */
+struct symbol *lookup(char *sym)
 {
-    struct symbol *sp = &symtab[symhash(sym) % SYMTAB_SIZE];
-    int scount = SYMTAB_SIZE;
-
-    while (--scount >= 0)
+    // Search for symbol in both environments
+    for (int i = currenv; i >= 0; i--)
     {
-        if (sp->name && !strcmp(sp->name, sym)) { return sp; }
+        struct symbol *entry = &env[i][symhash(sym) % SYMTAB_SIZE];
+        int iter = SYMTAB_SIZE;
 
-        // new entry.
-        if (!sp->name)
+        while (--iter >= 0)
         {
-            sp->name = strdup(sym);
-            sp->value = 0;
+            // Key already exists
+            if (entry->name && !strcmp(entry->name, sym))
+                return entry;
 
-            return sp;
+            // Loop back
+            if (++entry >= env[i] + SYMTAB_SIZE)
+                entry = env[i];
+        }
+    }
+
+    struct symbol *entry = &env[currenv][symhash(sym) % SYMTAB_SIZE];
+    int iter = SYMTAB_SIZE;
+
+    // New symbol, insert it into current environment
+    while (--iter >= 0)
+    {
+        if (!entry->name)
+        {
+            entry->name = strdup(sym);
+            entry->value = 0;
+            return entry;
         }
 
-        if (++sp >= symtab + SYMTAB_SIZE) sp = symtab;
+        // Loop back
+        if (++entry >= env[currenv] + SYMTAB_SIZE)
+            entry = env[currenv];
     }
-    
+
     yyerror("symbol table overflow\n");
-    abort(); // tried them all, table is full.
 }
 
-void freesymbol(struct symbol * sym) {
+/**
+ * Define symbol
+ */
+void symdef(struct symbol *sym, struct ast *val)
+{
+    sym->value = eval(val);
+}
+
+/**
+ * Free symbol
+ */
+void symbolfree(struct symbol * sym)
+{
     free(sym->name);
     free(sym->prog);
-    // free(sym);
+}
+
+/**
+ * Create symbol list
+ */
+struct symlist* newslist(struct symbol *sym, struct symlist *next)
+{
+    struct symlist *list = (struct symlist*) malloc(sizeof(struct symlist));
+    list->sym = sym;
+    list->next = next;
+    return list;
 }

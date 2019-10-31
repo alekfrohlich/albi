@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -19,58 +19,42 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __PARSING__
-#define __PARSING__
+#ifndef PARSING_H
+#define PARSING_H
 
-#include "ast.h"
-#include <stdio.h>
+    #include "ast.h"
 
-// BEGIN INTERMEDIATE NODES
+    /**
+     * List of AST nodes
+     */
+    struct nodelist {
+        struct ast *node;
+        struct nodelist *next;
+    };
 
-struct explist {
-	struct ast * exp;
-	struct explist * next;
-};
+    /**
+     * Program call list
+     */
+    struct progcall {
+        struct symbol *progref;     // Called program
+        struct symlist *shares;     // Shared variables
+        struct nodelist *explist;   // Parameters
+        struct progcall *next;      // Next called program
+    };
 
-struct progcall {
-	struct symbol * sym;
-	struct progcall * next;
-	struct symlist * list;
-	struct explist * exp;
-};
+    // Forward definitions
+    extern double eval(struct ast *a);
+    extern void genparam(char *name, struct ast *val);
+    extern void gencompart(struct compart *compartment);
+    extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
+    extern struct progcall *newprogcall(
+            struct symbol *sym,
+            struct symlist *symlist,
+            struct nodelist *parameters,
+            struct progcall *call);
+    extern void progcallfree(struct progcall *prog);
 
-struct symlist {
-    struct symbol *sym;
-    struct symlist *next;
-};
+    // Toolchain definitions
+    extern int yyerror(const char *s);
 
-struct assignlist {
-    struct symassign *assign;
-    struct assignlist *next;
-};
-
-struct stmtlist {
-	struct ast * stmt;
-	struct stmtlist * next;
-};
-// END INTERMEDIATE NODES
-
-// forward defined.
-extern void genparam(char *name, struct ast *val);
-extern void gencompart(struct compart* compartment);
-extern void symdef(struct symbol *sym, struct ast *val);
-extern void progdef(struct symbol *name, struct symlist *syms, struct stmtlist *stmts);
-extern struct assignlist *newassignlist(struct symassign *assign, struct assignlist *next);
-extern struct symlist *newsymlist(struct symbol *sym, struct symlist *next);
-extern struct explist *newexplist(struct ast* exp, struct explist* next);
-extern struct stmtlist *newstmtlist(struct ast * stmt, struct stmtlist * next);
-extern struct progcall *newprogcall();
-extern void treefree(struct ast *a);
-
-// toolchain defined.
-extern int yyerror(const char *s);
-extern int yylex(void);
-extern void abort(void);
-extern FILE * yyout;
-
-#endif  // __PARSING__
+#endif  // PARSING_H
