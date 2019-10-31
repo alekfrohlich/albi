@@ -211,7 +211,7 @@ static void makedecls(struct program *prog)
     {
         // Skip non-assignment nodes
         if (it->node->type != SYM_ASSIGN)
-            goto mov;
+            continue;
 
          // Add specie
         for (struct nodelist *it3 = species; it3 != NULL; it3 = it3->next)
@@ -223,7 +223,7 @@ static void makedecls(struct program *prog)
                         ((struct symassign*) it3->node)->val);
                 itdec->next = newnodelist(a, NULL);
                 itdec = itdec->next;
-                goto mov;
+                continue;
             }
         }
 
@@ -237,11 +237,9 @@ static void makedecls(struct program *prog)
                         ((struct symassign*) it2->node)->val);
                 itdec->next = newnodelist(a, NULL);
                 itdec = itdec->next;
-                goto mov;
+                continue;
             }
         }
-
-    mov:continue;
     }
     prog->declarations = decls->next;  // First node is dummy
 }
