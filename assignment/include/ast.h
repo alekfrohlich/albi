@@ -54,8 +54,8 @@
      */
     struct ast {
         enum nodetypes type;
-        struct ast * left;
-        struct ast * right;
+        struct ast *left;
+        struct ast *right;
     };
 
     /**
