@@ -114,7 +114,7 @@ void gencompart(struct compart *compartment)
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
- * Create new list of AST nodes
+ * Create list of AST nodes
  */
 struct nodelist *newnodelist(struct ast *node, struct nodelist *next)
 {
@@ -133,8 +133,7 @@ void nodelistfree(struct nodelist *list)
 }
 
 /**
- * Create new list of program
- * call parameters
+ * Create list of program call parameters
  */
 struct progcall *newprogcall(
     struct symbol *progref,
@@ -150,8 +149,7 @@ struct progcall *newprogcall(
 }
 
 /**
- * Free list of program
- * call parameters
+ * Free list of program call parameters
  */
 void progcallfree(struct progcall *progcall)
 {

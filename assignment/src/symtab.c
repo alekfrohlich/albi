@@ -24,20 +24,19 @@
 #include "symtab.h"
 #include "parsing.h"
 
-/**
- * Start saving to global context.
- */
-int currenv = 0;
-struct symbol globals[SYMTAB_SIZE];
+int currenv = 0;                            // Current parsing environment
+struct symbol globals[SYMTAB_SIZE];         // Global symbol table
 
+/**
+ * Parsing environments
+ */
 struct symbol *env[2] = {
     globals,
     NULL
 };
 
 /**
- * Hashes a symbol by multiplying by 9
- * and xor'ing with the last result.
+ * Hash function for symbol tables
  */
 static unsigned symhash(char *sym)
 {
@@ -51,78 +50,51 @@ static unsigned symhash(char *sym)
 }
 
 /**
- * Look-up key in hash table.
+ * Look-up key in hash table
  */
 struct symbol *lookup(char *sym)
 {
+    // Search for symbol in both environments
     for (int i = currenv; i >= 0; i--)
     {
         struct symbol *entry = &env[i][symhash(sym) % SYMTAB_SIZE];
         int iter = SYMTAB_SIZE;
 
-        /**
-         * Try all entries on global symbol table.
-         */
         while (--iter >= 0)
         {
-            /**
-             * Key already exists, so return it!
-             */
+            // Key already exists
             if (entry->name && !strcmp(entry->name, sym))
-            {
-                #ifdef DEBUG
-                    printf("entry %s found at context %d\n", sym, i);
-                #endif
                 return entry;
-            }
 
-            /**
-             * Loop back to start of table.
-             */
+            // Loop back
             if (++entry >= env[i] + SYMTAB_SIZE)
                 entry = env[i];
         }
-
-        /**
-         * Tried all global entries whilst
-         * not inside a program.
-         */
     }
 
     struct symbol *entry = &env[currenv][symhash(sym) % SYMTAB_SIZE];
     int iter = SYMTAB_SIZE;
 
-    /**
-     * Key doesn't exist,
-     * create new entry for it!
-     */
+    // New symbol, insert it into current environment
     while (--iter >= 0)
     {
         if (!entry->name)
         {
             entry->name = strdup(sym);
             entry->value = 0;
-            #ifdef DEBUG
-                printf("entry %s added at context %d\n", sym, currenv);
-            #endif
             return entry;
         }
 
-        /**
-         * Loop back to start of table.
-         */
+        // Loop back
         if (++entry >= env[currenv] + SYMTAB_SIZE)
             entry = env[currenv];
     }
 
-    /**
-     * Tried all local entries, symbol table full.
-     */
     yyerror("symbol table overflow\n");
 }
 
 /**
- * Define new symbol.
+ * Define new symbol
  */
 void symdef(struct symbol *sym, struct ast *val)
 {
@@ -130,8 +102,7 @@ void symdef(struct symbol *sym, struct ast *val)
 }
 
 /**
- * Clean's a symbol dynamic memory
- * consumption.
+ * Free symbol
  */
 void symbolfree(struct symbol * sym)
 {
@@ -139,6 +110,9 @@ void symbolfree(struct symbol * sym)
     free(sym->prog);
 }
 
+/**
+ * Create symbol list
+ */
 struct symlist* newslist(struct symbol *sym, struct symlist *next)
 {
     struct symlist *list = (struct symlist*) malloc(sizeof(struct symlist));

@@ -115,7 +115,7 @@ void treefree(struct ast *a)
     switch (a->type)
     {
 
-    // two subtrees.
+    // Two subtrees.
     case PLUS:
     case MINUS:
     case TIMES:
@@ -124,7 +124,7 @@ void treefree(struct ast *a)
         treefree(a->right);
         break;
 
-    // one subtree.
+    // One subtree.
     case SYM_ASSIGN:
         treefree(((struct symassign*)a)->val);
         break;
@@ -133,7 +133,7 @@ void treefree(struct ast *a)
         treefree(a->right);
         break;
 
-    // no subtree.
+    // No subtree.
     case SYM_REF:
         break;
     case RATESTATEMENT:
