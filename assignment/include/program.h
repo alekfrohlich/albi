@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -27,41 +27,40 @@
     #include "structures.h"
 
     /**
-     * 
+     * Parsed program
      */
     struct program {
-        int reactions_size;
         struct symbol *symtab;
         struct nodelist *body;
         struct nodelist *declarations;
-        struct nodelist *dependences;  // ignored.
+        struct nodelist *dependences;  // TODO
         struct symlist *parameters;
         struct reactionlist *reactions;
     };
 
     /**
-     * 
+     * Parsed reaction
      */
     struct reaction {
-        struct nodelist * reactant;
-        struct nodelist * product;
-        struct ast * rate;
+        struct nodelist *reactant;
+        struct nodelist *product;
+        struct ast *rate;
     };
 
     /**
-     * 
+     * List of parsed reactions
      */
     struct reactionlist {
-        struct reaction * reac;
-        struct reactionlist * next;
+        struct reaction *reac;
+        struct reactionlist *next;
     };
 
-    // Forward definitions.
+    // Forward definitions
     extern void progdef(struct symbol *name, struct symlist *syms, struct nodelist *stmts);
-    extern MAP* mergeprograms(
-        struct symbol** progrefs,
-        struct symlist** export,
-        struct nodelist** params,
+    extern struct maplist **mergeprograms(
+        struct symbol **progrefs,
+        struct symlist **export,
+        struct nodelist **params,
         int compartnum,
         int size);
 

@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -22,39 +22,39 @@
 #ifndef PARSING_H
 #define PARSING_H
 
-	#include "ast.h"
+    #include "ast.h"
 
-	typedef struct nodelist* stmtlist;
-	typedef struct nodelist* explist;
-	typedef struct nodelist* assignlist;
+    /**
+     * List of AST nodes
+     */
+    struct nodelist {
+        struct ast *node;
+        struct nodelist *next;
+    };
 
-	/**
-	 * List of AST nodes.
-	 */
-	struct nodelist {
-		struct ast *node;
-		struct nodelist *next;
-	};
+    /**
+     * Program call list
+     */
+    struct progcall {
+        struct symbol *progref;     // Called program
+        struct symlist *shares;     // Shared variables
+        struct nodelist *explist;   // Parameters
+        struct progcall *next;      // Next called program
+    };
 
-	/**
-	 * Program call list.
-	 */
-	struct calllist {
-		struct symbol * sym;
-		struct calllist * next;
-		struct symlist * symlist;
-		struct nodelist * explist;
-	};
+    // Forward definitions
+    extern double eval(struct ast *a);
+    extern void genparam(char *name, struct ast *val);
+    extern void gencompart(struct compart *compartment);
+    extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
+    extern struct progcall *newprogcall(
+            struct symbol *sym,
+            struct symlist *symlist,
+            struct nodelist *parameters,
+            struct progcall *call);
+    extern void progcallfree(struct progcall *prog);
 
-	// Forward definitions.
-	extern double eval(struct ast *a);
-	extern void genparam(char *name, struct ast *val);
-	extern void gencompart(struct compart* compartment);
-	extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
-	extern struct calllist *newcalllist(struct symbol*, struct symlist *symlist, struct nodelist* parameters, struct calllist*);
-	extern void calllistfree(struct calllist * prog);
+    // Toolchain definitions
+    extern int yyerror(const char *s);
 
-	// Toolchain definitions.
-	extern int yyerror(const char *s);
-
-#endif  // _PARSING_H
+#endif  // PARSING_H

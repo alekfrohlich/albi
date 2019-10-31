@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -34,33 +34,33 @@ extern int yylex();
 %}
 
 %union {
-    // Exported by Flex.
-	double double_t;				// Double.
-    struct symbol *sym_t;   		// Symbol.
-	
-	// Intermediate structures.
-    struct ast *node;				// AST node.
-	struct calllist *callparams;	// Compartment creation node.
-	struct nodelist *list;			// List of AST nodes.
-	struct symlist *slist;			// List of symbols.
+    // Exported by Flex
+	double double_t;				// Double
+    struct symbol *sym_t;   		// Symbol
+
+	// Intermediate structures
+    struct ast *ast;				// AST node
+	struct progcall *progcall;		// Compartment creation node
+	struct nodelist *nodelist;		// List of AST nodes
+	struct symlist *symlist;		// List of symbols
 }
 
-// Token types.
+// Token types
 %token <double_t> NUM
 %token <sym_t> VAR
 %token ASSIGN PROG RATE SHARE ECOLI
 
-// Precendences and associativity.
+// Precendences and associativity
 %right '='
 %left '+' '-'
 %left '*' '/'
 
-// Rule types.
+// Rule types
 %type <sym_t> progdef
-%type <node> exp statement assignment ecoli
-%type <list> assignlist explist stmtlist
-%type <slist> symlist
-%type <callparams> calllist
+%type <ast> exp statement assignment ecoli
+%type <nodelist> assignlist explist stmtlist
+%type <symlist> symlist
+%type <progcall> progcall
 
 %%
 
@@ -70,46 +70,44 @@ start_of_prog: %empty
 										struct symassign *assign = (struct symassign *) $2;
 										symdef(assign->sym, assign->val);
 										genparam(assign->sym->name, assign->val);
-										// treefree($2);
 									}
 | start_of_prog program
 									{
-										curr_env = 0;
+										currenv = 0;
 									}
-| start_of_prog ecoli				
+| start_of_prog ecoli
 									{
 										gencompart((struct compart *) $2);
-										// treefree($2);
 									}
 ;
 
-assignment: VAR ASSIGN exp ';'		
+assignment: VAR ASSIGN exp ';'
 									{
 										$$ = newassign($1, $3);
 									}
 ;
 
-exp: exp '+' exp					
+exp: exp '+' exp
 									{
 										$$ = newast(PLUS, $1, $3);
 									}
-| exp '-' exp						
+| exp '-' exp
 									{
 										$$ = newast(MINUS, $1, $3);
 									}
-| exp '*' exp						
+| exp '*' exp
 									{
 										$$ = newast(TIMES, $1, $3);
 									}
-| exp '/' exp						
+| exp '/' exp
 									{
 										$$ = newast(DIV, $1, $3);
 									}
-| NUM								
+| NUM
 									{
 										$$ = newnum($1);
 									}
-| VAR								
+| VAR
 									{
 										$$ = newref($1);
 									}
@@ -129,7 +127,7 @@ progdef: PROG VAR
 									{
 										$$ = $2;
 										env[1] = (struct symbol *) malloc(sizeof(struct symbol) * SYMTAB_SIZE);
-										curr_env = 1;
+										currenv = 1;
 									}
 ;
 
@@ -137,7 +135,7 @@ symlist: VAR
 									{
 										$$ = newslist($1, NULL);
 									}
-| VAR ',' symlist              
+| VAR ',' symlist
 									{
 										$$ = newslist($1, $3);
 									}
@@ -176,74 +174,74 @@ assignlist: %empty
 									}
 ;
 
-ecoli: ECOLI '(' '[' ']' ',' PROG calllist ')' ';'
+ecoli: ECOLI '(' '[' ']' ',' PROG progcall ')' ';'
 									{
 										$$ = newcompart("ECOLI", $7);
 									}
 ;
 
-calllist: VAR '(' explist ')' 
-									{ 
-										$$ = newcalllist(
-										    $1, 
-										    NULL, 
-										    (struct nodelist*) $3, 
-										    NULL);
-									}
-| VAR '(' explist ')' SHARE symlist 
+progcall: VAR '(' explist ')'
 									{
-										$$ = newcalllist(
-										    $1, 
-										    $6, 
-										    (struct nodelist*) $3, 
+										$$ = newprogcall(
+										    $1,
+										    NULL,
+										    (struct nodelist*) $3,
 										    NULL);
 									}
-| VAR '(' explist ')' '+' calllist 
-									{ 
-										$$ = newcalllist(
-										    $1, 
-										    NULL, 
-										    (struct nodelist*) $3, 
+| VAR '(' explist ')' SHARE symlist
+									{
+										$$ = newprogcall(
+										    $1,
+										    $6,
+										    (struct nodelist*) $3,
+										    NULL);
+									}
+| VAR '(' explist ')' '+' progcall
+									{
+										$$ = newprogcall(
+										    $1,
+										    NULL,
+										    (struct nodelist*) $3,
 										    $6);
 									}
-| VAR '(' explist ')' SHARE symlist '+' calllist 
-									{ 
-										$$ = newcalllist(
-										    $1, 
-										    $6, 
-										    $3, 
+| VAR '(' explist ')' SHARE symlist '+' progcall
+									{
+										$$ = newprogcall(
+										    $1,
+										    $6,
+										    $3,
 										    $8);
 									}
-| VAR '('')' 
-									{ 
-										$$ = newcalllist(
-										    $1, 
-										    NULL, 
-										    NULL, 
-										    NULL);
-									}
-| VAR '('')' SHARE symlist 
+| VAR '('')'
 									{
-										$$ = newcalllist(
-										    $1, 
-										    $5, 
-										    NULL, 
+										$$ = newprogcall(
+										    $1,
+										    NULL,
+										    NULL,
 										    NULL);
 									}
-| VAR '(' ')' '+' calllist 
-									{ 
-										$$ = newcalllist(
-										    $1, 
-										    NULL, 
-										    NULL, 
+| VAR '('')' SHARE symlist
+									{
+										$$ = newprogcall(
+										    $1,
+										    $5,
+										    NULL,
+										    NULL);
+									}
+| VAR '(' ')' '+' progcall
+									{
+										$$ = newprogcall(
+										    $1,
+										    NULL,
+										    NULL,
 										    $5);
 									}
-| VAR '(' ')' SHARE symlist '+' calllist 
-									{ 
-										$$ = newcalllist(
-										    $1, 
-										    $5, 
-										    NULL, 
+| VAR '(' ')' SHARE symlist '+' progcall
+									{
+										$$ = newprogcall(
+										    $1,
+										    $5,
+										    NULL,
 										    $7);
 									}
 ;

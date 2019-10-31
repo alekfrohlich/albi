@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -25,9 +25,10 @@
     #include "program.h"
     #include "structures.h"
 
-    // Forward definitions.
+    // Forward definitions
     extern FILE * yyout;
-    extern void outdecls(struct nodelist *declarations, MAP namemap, int compartnum);
-    extern void outreacs(struct reactionlist *reactions, MAP namemap);
+    extern void outparam(char *name, struct ast *val);
+    extern void outdecls(struct nodelist *decls, struct maplist *namemap, int compartnum);
+    extern void outreacs(struct reactionlist *reacs, struct maplist *namemap);
 
 #endif  // OUTPUT_H

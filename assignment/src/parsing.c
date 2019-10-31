@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -28,11 +28,11 @@
 #include "structures.h"
 #include "output.h"
 
-struct symbol* env[2];
-int curr_compart = 0;
+struct symbol* env[2];         // [ Global | Local ] parsing tables
+int currcompart = 0;           // Current compartment count
 
 /**
- * Evaluate arithmetic expression tree.
+ * Evaluate arithmetic expression tree
  */
 double eval(struct ast *a)
 {
@@ -41,17 +41,17 @@ double eval(struct ast *a)
     switch (a->type)
     {
 
-    // constants.
+    // Constants
     case CONSLIT:
         v = ((struct numval *) a)->number;
         break;
 
-    // name reference.
+    // Symbol references
     case SYM_REF:
         v = ((struct symref *) a)->sym->value;
         break;
 
-    // expressions:
+    // Expressions:
     case PLUS:  v = eval(a->left) + eval(a->right); break;
     case MINUS: v = eval(a->left) - eval(a->right); break;
     case TIMES: v = eval(a->left) * eval(a->right); break;
@@ -64,61 +64,58 @@ double eval(struct ast *a)
     return v;
 }
 
-// SBML GENERATION FUNCTIONS.
+///////////////////////////////////////////////////////////////////////////////
+//                       INTERMEDIATE CODE GENERATION                        //
+///////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Generate intermediate
+ * representation of parameter (print)
+ */
 void genparam(char *name, struct ast *val)
 {
-    fprintf(yyout, "%s = %0.4lf;\n", name, eval(val));
+    outparam(name, val);
 }
- 
-void gencompart(struct compart * compartment) 
+
+ /**
+  * Generate intermediate
+  * representation of compartment (print)
+  */
+void gencompart(struct compart *compartment)
 {
-    curr_compart++;
-    struct calllist * call = compartment->calllist; // call params.
-    MAP* maplist;
+    struct maplist **maps;
+    struct symbol **progrefs = (struct symbol**)malloc(sizeof(struct symbol*)*20);
+    struct nodelist **explists = (struct nodelist**) malloc(sizeof(struct nodelist*)*20);
 
-    int size = 0;
-    while (call != NULL)
+    int progcount = 0;
+    for (struct progcall *it = compartment->call; it != NULL;
+         it = it->next, progcount++)
     {
-        call = call->next;
-        size++;
+        progrefs[progcount] = it->progref;
+        explists[progcount] = it->explist;
     }
 
-    struct symbol * prog[size];
-    struct symlist * export[size];  // ignore.
-    struct nodelist * params[size];
+    // Eval and apply explist. TODO: handle shares
+    maps = mergeprograms(progrefs, NULL, explists, currcompart, progcount);
 
-    call  = compartment->calllist;
-    int index = 0;
-    while (call != NULL)
+    fprintf(yyout, "Compartment ECOLI%d\n", currcompart);
+
+    // Generate intermediate code (print)
+    for (int i = 0; i < progcount; i++)
     {
-        struct calllist * aux = call;
-        call = call->next;
-        prog[index] = aux->sym;
-        export[index] = aux->symlist;
-        params[index] = aux->explist;
-        index++;
+        outdecls(progrefs[i]->prog->declarations, maps[i], currcompart);
+        outreacs(progrefs[i]->prog->reactions, maps[i]);
     }
-
-    /**
-     * Eval & Apply, will also check
-     * for dependences in the future.
-     */
-    maplist = mergeprograms(prog, export, params, curr_compart, size);
-
-    fprintf(yyout, "Compartment ECOLI%d\n", curr_compart);
-    /**
-     * Generate corresponding Tellurium.
-     */
-    for (int i = 0; i < size; i++)
-    {
-        // Working program.
-        struct program *wp = prog[i]->prog;
-        outdecls(wp->declarations, maplist[i], curr_compart);
-        outreacs(wp->reactions, maplist[i]);
-    }
+    currcompart++;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//                          STRUCTURE MANINPULATION                          //
+///////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Create list of AST nodes
+ */
 struct nodelist *newnodelist(struct ast *node, struct nodelist *next)
 {
     struct nodelist * list = (struct nodelist *) malloc(sizeof(struct nodelist));
@@ -127,26 +124,39 @@ struct nodelist *newnodelist(struct ast *node, struct nodelist *next)
     return list;
 }
 
-struct calllist *newcalllist(
-    struct symbol *sym, 
-    struct symlist *symlist, 
-    struct nodelist *explist, 
-    struct calllist *next) 
+/**
+ * Free list of AST nodes
+ */
+void nodelistfree(struct nodelist *list)
 {
-    struct calllist * p = (struct calllist *) malloc(sizeof(struct calllist)); 
-    p->sym = sym;
-    p->symlist = symlist;
+    // TODO
+}
+
+/**
+ * Create list of program call parameters
+ */
+struct progcall *newprogcall(
+    struct symbol *progref,
+    struct symlist *shares,
+    struct nodelist *explist,
+    struct progcall *next)
+{
+    struct progcall * p = (struct progcall *) malloc(sizeof(struct progcall));
+    p->progref = progref;
+    p->shares = shares;
     p->explist = explist;
     p->next = next;
 }
 
-void calllistfree(struct calllist * prog)
+/**
+ * Free list of program call parameters
+ */
+void progcallfree(struct progcall *progcall)
 {
-    while (prog != NULL) {
-        struct calllist * aux = prog;
-        prog = prog->next;
-        // symlistfree(aux->list); | nodelistfree?
-        // explistfree(aux->exp);  |
+    while (progcall != NULL)
+    {
+        struct progcall * aux = progcall;
+        progcall = progcall->next;
         free(aux);
     }
 }
