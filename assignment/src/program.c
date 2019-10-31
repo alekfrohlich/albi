@@ -42,7 +42,7 @@ static struct nodelist *declspecie(
 
     // Removing head?
     if (it != NULL &&
-        strcmp(((struct symassign *) it->node)->sym->name, declaree) == 0)
+        strcmp(((struct symassign*) it->node)->sym->name, declaree) == 0)
     {
         locals = locals->next;
     }
@@ -52,12 +52,12 @@ static struct nodelist *declspecie(
     {
         // Iterate until prev
         while (it->next != NULL &&
-            strcmp(((struct symassign *)it->next->node)->sym->name, declaree) != 0)
+            strcmp(((struct symassign*)it->next->node)->sym->name, declaree) != 0)
         {
             it = it->next;
         }
 
-        struct nodelist * aux = it->next;
+        struct nodelist *aux = it->next;
         it->next = it->next->next;
         it = aux;
     }
@@ -97,17 +97,17 @@ static struct nodelist *newreaction(
     for (struct nodelist *it = rate->assigns; it != NULL; it = it->next)
     {
         // Reactant
-        if (((struct symassign *)it->node)->val->type == MINUS)
+        if (((struct symassign*) it->node)->val->type == MINUS)
         {
-            reac->reactant = newnodelist(((struct ast *) it->node), reac->reactant);
-            species = declspecie(program, ((struct symassign *) it->node), species, locals);
+            reac->reactant = newnodelist(((struct ast*) it->node), reac->reactant);
+            species = declspecie(program, ((struct symassign*) it->node), species, locals);
         }
 
         // Product
-        else if (((struct symassign *)it->node)->val->type == PLUS)
+        else if (((struct symassign*) it->node)->val->type == PLUS)
         {
-            reac->product = newnodelist(((struct ast *) it->node), reac->product);
-            species = declspecie(program, ((struct symassign *) it->node), species, locals);
+            reac->product = newnodelist(((struct ast*) it->node), reac->product);
+            species = declspecie(program, ((struct symassign*) it->node), species, locals);
         }
 
         else
@@ -162,7 +162,7 @@ struct maplist **mergeprograms(
         {
             ((struct tsymassign*) it->node)->sym->value = eval(((struct tsymassign*) it->node)->val);
             char *name = namemergedvar(progrefs[i]->name,
-                    ((struct tsymassign *)it->node)->sym->name, compartnum);
+                    ((struct tsymassign*) it->node)->sym->name, compartnum);
             maps[i] = newmaplist(((struct tsymassign *)it->node)->sym->name, name, maps[i]);
         }
     }
@@ -238,7 +238,7 @@ static void makedecls(struct program *prog)
  /**
   * Define program
   */
-void progdef(struct symbol *name, struct symlist *syms, struct nodelist * stmts)
+void progdef(struct symbol *name, struct symlist *syms, struct nodelist *stmts)
 {
     struct program *program = (struct program*) malloc(sizeof(struct program));
     name->prog = program;

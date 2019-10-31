@@ -109,7 +109,7 @@ void symdef(struct symbol *sym, struct ast *val)
 /**
  * Free symbol
  */
-void symbolfree(struct symbol * sym)
+void symbolfree(struct symbol *sym)
 {
     free(sym->name);
     free(sym->prog);

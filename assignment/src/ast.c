@@ -28,7 +28,7 @@
 /**
  * Create generic expression node
  */
-struct ast * newast(enum nodetypes type, struct ast *left, struct ast *right)
+struct ast *newast(enum nodetypes type, struct ast *left, struct ast *right)
 {
     struct ast *a = malloc(sizeof(struct ast));
     a->type = type;
@@ -42,7 +42,7 @@ struct ast * newast(enum nodetypes type, struct ast *left, struct ast *right)
  */
 struct ast *newcompart(char *name, struct progcall *call)
 {
-    struct compart *a = malloc(sizeof(struct compart*));
+    struct compart *a = malloc(sizeof(struct compart));
     a->type = COMPART;
     a->name = name;
     a->call = call;
@@ -52,35 +52,35 @@ struct ast *newcompart(char *name, struct progcall *call)
 /**
  * Create numeric value node
  */
-struct ast * newnum(double d)
+struct ast *newnum(double d)
 {
     struct numval *a = malloc(sizeof(struct numval));
     a->type = CONSLIT;
     a->number = d;
-    return (struct ast *) a;
+    return (struct ast*) a;
 }
 
 /**
  * Create symbol reference
  */
-struct ast * newref(struct symbol *sym)
+struct ast *newref(struct symbol *sym)
 {
     struct symref *a = malloc(sizeof(struct symref));
     a->type = SYM_REF;
     a->sym = sym;
-    return (struct ast *) a;
+    return (struct ast*) a;
 }
 
 /**
  * Create symbol assingment node
  */
-struct ast * newassign(struct symbol *sym, struct ast *val)
+struct ast *newassign(struct symbol *sym, struct ast *val)
 {
     struct symassign *a = malloc(sizeof(struct symassign));
     a->type = SYM_ASSIGN;
     a->sym = sym;
     a->val = val;
-    return (struct ast *) a;
+    return (struct ast*) a;
 }
 
 /**
@@ -93,19 +93,19 @@ struct ast *newtassign(enum sbmltypes type, struct symbol *sym, struct ast *val)
     a->_type = type;
     a->sym = sym;
     a->val = val;
-    return (struct ast *) a;
+    return (struct ast*) a;
 }
 
 /**
  * Create rate expression node
  */
-struct ast *newrate(struct ast* exp, struct nodelist *assigns)
+struct ast *newrate(struct ast *exp, struct nodelist *assigns)
 {
-    struct rate * r = malloc(sizeof(struct rate));
+    struct rate *r = malloc(sizeof(struct rate));
     r->type = RATESTATEMENT;
     r->assigns = assigns;
     r->exp = exp;
-    return (struct ast *) r;
+    return (struct ast*) r;
 }
 
 /**
@@ -139,12 +139,12 @@ void treefree(struct ast *a)
         break;
     case RATESTATEMENT:
         ;
-        struct rate * rate = (struct rate *) a;
+        struct rate *rate = (struct rate*)a;
         treefree(rate->exp);
         // nodelistfree?
     case COMPART: // double free problem?
         ;
-        progcallfree(((struct compart *)a)->call);
+        progcallfree(((struct compart*)a)->call);
         break;
     case CONSLIT:
         break;
