@@ -81,7 +81,6 @@ void outparam(char *name, struct ast *val)
     fprintf(yyout, "%s = %0.4lf;\n", name, eval(val));
 }
 
-
 /**
  * Declare and define program variables (print)
  */

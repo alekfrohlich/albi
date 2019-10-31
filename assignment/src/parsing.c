@@ -28,13 +28,11 @@
 #include "structures.h"
 #include "output.h"
 
-// TODO: gencompartg,
-
-struct symbol* env[2];         // (Global, Local) parsing tables.
-int currcompart = 0;           // Current compartment count.
+struct symbol* env[2];         // [ Global | Local ] parsing tables
+int currcompart = 0;           // Current compartment count
 
 /**
- * Evaluate arithmetic expression tree.
+ * Evaluate arithmetic expression tree
  */
 double eval(struct ast *a)
 {
@@ -43,12 +41,12 @@ double eval(struct ast *a)
     switch (a->type)
     {
 
-    // Constants.
+    // Constants
     case CONSLIT:
         v = ((struct numval *) a)->number;
         break;
 
-    // Symbol references.
+    // Symbol references
     case SYM_REF:
         v = ((struct symref *) a)->sym->value;
         break;
@@ -85,50 +83,30 @@ void genparam(char *name, struct ast *val)
   */
 void gencompart(struct compart *compartment)
 {
-    currcompart++;
-    struct progcall * call = compartment->call; // call params.
     struct maplist **maps;
+    struct symbol **progrefs = (struct symbol**)malloc(sizeof(struct symbol**)*20);
+    struct nodelist **explists = (struct nodelist**) malloc(sizeof(struct nodelist**)*20);
 
     int size = 0;
-    while (call != NULL)
+    for (struct progcall *it = compartment->call; it != NULL;
+         it = it->next, size++)
     {
-        call = call->next;
-        size++;
+        progrefs[size] = it->progref;
+        explists[size] = it->explist;
     }
 
-    struct symbol * prog[size];
-    struct symlist * export[size];  // ignore.
-    struct nodelist * params[size];
-
-    call  = compartment->call;
-    int index = 0;
-    while (call != NULL)
-    {
-        struct progcall * aux = call;
-        call = call->next;
-        prog[index] = aux->progref;
-        export[index] = aux->shares;
-        params[index] = aux->explist;
-        index++;
-    }
-
-    /**
-     * Eval & Apply, will also check
-     * for dependences in the future.
-     */
-    maps = mergeprograms(prog, export, params, currcompart, size);
+    // Eval and apply explist. TODO: handle shares
+    maps = mergeprograms(progrefs, NULL, explists, currcompart, size);
 
     fprintf(yyout, "Compartment ECOLI%d\n", currcompart);
-    /**
-     * Generate corresponding Tellurium.
-     */
+
+    // Generate intermediate code (print)
     for (int i = 0; i < size; i++)
     {
-        // Working program.
-        struct program *wp = prog[i]->prog;
-        outdecls(wp->declarations, maps[i], currcompart);
-        outreacs(wp->reactions, maps[i]);
+        outdecls(progrefs[i]->prog->declarations, maps[i], currcompart);
+        outreacs(progrefs[i]->prog->reactions, maps[i]);
     }
+    currcompart++;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -151,7 +129,7 @@ struct nodelist *newnodelist(struct ast *node, struct nodelist *next)
  */
 void nodelistfree(struct nodelist *list)
 {
-    // TODO: free nodelist.
+    // TODO: free nodelist
 }
 
 /**
@@ -173,7 +151,7 @@ struct progcall *newprogcall(
 
 /**
  * Free list of program
- * call parameters.
+ * call parameters
  */
 void progcallfree(struct progcall *progcall)
 {
