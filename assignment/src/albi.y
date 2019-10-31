@@ -48,7 +48,8 @@ extern int yylex();
 // Token types
 %token <double_t> NUM
 %token <sym_t> VAR
-%token ASSIGN PROG RATE SHARE ECOLI
+%token PROG RATE SHARE ECOLI
+%token ASSIGN ":="
 
 // Precendences and associativity
 %right '='
@@ -81,7 +82,7 @@ start_of_prog: %empty
 									}
 ;
 
-assignment: VAR ASSIGN exp ';'
+assignment: VAR ":=" exp ';'
 									{
 										$$ = newassign($1, $3);
 									}
@@ -113,11 +114,11 @@ exp: exp '+' exp
 									}
 ;
 
-program: progdef '(' symlist ')' ASSIGN '{' stmtlist '}' ';'
+program: progdef '(' symlist ')' ":=" '{' stmtlist '}' ';'
 									{
 										progdef($1, $3, $7);
 									}
-| progdef '(' ')' ASSIGN '{' stmtlist '}' ';'
+| progdef '(' ')' ":=" '{' stmtlist '}' ';'
 									{
 										progdef($1, NULL, $6);
 									}
