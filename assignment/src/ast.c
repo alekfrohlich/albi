@@ -24,6 +24,9 @@
 #include "ast.h"
 #include "parsing.h"
 
+/**
+ * Create generic expression node
+ */
 struct ast * newast(enum nodetypes type, struct ast *left, struct ast *right)
 {
     struct ast *a = malloc(sizeof(struct ast));
@@ -33,6 +36,9 @@ struct ast * newast(enum nodetypes type, struct ast *left, struct ast *right)
     return a;
 }
 
+/**
+ * Create compartment instantiation node
+ */
 struct ast *newcompart(char *name, struct progcall *call)
 {
     struct compart *a = malloc(sizeof(struct compart*));
@@ -42,6 +48,9 @@ struct ast *newcompart(char *name, struct progcall *call)
     return (struct ast*) a;
 }
 
+/**
+ * Create numeric value node
+ */
 struct ast * newnum(double d)
 {
     struct numval *a = malloc(sizeof(struct numval));
@@ -50,6 +59,9 @@ struct ast * newnum(double d)
     return (struct ast *) a;
 }
 
+/**
+ * Create symbol reference
+ */
 struct ast * newref(struct symbol *sym)
 {
     struct symref *a = malloc(sizeof(struct symref));
@@ -58,6 +70,9 @@ struct ast * newref(struct symbol *sym)
     return (struct ast *) a;
 }
 
+/**
+ * Create symbol assingment node
+ */
 struct ast * newassign(struct symbol *sym, struct ast *val)
 {
     struct symassign *a = malloc(sizeof(struct symassign));
@@ -67,6 +82,9 @@ struct ast * newassign(struct symbol *sym, struct ast *val)
     return (struct ast *) a;
 }
 
+/**
+ * Create typed symbol assignment node
+ */
 struct ast *newtassign(enum sbmltypes type, struct symbol *sym, struct ast *val)
 {
     struct tsymassign *a = malloc(sizeof(struct tsymassign));
@@ -77,6 +95,9 @@ struct ast *newtassign(enum sbmltypes type, struct symbol *sym, struct ast *val)
     return (struct ast *) a;
 }
 
+/**
+ * Create rate expression node
+ */
 struct ast *newrate(struct ast* exp, struct nodelist *assigns)
 {
     struct rate * r = malloc(sizeof(struct rate));
@@ -86,6 +107,9 @@ struct ast *newrate(struct ast* exp, struct nodelist *assigns)
     return (struct ast *) r;
 }
 
+/**
+ * Free AST
+ */
 void treefree(struct ast *a)
 {
     switch (a->type)

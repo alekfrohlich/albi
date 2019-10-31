@@ -76,7 +76,7 @@
     };
 
     /**
-     * Reference to symbol node
+     * Symbol reference node
      */
     struct symref {
         enum nodetypes type;
