@@ -24,6 +24,9 @@
 
 #include "structures.h"
 
+/**
+ * Create map
+ */
 struct maplist *newmaplist(char *key, char *value, struct maplist *next)
 {
 	struct maplist *ml = (struct maplist*) malloc(sizeof(struct maplist));
@@ -33,11 +36,14 @@ struct maplist *newmaplist(char *key, char *value, struct maplist *next)
 	return ml;
 }
 
-char *getmap(struct maplist *list, char *key)
+/**
+ * Get entry on map
+ */
+char *getmap(struct maplist *map, char *key)
 {
-	if (list == NULL)
+	if (map == NULL)
 		return NULL;
-	if (strcmp(list->key, key) == 0)
-		return list->value;
-	return getmap(list->next, key);
+	if (strcmp(map->key, key) == 0)
+		return map->value;
+	return getmap(map->next, key);
 }

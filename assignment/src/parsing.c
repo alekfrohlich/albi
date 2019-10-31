@@ -84,24 +84,24 @@ void genparam(char *name, struct ast *val)
 void gencompart(struct compart *compartment)
 {
     struct maplist **maps;
-    struct symbol **progrefs = (struct symbol**)malloc(sizeof(struct symbol**)*20);
-    struct nodelist **explists = (struct nodelist**) malloc(sizeof(struct nodelist**)*20);
+    struct symbol **progrefs = (struct symbol**)malloc(sizeof(struct symbol*)*20);
+    struct nodelist **explists = (struct nodelist**) malloc(sizeof(struct nodelist*)*20);
 
-    int size = 0;
+    int progcount = 0;
     for (struct progcall *it = compartment->call; it != NULL;
-         it = it->next, size++)
+         it = it->next, progcount++)
     {
-        progrefs[size] = it->progref;
-        explists[size] = it->explist;
+        progrefs[progcount] = it->progref;
+        explists[progcount] = it->explist;
     }
 
     // Eval and apply explist. TODO: handle shares
-    maps = mergeprograms(progrefs, NULL, explists, currcompart, size);
+    maps = mergeprograms(progrefs, NULL, explists, currcompart, progcount);
 
     fprintf(yyout, "Compartment ECOLI%d\n", currcompart);
 
     // Generate intermediate code (print)
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < progcount; i++)
     {
         outdecls(progrefs[i]->prog->declarations, maps[i], currcompart);
         outreacs(progrefs[i]->prog->reactions, maps[i]);
@@ -129,7 +129,7 @@ struct nodelist *newnodelist(struct ast *node, struct nodelist *next)
  */
 void nodelistfree(struct nodelist *list)
 {
-    // TODO: free nodelist
+    // TODO
 }
 
 /**

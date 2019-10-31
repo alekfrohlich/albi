@@ -28,83 +28,68 @@
 #include "output.h"
 
 /**
- * Move a specie from local's list to
- * the specie's list and returns it.
+ * Undeclare variable as local
+ * and redeclare it as specie
  */
-static struct nodelist *declare_specie(
+static struct nodelist *declspecie(
     struct program *program,
     struct symassign *assign,
     struct nodelist *species,
     struct nodelist *locals)
 {
-    char * name = assign->sym->name;
-    struct nodelist * iter = locals; /* Who is to be removed, if any. */
+    char *declaree = assign->sym->name;
+    struct nodelist *it = locals;
 
-    /**
-     * Removing head?
-     */
-    if (iter != NULL &&
-        strcmp(((struct symassign *) iter->node)->sym->name, name) == 0)
+    // Removing head?
+    if (it != NULL &&
+        strcmp(((struct symassign *) it->node)->sym->name, declaree) == 0)
     {
         locals = locals->next;
     }
 
-    /**
-     * Removing middle element?
-     */
-    else if (iter != NULL)
+    // Removing middle element?
+    else if (it != NULL)
     {
-        /**
-         * Find symbol in specie's list.
-         */
-        while (iter->next != NULL &&
-            strcmp(((struct symassign *)iter->next->node)->sym->name, name) != 0)
+        // Iterate until prev
+        while (it->next != NULL &&
+            strcmp(((struct symassign *)it->next->node)->sym->name, declaree) != 0)
         {
-            iter = iter->next;
+            it = it->next;
         }
 
-        /**
-         * Symbol is not in local's.
-         * Using undeclared variable!
-         */
-        if (iter->next == NULL)
+        if (it->next == NULL)
             yyerror("Undeclared variable");
 
-        struct nodelist * aux = iter->next;
-        iter->next = iter->next->next;
-        iter = aux;
+        struct nodelist * aux = it->next;
+        it->next = it->next->next;
+        it = aux;
     }
 
-    /**
-     * Empty list.
-     * Using undeclared variable!
-     */
+    // Empty list
     else
     {
         yyerror("Undeclared variable");
     }
 
-    /**
-     * Add new specie.
-     */
-    iter->next = species;
-    species = iter;
+    // Add located specie
+    it->next = species;
+    species = it;
     return species;
 }
 
 /**
- * Create new reaction list.
+ * Create reaction list
  */
-static struct reactionlist * newreactionlist(struct reaction * reaction, struct reactionlist * next)
+static struct reactionlist *newreactionlist(struct reaction *reaction, struct reactionlist *next)
 {
-    struct reactionlist * rl = malloc(sizeof(struct reactionlist));
+    struct reactionlist *rl = malloc(sizeof(struct reactionlist));
     rl->reac = reaction;
     rl->next = next;
     return rl;
 }
 
 /**
- * Add new reaction to program's reaction list.
+ * Add reaction to program's reaction list
  */
 static struct nodelist *newreaction(
     struct program *program,
@@ -112,33 +97,28 @@ static struct nodelist *newreaction(
     struct nodelist *species,
     struct nodelist *locals)
 {
-    struct reaction * reac = (struct reaction *) malloc(sizeof(struct reaction));
+    struct reaction *reac = (struct reaction*) malloc(sizeof(struct reaction));
     program->reactions = newreactionlist(reac, program->reactions);
     reac->rate = rate->exp;
 
-    /**
-     * Classifying the rate assignments into
-     * reactans and products. Also move them from
-     * the local's list to the specie's list.
-     */
+    // Build-up reac's reactants and products,
+    // also redeclare found species 
     for (struct nodelist * iter = rate->assigns; iter != NULL; iter = iter->next)
     {
+        // Reactant
         if (((struct symassign *)iter->node)->val->type == MINUS)
         {
             reac->reactant = newnodelist(((struct ast *) iter->node), reac->reactant);
-            species = declare_specie(program, ((struct symassign *) iter->node), species, locals);
+            species = declspecie(program, ((struct symassign *) iter->node), species, locals);
         }
 
+        // Product
         else if (((struct symassign *)iter->node)->val->type == PLUS)
         {
             reac->product = newnodelist(((struct ast *) iter->node), reac->product);
-            species = declare_specie(program, ((struct symassign *) iter->node), species, locals);
+            species = declspecie(program, ((struct symassign *) iter->node), species, locals);
         }
 
-        /**
-         * Product/reactant not expressed
-         * as A := A + 1 or B := B -1.
-         */
         else
         {
             yyerror("Invalid expression");
@@ -148,78 +128,58 @@ static struct nodelist *newreaction(
 }
 
 /**
- * Rename variables to avoid
- * namespace collisions.
+ * Rename variable to avoid namespace collision
  */
 static char *namemergedvar(char *progname, char *varname, int compartnum)
 {
-    char *name = (char *) malloc(100);
+    char *name = (char*) malloc(100);
     snprintf(name, 100, "ECOLI%d_%s_%s", compartnum, progname, varname);
     return name;
 }
 
 /**
- * Merge program list's of declarations.
+ * Merge program list's of declarations and return resulting namemaps
  */
-struct maplist ** mergeprograms(
-    struct symbol** progrefs,
-    struct symlist** export,
-    struct nodelist** explist,
+struct maplist **mergeprograms(
+    struct symbol **progrefs,
+    struct symlist **exports,
+    struct nodelist **explists,
     int compartnum,
-    int size)
+    int progcount)
  {
-     /**
-      * Program to compartment variable name dictionary.
-      */
-    struct maplist ** map = (struct maplist **) malloc(sizeof(struct maplist*)*size);
+    struct maplist **maps = (struct maplist**) malloc(sizeof(struct maplist*)*progcount);
 
-    /**
-     * Iterate over all programs in call list.
-     */
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < progcount; i++)
     {
-        // Working program.
         struct program *prog = progrefs[i]->prog;
 
-        /**
-         * Evaluate call parameters.
-         */
+        // Evaluate call parameters
         struct symlist *param = prog->parameters;
-        struct nodelist *exp = explist[i];
+        struct nodelist *exp = explists[i];
         while (param != NULL && exp != NULL)
         {
-            param->sym->value = eval(exp->node); // recover symlist.
+            param->sym->value = eval(exp->node);
             param = param->next;
             exp = exp->next;
         }
 
         if (param || exp)
             yyerror("Wrong number of arguments to program!");
-        /**
-         * Apply call parameters.
-         */
-        for (struct nodelist *decl = prog->declarations; decl != NULL; decl = decl->next)
-        {
-            ((struct tsymassign*) decl->node)->sym->value = eval(((struct tsymassign*) decl->node)->val);
-        }
 
-        /**
-         * Map working program variables
-         * to compartment namespace.
-         */
-        for (struct nodelist *decl = prog->declarations; decl != NULL; decl = decl->next)
+        // Apply call parameters to variable, also map it's name to compartment namespace
+        for (struct nodelist *it = prog->declarations; it != NULL; it = it->next)
         {
+            ((struct tsymassign*) it->node)->sym->value = eval(((struct tsymassign*) it->node)->val);
             char *name = namemergedvar(progrefs[i]->name,
-                    ((struct tsymassign *)decl->node)->sym->name, compartnum);
-            map[i] = newmaplist(((struct tsymassign *)decl->node)->sym->name, name, map[i]);
+                    ((struct tsymassign *)it->node)->sym->name, compartnum);
+            maps[i] = newmaplist(((struct tsymassign *)it->node)->sym->name, name, maps[i]);
         }
     }
-
-    return map;
+    return maps;
  }
 
 /**
- * Make list of declarations.
+ * Make list of declarations
  */
 static void makedecls(struct program *prog)
 {
@@ -227,84 +187,71 @@ static void makedecls(struct program *prog)
     struct nodelist *locals = NULL;
     struct nodelist *decls = (struct nodelist*) malloc(sizeof(struct nodelist));
 
-    /**
-     * Build locals, species and reactions.
-     */
+     // Build locals, species and reactions
     for (struct nodelist *it = prog->body; it != NULL; it = it->next)
     {
         if (it->node->type == SYM_ASSIGN)
         {
-            locals = newnodelist((struct ast *) it->node, locals);
+            locals = newnodelist((struct ast*) it->node, locals);
         }
 
         else if (it->node->type == RATESTATEMENT)
         {
-            species = newreaction(prog, (struct rate *) it->node, species, locals);
+            species = newreaction(prog, (struct rate*) it->node, species, locals);
         }
 
         else
         {
-            yyerror("Invalid expression inside rate block");
+            yyerror("Invalid node inside of program");
         }
     }
 
-    /**
-     * Build decls.
-     */
+    // Build declarations
     for (struct nodelist *it = prog->body, *itdec = decls; it != NULL; it = it->next)
     {
-        /**
-         * Skip non-assignment nodes.
-         */
+        // Skip non-assignment nodes
         if (it->node->type != SYM_ASSIGN)
             goto mov;
 
-        /**
-         * Add species to declarations.
-         */
+         // Add specie
         for (struct nodelist *it3 = species; it3 != NULL; it3 = it3->next)
         {
-            if (strcmp(((struct symassign *) it3->node)->sym->name,
-                ((struct symassign *) it->node)->sym->name) == 0)
+            if (strcmp(((struct symassign*) it3->node)->sym->name,
+                ((struct symassign*) it->node)->sym->name) == 0)
             {
-                struct ast *a = newtassign(SPECIE, ((struct symassign *) it3->node)->sym,
-                        ((struct symassign *) it3->node)->val);
-                // free(species->node); ?
+                struct ast *a = newtassign(SPECIE, ((struct symassign*) it3->node)->sym,
+                        ((struct symassign*) it3->node)->val);
                 itdec->next = newnodelist(a, NULL);
                 itdec = itdec->next;
                 goto mov;
             }
         }
 
-        /**
-         * Add locals to declarations.
-         */
+        // Add local
         for (struct nodelist *it2 = locals; it2 != NULL; it2 = it2->next)
         {
-            if (strcmp(((struct symassign *) it2->node)->sym->name,
-                ((struct symassign *) it->node)->sym->name) == 0)
+            if (strcmp(((struct symassign*) it2->node)->sym->name,
+                ((struct symassign*) it->node)->sym->name) == 0)
             {
-                struct ast *a = newtassign(LOCAL, ((struct symassign *) it2->node)->sym,
-                        ((struct symassign *) it2->node)->val);
-                // free(locals->node); ?
+                struct ast *a = newtassign(LOCAL, ((struct symassign*) it2->node)->sym,
+                        ((struct symassign*) it2->node)->val);
                 itdec->next = newnodelist(a, NULL);
                 itdec = itdec->next;
                 goto mov;
             }
         }
 
-    mov:
-        continue;
+    mov:continue;
     }
-    prog->declarations = decls->next;
+    prog->declarations = decls->next;  // First node is dummy
 }
 
  /**
-  * Define new program.
+  * Define program
   */
 void progdef(struct symbol *name, struct symlist *syms, struct nodelist * stmts)
 {
-    struct program * program = (struct program *) malloc(sizeof(struct program));
+    struct program *program = (struct program*) malloc(sizeof(struct program));
     name->prog = program;
     program->symtab = env[currenv];
     program->parameters = syms;

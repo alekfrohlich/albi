@@ -94,7 +94,7 @@ struct symbol *lookup(char *sym)
 }
 
 /**
- * Define new symbol
+ * Define symbol
  */
 void symdef(struct symbol *sym, struct ast *val)
 {
