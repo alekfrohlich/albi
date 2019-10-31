@@ -19,21 +19,30 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef STRUCTS__H
-#define STRUCTS__H
+#include <stdio.h>
 
-    /**
-     * Map implemented
-     * as linked list
-     */
-    struct maplist {
-        char *key;
-        char *value;
-        struct maplist *next;
-    };
+#include "albi.tab.h"
 
-    // Forward definitions
-    extern struct maplist *newmaplist(char *key, char *value, struct maplist *next);
-    extern char *getmap(struct maplist *map, char *key);
+int yycolumn = 1;       // Bison location
+char *currfilename;     // Current yyin file name
 
-#endif  // STRUCTS_H
+/**
+ * Display error message and exit
+ */
+int yyerror(const char *s)
+{
+    #define ERROR_RED(s)    fprintf(stderr, "\033[1;31m%s\033[0m", s)
+    #define BEGIN_BOLD      fprintf(stderr, "\033[1;80m")
+    #define COLOR_RESET     fprintf(stderr, "\033[0m")
+
+    if (yylloc.first_line)
+    {
+        BEGIN_BOLD;
+        fprintf(stderr, "%s:%d:%d: ", currfilename, yylloc.last_line,
+                yylloc.last_column);
+        COLOR_RESET;
+    }
+
+    ERROR_RED("error: ");
+    fprintf(stderr, "%s.\n", s);
+}

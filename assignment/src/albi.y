@@ -30,6 +30,8 @@
 #include "parsing.h"
 #include "program.h"
 
+#define YYERROR_VERBOSE 1
+
 extern int yylex();
 %}
 
@@ -248,11 +250,10 @@ progcall: VAR '(' explist ')'
 ;
 
 explist: exp 						{
-										if ($1 != NULL) {
+										if ($1 != NULL)
 											$$ = newnodelist($1, NULL);
-										} else {
+										else
 											$$ = NULL;
-										}
 									}
 | exp ',' explist
 									{

@@ -25,29 +25,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "symtab.h"    // lookup, currenv
-#include "albi.tab.h"  // tokens, yylval
 
-// Bison location
-int yycolumn = 1;
-#define YY_USER_ACTION \
-    yylloc.first_line = yylloc.last_line = yylineno; \
-    yylloc.first_column = yycolumn; yylloc.last_column = yycolumn+yyleng-1; \
-    yycolumn += yyleng;
+#include "symtab.h"    // lookup, currenv
+#include "error.h"     // yyerror, YY_USER_ACTION
+#include "albi.tab.h"  // tokens, yylval
 %}
 
 white               [ \t]+
 digit               [0-9]
 integer             {digit}+
-variable            [a-zA-Z_]+
-float               [+-]?{integer}(\.{integer})?
+variable            [a-zA-Z_]([a-zA-Z_0-9]+)?
+misspelled          [a-zA-Z_0-9]+
+float               ([+-])?([0-9]+)|([0-9]*"."[0-9]+(E[+-][0-9]{1,2}){0,1})
 
 assignment          ":="
 program_keyword		"program"
 rate_keyword		"rate"
 sharing_keyword     "sharing"
 ecoli_keyword       "ecoli"
-ignore              "include gro"
+ignore              ("include gro"|"lamba"|"true"|"false"|"let"|"in"|"foreach"|"do"|"end"|"maptocells"|"if"|"then"|"else"|"fun"|"head"|"tail"|"external"|"internal"|"compose"|"exec")
 %%
 
 {white}             { }
@@ -60,29 +56,13 @@ ignore              "include gro"
 
 {float}             { yylval.double_t = atof(yytext); return NUM; }
 {variable}          { yylval.sym_t = lookup(yytext); return VAR;  }
-{assignment}        { return ASSIGN;  }
+{misspelled}        { yyerror("invalid identifier"); }
+{assignment}        { return ASSIGN; }
 
-","                 |
-";"                 |
-"+"					|
-"-"					|
-"*"                 |
-"/"                 |
-"[" 				|
-"]"					|
-"("                 |
-")"                 |
-":"					|
-"{"					|
-"}"					{ return yytext[0]; }
-
-"\n"                { yycolumn = 1; }
-.                   { }
+"\n"                { yycolumn = 1;     }
+.                   { return yytext[0]; }
 
 %%
-
-// Current yyin file name
-char *filename;
 
 /**
  * Entry point
@@ -91,29 +71,7 @@ int main(int argc, char **argv)
 {
     yyin = fopen(argv[1],"r");
     yyout = fopen("parsed.intermediate", "w");
-    filename = argv[2];
+    currfilename = argv[2];
 
-	yyparse();
-}
-
-/**
- * Display error message and exit
- */
-int yyerror(const char *s)
-{
-    #define ERROR_RED(s)    fprintf(stderr, "\033[1;31m%s\033[0m", s)
-    #define BEGIN_BOLD      fprintf(stderr, "\033[1;80m")
-    #define COLOR_RESET     fprintf(stderr, "\033[0m")
-
-    if (yylloc.first_line)
-    {
-        BEGIN_BOLD;
-        fprintf(stderr, "%s:%d:%d: ", filename, yylloc.last_line,
-                yylloc.last_column);
-        COLOR_RESET;
-    }
-
-    ERROR_RED("error: ");
-    fprintf(stderr, "%s.\n", s);
-    exit(-1);
+    yyparse();
 }
