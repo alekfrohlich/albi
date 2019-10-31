@@ -25,7 +25,7 @@
 
 #include "program.h"
 #include "structures.h"
-#include "output.h"
+#include "error.h"
 
 /**
  * Undeclare variable as local
@@ -102,7 +102,7 @@ static struct nodelist *newreaction(
     reac->rate = rate->exp;
 
     // Build-up reac's reactants and products,
-    // also redeclare found species 
+    // also redeclare found species
     for (struct nodelist * iter = rate->assigns; iter != NULL; iter = iter->next)
     {
         // Reactant

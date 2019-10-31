@@ -23,6 +23,7 @@
 
 #include "ast.h"
 #include "parsing.h"
+#include "error.h"
 
 /**
  * Create generic expression node

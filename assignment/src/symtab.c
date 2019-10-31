@@ -21,8 +21,10 @@
 
 #include <string.h>
 #include <stdlib.h>
+
 #include "symtab.h"
 #include "parsing.h"
+#include "error.h"
 
 int currenv = 0;                            // Current parsing environment
 struct symbol globals[SYMTAB_SIZE];         // Global symbol table

@@ -29,6 +29,7 @@
 #include "symtab.h"
 #include "parsing.h"
 #include "program.h"
+#include "error.h"
 
 #define YYERROR_VERBOSE 1
 
