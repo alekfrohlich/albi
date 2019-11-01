@@ -100,6 +100,7 @@ int yyerror(const char *s, ...)
 int yyerrorexp(const char *s, struct ast *a, ...)
 {
     yyerror(s);
+    ERROR_RED("-> ");
     errexp(a);
-    fprintf(stderr, "\n");
+    ERROR_RED(" <-\n");
 }
