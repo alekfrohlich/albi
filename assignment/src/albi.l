@@ -76,7 +76,12 @@ int main(int argc, char **argv)
 
     nowrites = 0;
     yycolumn = 1;
-    currfilename = argv[2];
+
+    // only displays relative via second cl argument
+    if (argc == 3)
+        currfilename = argv[2];
+    else
+        currfilename = argv[1];
 
     yyparse();
 }

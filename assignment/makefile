@@ -54,7 +54,7 @@ test: albi
 
 fault: albi
 	@echo "\nA demonstration of Albi's syntax errors...\n"
-	@$(TRANSLATOR) $(FAULTDIR)/invalid_syntax.gro
+	@$(TRANSLATOR) $(FAULTDIR)/invalid_syntax.gro invalid_syntax.gro
 
 # Cleans compilation files.
 clean:
