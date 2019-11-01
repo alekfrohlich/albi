@@ -58,7 +58,7 @@ ignore              ("include gro"|"lamba"|"true"|"false"|"let"|"in"|"foreach"|"
 
 {float}             { yylval.double_t = atof(yytext); return NUM; }
 {variable}          { yylval.sym_t = lookup(yytext); return VAR;  }
-{invalid_id}        { yyerror("invalid identifier '%s'", yytext); }
+{invalid_id}        { yyerror("invalid identifier '%s'", yytext); REJECT; }
 {assignment}        { return ASSIGN; }
 
 "\n"                { yycolumn = 1;     }
