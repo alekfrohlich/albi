@@ -28,7 +28,7 @@
 /**
  * Generate AST with proper name corrections (print)
  */
-static void outast(struct ast *a, struct maplist *namemap)
+static void outexp(struct ast *a, struct maplist *namemap)
 {
     if (a == NULL)
         return;
@@ -36,27 +36,27 @@ static void outast(struct ast *a, struct maplist *namemap)
     switch (a->type)
     {
         case PLUS:
-            outast(a->left, namemap);
+            outexp(a->left, namemap);
             fprintf(yyout, "+" );
-            outast(a->right, namemap);
+            outexp(a->right, namemap);
             break;
 
         case MINUS:
-            outast(a->left, namemap);
+            outexp(a->left, namemap);
             fprintf(yyout, "-" );
-            outast(a->right, namemap);
+            outexp(a->right, namemap);
             break;
 
         case DIV:
-            outast(a->left, namemap);
+            outexp(a->left, namemap);
             fprintf(yyout, "/" );
-            outast(a->right, namemap);
+            outexp(a->right, namemap);
             break;
 
         case TIMES:
-            outast(a->left, namemap);
+            outexp(a->left, namemap);
             fprintf(yyout, "*");
-            outast(a->right, namemap);
+            outexp(a->right, namemap);
             break;
 
         case SYM_REF:
@@ -118,7 +118,7 @@ void outreacs(struct reactionlist *reacs, struct maplist * namemap)
                     getmap(namemap, ((struct symassign *)it2->node)->sym->name));
 
         fprintf(yyout, ";");
-        outast(it->reac->rate, namemap);
+        outexp(it->reac->rate, namemap);
         fprintf(yyout, ";\n");
     }
 }

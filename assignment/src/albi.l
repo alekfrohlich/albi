@@ -36,7 +36,7 @@ linecomment         "//".*
 digit               [0-9]
 integer             {digit}+
 variable            [a-zA-Z_]([a-zA-Z_0-9]+)?
-misspelled          [a-zA-Z_0-9]+
+misspelled          [0-9][a-zA-Z0-9_]+
 float               ([+-])?([0-9]+)|([0-9]*"."[0-9]+(E[+-][0-9]{1,2}){0,1})
 
 assignment          ":="

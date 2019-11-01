@@ -22,6 +22,8 @@
 #ifndef ERROR_H
 #define ERROR_H
 
+    #include "ast.h"
+
     /**
      * Keep track of current location
      */
@@ -36,5 +38,6 @@
     extern int yycolumn;
     extern char *currfilename;
     extern int yyerror(const char *s, ...);
+    extern int yyerrorexp(const char *s, struct ast *a, ...);
 
 #endif  // ERROR_H

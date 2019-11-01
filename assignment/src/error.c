@@ -23,21 +23,62 @@
 #include <stdarg.h>
 
 #include "albi.tab.h"
+#include "ast.h"
+
+// Colorful output
+#define ERROR_RED(s)    fprintf(stderr, "\033[1;31m%s\033[0m", s)
+#define BEGIN_BOLD      fprintf(stderr, "\033[1;80m")
+#define COLOR_RESET     fprintf(stderr, "\033[0m")
 
 int nowrites;           // Symbol table writable?
 int yycolumn;           // Bison location
 char *currfilename;     // Current yyin file name
 
+static char ast2str[] = {'K','+','-','*','/','N', 'S','=','T','C','R'};
+
 /**
- * Display error message and exit
+ * Display expression to stderr (err)
+ */
+static void errexp(struct ast *a)
+{
+    if (a == NULL)
+        return;
+
+    switch (a->type)
+    {
+        case PLUS:
+        case MINUS:
+        case TIMES:
+        case DIV:
+            errexp(a->left);
+            fprintf(stderr, "%c", ast2str[a->type]);
+            errexp(a->right);
+            break;
+
+        case SYM_REF:
+            fprintf(stderr, "%s", ((struct symref*) a)->sym->name);
+            break;
+
+        case CONSLIT:
+            fprintf(stderr, "%0.4lf", ((struct numval*) a)->number);
+            break;
+
+        default:
+            printf("internal error: bad node at eval, type %c\n", ast2str[a->type]);
+    }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//                      VISIBLE ERROR DISPLAY FUNCTIONS                      //
+///////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * Display error message (err)
  */
 int yyerror(const char *s, ...)
 {
-    // Colorful output
-    #define ERROR_RED(s)    fprintf(stderr, "\033[1;31m%s\033[0m", s)
-    #define BEGIN_BOLD      fprintf(stderr, "\033[1;80m")
-    #define COLOR_RESET     fprintf(stderr, "\033[0m")
-
     va_list ap;
     va_start(ap, s);
 
@@ -52,4 +93,14 @@ int yyerror(const char *s, ...)
     ERROR_RED("error: ");
     vfprintf(stderr, s, ap);
     fprintf(stderr, ".\n");
+}
+
+/**
+ * Display invalid expression (err)
+ */
+int yyerrorexp(const char *s, struct ast *a, ...)
+{
+    yyerror(s);
+    errexp(a);
+    fprintf(stderr, "\n");
 }

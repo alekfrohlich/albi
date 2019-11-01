@@ -96,23 +96,27 @@ static struct nodelist *newreaction(
     // also redeclare found species
     for (struct nodelist *it = rate->assigns; it != NULL; it = it->next)
     {
+        struct symassign *assign = ((struct symassign*) it->node);
+
+        // Invalid node
+        if (assign->val->type != PLUS || assign->val->type != MINUS ||
+            assign->val->left->type != CONSLIT || assign->val->right != CONSLIT)
+        {
+            yyerrorexp("invalid expression inside rate body", assign->val);
+        }
+
         // Reactant
-        if (((struct symassign*) it->node)->val->type == MINUS)
+        if (assign->val->type == MINUS)
         {
             reac->reactant = newnodelist(((struct ast*) it->node), reac->reactant);
-            species = declspecie(program, ((struct symassign*) it->node), species, locals);
+            species = declspecie(program, assign, species, locals);
         }
 
         // Product
-        else if (((struct symassign*) it->node)->val->type == PLUS)
+        else if (assign->val->type == PLUS)
         {
             reac->product = newnodelist(((struct ast*) it->node), reac->product);
-            species = declspecie(program, ((struct symassign*) it->node), species, locals);
-        }
-
-        else
-        {
-            yyerror("Invalid expression of type %d", it->node->type);
+            species = declspecie(program, assign, species, locals);
         }
     }
     return species;
@@ -155,7 +159,7 @@ struct maplist **mergeprograms(
         }
 
         if (param || exp)
-            yyerror("Wrong number of arguments to program!");
+            yyerror("wrong number of arguments to program");
 
         // Apply call parameters to variable, also map it's name to compartment namespace
         for (struct nodelist *it = prog->declarations; it != NULL; it = it->next)
@@ -193,7 +197,7 @@ static void makedecls(struct program *prog)
 
         else
         {
-            yyerror("Invalid node inside of program");
+            yyerror("internal error: invalid node inside of program");
         }
     }
 

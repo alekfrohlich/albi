@@ -28,7 +28,7 @@
      * AST node types
      */
     enum nodetypes {
-        CONSLIT = 1,    // Constant literal
+        CONSLIT = 0,    // Constant literal
         PLUS,           // Arithmetic expression: +
         MINUS,          // Arithmetic expression: -
         TIMES,          // Arithmetic expression: *
@@ -45,7 +45,7 @@
      * SBML types
      */
     enum sbmltypes {
-        SPECIE = 1,     // Specie
+        SPECIE = 0,     // Specie
         LOCAL,          // Var
     };
 
