@@ -54,7 +54,4 @@
             struct progcall *call);
     extern void progcallfree(struct progcall *prog);
 
-    // Toolchain definitions
-    extern int yyerror(const char *s);
-
 #endif  // PARSING_H

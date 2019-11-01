@@ -26,9 +26,14 @@
 #include "structures.h"
 
 /**
+ * AST node to string (indexable by type)
+ */
+char ast2str[NUMNODETYPES] = { 'K','+','-','*','/','N','S','=','T','C','R' };
+
+/**
  * Generate AST with proper name corrections (print)
  */
-static void outast(struct ast *a, struct maplist *namemap)
+static void outexp(struct ast *a, struct maplist *namemap)
 {
     if (a == NULL)
         return;
@@ -36,27 +41,12 @@ static void outast(struct ast *a, struct maplist *namemap)
     switch (a->type)
     {
         case PLUS:
-            outast(a->left, namemap);
-            fprintf(yyout, "+" );
-            outast(a->right, namemap);
-            break;
-
         case MINUS:
-            outast(a->left, namemap);
-            fprintf(yyout, "-" );
-            outast(a->right, namemap);
-            break;
-
-        case DIV:
-            outast(a->left, namemap);
-            fprintf(yyout, "/" );
-            outast(a->right, namemap);
-            break;
-
         case TIMES:
-            outast(a->left, namemap);
-            fprintf(yyout, "*");
-            outast(a->right, namemap);
+        case DIV:
+            outexp(a->left, namemap);
+            fprintf(yyout, "%c", ast2str[a->type]);
+            outexp(a->right, namemap);
             break;
 
         case SYM_REF:
@@ -69,7 +59,7 @@ static void outast(struct ast *a, struct maplist *namemap)
             break;
 
         default:
-            printf("internal error: bad node at eval, type %u\n", a->type);
+            printf("internal error: bad node at eval, type %c\n", ast2str[a->type]);
     }
 }
 
@@ -118,7 +108,7 @@ void outreacs(struct reactionlist *reacs, struct maplist * namemap)
                     getmap(namemap, ((struct symassign *)it2->node)->sym->name));
 
         fprintf(yyout, ";");
-        outast(it->reac->rate, namemap);
+        outexp(it->reac->rate, namemap);
         fprintf(yyout, ";\n");
     }
 }

@@ -19,38 +19,25 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef SYMTAB_H
-#define SYMTAB_H
+#ifndef ERROR_H
+#define ERROR_H
+
+    #include "ast.h"
 
     /**
-     * Size of symbol table
+     * Keep track of current location
      */
-    #define SYMTAB_SIZE 9997
+    #define YY_USER_ACTION \
+        yylloc.first_line = yylloc.last_line = yylineno; \
+        yylloc.first_column = yycolumn; yylloc.last_column = yycolumn+yyleng-1; \
+        yycolumn += yyleng;
 
-    /**
-     * Symbol table entry
-     */
-    struct symbol {
-        char *name;
-        double value;
-        struct program *prog;
-    };
-
-    /**
-     * List of symbols
-     */
-    struct symlist {
-        struct symbol *sym;
-        struct symlist *next;
-    };
 
     // Forward definitions
-    struct ast;
-    struct symbol *env[2];
-    extern int currenv;
-    extern struct symbol *lookup(char *sym);
-    extern struct symlist *newslist(struct symbol *sym, struct symlist *next);
-    extern void symdef(struct symbol *sym, struct ast *val);
-    extern void freesymbol(struct symbol *sym);
+    extern int nowrites;
+    extern int yycolumn;
+    extern char *currfilename;
+    extern int yyerror(const char *s, ...);
+    extern int yyerrorexp(const char *s, struct ast *a, ...);
 
-#endif  // SYMTAB_H
+#endif  // ERROR_H

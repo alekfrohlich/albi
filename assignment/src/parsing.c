@@ -27,8 +27,9 @@
 #include "program.h"
 #include "structures.h"
 #include "output.h"
+#include "error.h"
 
-struct symbol* env[2];         // [ Global | Local ] parsing tables
+struct symbol *env[2];         // [ Global | Local ] parsing tables
 int currcompart = 0;           // Current compartment count
 
 /**
@@ -43,12 +44,12 @@ double eval(struct ast *a)
 
     // Constants
     case CONSLIT:
-        v = ((struct numval *) a)->number;
+        v = ((struct numval*) a)->number;
         break;
 
     // Symbol references
     case SYM_REF:
-        v = ((struct symref *) a)->sym->value;
+        v = ((struct symref*) a)->sym->value;
         break;
 
     // Expressions:
@@ -58,7 +59,7 @@ double eval(struct ast *a)
     case DIV:   v = eval(a->left) / eval(a->right); break;
 
     default:
-        printf("internal error: bad node at eval, type %u\n", a->type);
+        yyerror("internal error: bad node at eval %d", a->type);
     }
 
     return v;
@@ -118,7 +119,7 @@ void gencompart(struct compart *compartment)
  */
 struct nodelist *newnodelist(struct ast *node, struct nodelist *next)
 {
-    struct nodelist * list = (struct nodelist *) malloc(sizeof(struct nodelist));
+    struct nodelist *list = (struct nodelist*) malloc(sizeof(struct nodelist));
     list->node = node;
     list->next = next;
     return list;
@@ -141,7 +142,7 @@ struct progcall *newprogcall(
     struct nodelist *explist,
     struct progcall *next)
 {
-    struct progcall * p = (struct progcall *) malloc(sizeof(struct progcall));
+    struct progcall *p = (struct progcall*) malloc(sizeof(struct progcall));
     p->progref = progref;
     p->shares = shares;
     p->explist = explist;
@@ -155,7 +156,7 @@ void progcallfree(struct progcall *progcall)
 {
     while (progcall != NULL)
     {
-        struct progcall * aux = progcall;
+        struct progcall *aux = progcall;
         progcall = progcall->next;
         free(aux);
     }

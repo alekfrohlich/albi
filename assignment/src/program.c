@@ -25,7 +25,7 @@
 
 #include "program.h"
 #include "structures.h"
-#include "output.h"
+#include "error.h"
 
 /**
  * Undeclare variable as local
@@ -42,7 +42,7 @@ static struct nodelist *declspecie(
 
     // Removing head?
     if (it != NULL &&
-        strcmp(((struct symassign *) it->node)->sym->name, declaree) == 0)
+        strcmp(((struct symassign*) it->node)->sym->name, declaree) == 0)
     {
         locals = locals->next;
     }
@@ -52,23 +52,14 @@ static struct nodelist *declspecie(
     {
         // Iterate until prev
         while (it->next != NULL &&
-            strcmp(((struct symassign *)it->next->node)->sym->name, declaree) != 0)
+            strcmp(((struct symassign*)it->next->node)->sym->name, declaree) != 0)
         {
             it = it->next;
         }
 
-        if (it->next == NULL)
-            yyerror("Undeclared variable");
-
-        struct nodelist * aux = it->next;
+        struct nodelist *aux = it->next;
         it->next = it->next->next;
         it = aux;
-    }
-
-    // Empty list
-    else
-    {
-        yyerror("Undeclared variable");
     }
 
     // Add located specie
@@ -102,26 +93,31 @@ static struct nodelist *newreaction(
     reac->rate = rate->exp;
 
     // Build-up reac's reactants and products,
-    // also redeclare found species 
-    for (struct nodelist * iter = rate->assigns; iter != NULL; iter = iter->next)
+    // also redeclare found species
+    for (struct nodelist *it = rate->assigns; it != NULL; it = it->next)
     {
-        // Reactant
-        if (((struct symassign *)iter->node)->val->type == MINUS)
+        struct symassign *assign = ((struct symassign*) it->node);
+
+        // Invalid node
+        if ((assign->val->type != PLUS && assign->val->type != MINUS)
+             || (assign->val->left->type != CONSLIT && assign->val->left->type != SYM_REF)
+             || (assign->val->right->type != CONSLIT && assign->val->right->type != SYM_REF))
         {
-            reac->reactant = newnodelist(((struct ast *) iter->node), reac->reactant);
-            species = declspecie(program, ((struct symassign *) iter->node), species, locals);
+            yyerrorexp("invalid expression inside rate body", assign->val);
+        }
+
+        // Reactant
+        if (assign->val->type == MINUS)
+        {
+            reac->reactant = newnodelist(((struct ast*) it->node), reac->reactant);
+            species = declspecie(program, assign, species, locals);
         }
 
         // Product
-        else if (((struct symassign *)iter->node)->val->type == PLUS)
+        else if (assign->val->type == PLUS)
         {
-            reac->product = newnodelist(((struct ast *) iter->node), reac->product);
-            species = declspecie(program, ((struct symassign *) iter->node), species, locals);
-        }
-
-        else
-        {
-            yyerror("Invalid expression");
+            reac->product = newnodelist(((struct ast*) it->node), reac->product);
+            species = declspecie(program, assign, species, locals);
         }
     }
     return species;
@@ -164,14 +160,14 @@ struct maplist **mergeprograms(
         }
 
         if (param || exp)
-            yyerror("Wrong number of arguments to program!");
+            yyerror("wrong number of arguments to program");
 
         // Apply call parameters to variable, also map it's name to compartment namespace
         for (struct nodelist *it = prog->declarations; it != NULL; it = it->next)
         {
             ((struct tsymassign*) it->node)->sym->value = eval(((struct tsymassign*) it->node)->val);
             char *name = namemergedvar(progrefs[i]->name,
-                    ((struct tsymassign *)it->node)->sym->name, compartnum);
+                    ((struct tsymassign*) it->node)->sym->name, compartnum);
             maps[i] = newmaplist(((struct tsymassign *)it->node)->sym->name, name, maps[i]);
         }
     }
@@ -202,7 +198,7 @@ static void makedecls(struct program *prog)
 
         else
         {
-            yyerror("Invalid node inside of program");
+            yyerror("internal error: invalid node inside of program");
         }
     }
 
@@ -247,7 +243,7 @@ static void makedecls(struct program *prog)
  /**
   * Define program
   */
-void progdef(struct symbol *name, struct symlist *syms, struct nodelist * stmts)
+void progdef(struct symbol *name, struct symlist *syms, struct nodelist *stmts)
 {
     struct program *program = (struct program*) malloc(sizeof(struct program));
     name->prog = program;

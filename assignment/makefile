@@ -22,9 +22,10 @@
 .PHONY: albi test
 
 # Directories.
-export INCDIR  = $(CURDIR)/include
-export SRCDIR  = $(CURDIR)/src
-export GRODIR  = $(CURDIR)/gro
+export INCDIR  	= $(CURDIR)/include
+export SRCDIR  	= $(CURDIR)/src
+export GRODIR  	= $(CURDIR)/gro
+export FAULTDIR = $(GRODIR)/faulty
 
 # Gro translator.
 export TRANSLATOR = $(SRCDIR)/translator
@@ -50,6 +51,10 @@ albi:
 test: albi
 	@$(foreach gro, $(wildcard $(GRODIR)/*.gro), $(DOTEST))
 	@echo "SUCCESS!"
+
+fault: albi
+	@echo "\nA demonstration of Albi's syntax errors...\n"
+	@$(TRANSLATOR) $(FAULTDIR)/invalid_syntax.gro invalid_syntax.gro
 
 # Cleans compilation files.
 clean:

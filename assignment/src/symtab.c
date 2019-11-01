@@ -21,8 +21,10 @@
 
 #include <string.h>
 #include <stdlib.h>
+
 #include "symtab.h"
 #include "parsing.h"
+#include "error.h"
 
 int currenv = 0;                            // Current parsing environment
 struct symbol globals[SYMTAB_SIZE];         // Global symbol table
@@ -72,6 +74,9 @@ struct symbol *lookup(char *sym)
         }
     }
 
+    if (nowrites)
+        yyerror("undeclared variable %s", sym);
+
     struct symbol *entry = &env[currenv][symhash(sym) % SYMTAB_SIZE];
     int iter = SYMTAB_SIZE;
 
@@ -90,7 +95,7 @@ struct symbol *lookup(char *sym)
             entry = env[currenv];
     }
 
-    yyerror("symbol table overflow\n");
+    yyerror("internal error: symbol table overflow");
 }
 
 /**
@@ -104,7 +109,7 @@ void symdef(struct symbol *sym, struct ast *val)
 /**
  * Free symbol
  */
-void symbolfree(struct symbol * sym)
+void symbolfree(struct symbol *sym)
 {
     free(sym->name);
     free(sym->prog);

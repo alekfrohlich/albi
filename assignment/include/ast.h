@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -24,11 +24,13 @@
 
     #include "symtab.h"
 
+    #define NUMNODETYPES 11
+
     /**
      * AST node types
      */
     enum nodetypes {
-        CONSLIT = 1,    // Constant literal
+        CONSLIT = 0,    // Constant literal
         PLUS,           // Arithmetic expression: +
         MINUS,          // Arithmetic expression: -
         TIMES,          // Arithmetic expression: *
@@ -45,7 +47,7 @@
      * SBML types
      */
     enum sbmltypes {
-        SPECIE = 1,     // Specie
+        SPECIE = 0,     // Specie
         LOCAL,          // Var
     };
 
@@ -54,8 +56,8 @@
      */
     struct ast {
         enum nodetypes type;
-        struct ast * left;
-        struct ast * right;
+        struct ast *left;
+        struct ast *right;
     };
 
     /**

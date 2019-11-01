@@ -1,0 +1,70 @@
+// This file's purpose is to demonstrate some
+// of Albi's syntax errors and how does the compiler
+// deal with them.
+
+
+////////////////////////////////////////////////
+//       USING UNDECLARED VARIABLE C          //
+////////////////////////////////////////////////
+
+
+// program declaration
+program
+prog(X) := {
+    // declarations
+    E := 25;
+    F := 75 + E + 2 + X;
+    K := 2;
+
+    // law of mass-action rate
+    rate (K) : {
+        E := E + 1;
+        F := F - 1;
+    }
+};
+
+// E. colli instantiation
+ecoli([], program prog(C));
+
+
+////////////////////////////////////////////////
+//   WRONG NUMBER OF ARGUMENTS TO PROGRAM     //
+////////////////////////////////////////////////
+
+
+// E. colli instantiation
+ecoli(
+        [],
+        program prog(1,2)
+    );
+
+
+////////////////////////////////////////////////
+//    INVALID EXPRESSION INSIDE RATE BODY     //
+////////////////////////////////////////////////
+
+
+// program declaration
+program prog(X) :=
+{
+    // declarations
+    E := 25;
+    F := 75 + E + 2 + X;
+    K := 2;
+
+    // law of mass-action rate
+    rate (K):
+    {
+        E := E * 1;
+        F := F - 1;
+    }
+};
+
+
+////////////////////////////////////////////////
+//              INVALID IDENTIFIER            //
+////////////////////////////////////////////////
+
+
+// variable declaration
+1a := 2;
