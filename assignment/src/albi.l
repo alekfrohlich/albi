@@ -26,9 +26,10 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "albi.tab.h"  // tokens, yylval
 #include "symtab.h"    // lookup, currenv
 #include "error.h"     // yyerror, YY_USER_ACTION
-#include "albi.tab.h"  // tokens, yylval
+#include "ast.h"       // funtypes
 %}
 
 white               [ \t]+
@@ -38,12 +39,22 @@ integer             {digit}+
 variable            [a-zA-Z_]([a-zA-Z_0-9]+)?
 invalid_id          [0-9][a-zA-Z0-9_]+
 float               ([+-])?([0-9]+)|([0-9]*"."[0-9]+(E[+-][0-9]{1,2}){0,1})
-
 assignment          ":="
+
 program_keyword     "program"
 rate_keyword        "rate"
 sharing_keyword     "sharing"
 ecoli_keyword       "ecoli"
+
+builtin_sin         "sin"
+builtin_cos         "cos"
+builtin_tan         "tan"
+builtin_ln          "ln"
+builtin_log         "log"
+builtin_ceil        "ceil"
+builtin_floor       "floor"
+builtin_sqrt        "sqrt"
+
 ignore              ("include gro"|"lamba"|"true"|"false"|"let"|"in"|"foreach"|"do"|"end"|"maptocells"|"if"|"then"|"else"|"fun"|"head"|"tail"|"external"|"internal"|"compose"|"exec")
 %%
 
@@ -55,6 +66,15 @@ ignore              ("include gro"|"lamba"|"true"|"false"|"let"|"in"|"foreach"|"
 {rate_keyword}      { return RATE;  }
 {sharing_keyword}   { return SHARE; }
 {ecoli_keyword}     { return ECOLI; }
+
+{builtin_sin}       { yylval.funtype = __builtin_sin;   return FUNC; }
+{builtin_cos}       { yylval.funtype = __builtin_cos;   return FUNC; }
+{builtin_tan}       { yylval.funtype = __builtin_tan;   return FUNC; }
+{builtin_ln}        { yylval.funtype = __builtin_ln;    return FUNC; }
+{builtin_log}       { yylval.funtype = __builtin_log;   return FUNC; }
+{builtin_ceil}      { yylval.funtype = __builtin_ceil;  return FUNC; }
+{builtin_floor}     { yylval.funtype = __builtin_floor; return FUNC; }
+{builtin_sqrt}      { yylval.funtype = __builtin_sqrt;  return FUNC; }
 
 {float}             { yylval.double_t = atof(yytext); return NUM; }
 {variable}          { yylval.sym_t = lookup(yytext); return VAR;  }

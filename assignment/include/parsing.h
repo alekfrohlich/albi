@@ -44,6 +44,7 @@
 
     // Forward definitions
     extern double eval(struct ast *a);
+    extern double callbuiltin(struct funcall *fun);
     extern void genparam(char *name, struct ast *val);
     extern void gencompart(struct compart *compartment);
     extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);

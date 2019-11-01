@@ -108,6 +108,15 @@ struct ast *newrate(struct ast *exp, struct nodelist *assigns)
     return (struct ast*) r;
 }
 
+struct ast *newfuncall(enum funtypes type, struct ast *exp)
+{
+    struct funcall *fc = malloc(sizeof(struct funcall));
+    fc->type = BUILTIN;
+    fc->_type = type;
+    fc->exp = exp;
+    return (struct ast*) fc;
+}
+
 /**
  * Free AST
  */

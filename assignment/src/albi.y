@@ -26,10 +26,10 @@
 #include <stdlib.h>
 
 #include "ast.h"
+#include "error.h"
 #include "symtab.h"
 #include "parsing.h"
 #include "program.h"
-#include "error.h"
 
 #define YYERROR_VERBOSE 1
 
@@ -40,6 +40,7 @@ extern int yylex();
     // Exported by Flex
     double double_t;                // Double
     struct symbol *sym_t;           // Symbol
+    int funtype;                    // Built-in function type
 
     // Intermediate structures
     struct ast *ast;                // AST node
@@ -51,6 +52,7 @@ extern int yylex();
 // Token types
 %token <double_t> NUM
 %token <sym_t> VAR
+%token <funtype> FUNC
 %token PROG RATE SHARE ECOLI
 %token ASSIGN ":="
 
@@ -115,6 +117,10 @@ exp: exp '+' exp
 | VAR
                                     {
                                         $$ = newref($1);
+                                    }
+| FUNC '(' exp ')'
+                                    {
+                                        $$ = newfuncall($1, $3);
                                     }
 ;
 
