@@ -43,8 +43,8 @@ extern int yylex();
 
     // Intermediate structures
     struct ast *ast;                // AST node
-    struct progcall *progcall;        // Compartment creation node
-    struct nodelist *nodelist;        // List of AST nodes
+    struct progcall *progcall;      // Compartment creation node
+    struct nodelist *nodelist;      // List of AST nodes
     struct symlist *symlist;        // List of symbols
 }
 
@@ -252,7 +252,7 @@ progcall: VAR '(' explist ')'
                                     }
 ;
 
-explist: exp                         {
+explist: exp                        {
                                         if ($1 != NULL)
                                             $$ = newnodelist($1, NULL);
                                         else

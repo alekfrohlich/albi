@@ -36,11 +36,11 @@ linecomment         "//".*
 digit               [0-9]
 integer             {digit}+
 variable            [a-zA-Z_]([a-zA-Z_0-9]+)?
-misspelled          [0-9][a-zA-Z0-9_]+
+invalid_id          [0-9][a-zA-Z0-9_]+
 float               ([+-])?([0-9]+)|([0-9]*"."[0-9]+(E[+-][0-9]{1,2}){0,1})
 
 assignment          ":="
-program_keyword      "program"
+program_keyword     "program"
 rate_keyword        "rate"
 sharing_keyword     "sharing"
 ecoli_keyword       "ecoli"
@@ -58,7 +58,7 @@ ignore              ("include gro"|"lamba"|"true"|"false"|"let"|"in"|"foreach"|"
 
 {float}             { yylval.double_t = atof(yytext); return NUM; }
 {variable}          { yylval.sym_t = lookup(yytext); return VAR;  }
-{misspelled}        { yyerror("invalid identifier '%s'", yytext); }
+{invalid_id}        { yyerror("invalid identifier '%s'", yytext); }
 {assignment}        { return ASSIGN; }
 
 "\n"                { yycolumn = 1;     }
