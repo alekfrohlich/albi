@@ -2,7 +2,7 @@
  *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
- * 	  This file is a part of Albi.
+ *       This file is a part of Albi.
  *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
@@ -38,14 +38,14 @@ extern int yylex();
 
 %union {
     // Exported by Flex
-	double double_t;				// Double
-    struct symbol *sym_t;   		// Symbol
+    double double_t;                // Double
+    struct symbol *sym_t;           // Symbol
 
-	// Intermediate structures
-    struct ast *ast;				// AST node
-	struct progcall *progcall;		// Compartment creation node
-	struct nodelist *nodelist;		// List of AST nodes
-	struct symlist *symlist;		// List of symbols
+    // Intermediate structures
+    struct ast *ast;                // AST node
+    struct progcall *progcall;        // Compartment creation node
+    struct nodelist *nodelist;        // List of AST nodes
+    struct symlist *symlist;        // List of symbols
 }
 
 // Token types
@@ -70,197 +70,197 @@ extern int yylex();
 
 start_of_prog: %empty
 | start_of_prog assignment
-									{
-										struct symassign *assign = (struct symassign *) $2;
-										symdef(assign->sym, assign->val);
-										genparam(assign->sym->name, assign->val);
-									}
+                                    {
+                                        struct symassign *assign = (struct symassign *) $2;
+                                        symdef(assign->sym, assign->val);
+                                        genparam(assign->sym->name, assign->val);
+                                    }
 | start_of_prog program
-									{
-										currenv = 0;
-									}
+                                    {
+                                        currenv = 0;
+                                    }
 | start_of_prog ecoli
-									{
-										gencompart((struct compart *) $2);
-									}
+                                    {
+                                        gencompart((struct compart *) $2);
+                                    }
 ;
 
 assignment: VAR ":=" { nowrites = 1; } exp ';'
-									{
-										$$ = newassign($1, $4);
-										nowrites = 0;
-									}
+                                    {
+                                        $$ = newassign($1, $4);
+                                        nowrites = 0;
+                                    }
 ;
 
 exp: exp '+' exp
-									{
-										$$ = newast(PLUS, $1, $3);
-									}
+                                    {
+                                        $$ = newast(PLUS, $1, $3);
+                                    }
 | exp '-' exp
-									{
-										$$ = newast(MINUS, $1, $3);
-									}
+                                    {
+                                        $$ = newast(MINUS, $1, $3);
+                                    }
 | exp '*' exp
-									{
-										$$ = newast(TIMES, $1, $3);
-									}
+                                    {
+                                        $$ = newast(TIMES, $1, $3);
+                                    }
 | exp '/' exp
-									{
-										$$ = newast(DIV, $1, $3);
-									}
+                                    {
+                                        $$ = newast(DIV, $1, $3);
+                                    }
 | NUM
-									{
-										$$ = newnum($1);
-									}
+                                    {
+                                        $$ = newnum($1);
+                                    }
 | VAR
-									{
-										$$ = newref($1);
-									}
+                                    {
+                                        $$ = newref($1);
+                                    }
 ;
 
 program: progdef '(' symlist ')' ":=" '{' stmtlist '}' ';'
-									{
-										progdef($1, $3, $7);
-									}
+                                    {
+                                        progdef($1, $3, $7);
+                                    }
 | progdef '(' ')' ":=" '{' stmtlist '}' ';'
-									{
-										progdef($1, NULL, $6);
-									}
+                                    {
+                                        progdef($1, NULL, $6);
+                                    }
 ;
 
 progdef: PROG VAR
-									{
-										$$ = $2;
-										env[1] = (struct symbol *) malloc(sizeof(struct symbol) * SYMTAB_SIZE);
-										currenv = 1;
-									}
+                                    {
+                                        $$ = $2;
+                                        env[1] = (struct symbol *) malloc(sizeof(struct symbol) * SYMTAB_SIZE);
+                                        currenv = 1;
+                                    }
 ;
 
 symlist: VAR
-									{
-										$$ = newslist($1, NULL);
-									}
+                                    {
+                                        $$ = newslist($1, NULL);
+                                    }
 | VAR ',' symlist
-									{
-										$$ = newslist($1, $3);
-									}
+                                    {
+                                        $$ = newslist($1, $3);
+                                    }
 ;
 
 stmtlist: %empty
-									{
-										$$ = NULL;
-									}
+                                    {
+                                        $$ = NULL;
+                                    }
 | statement stmtlist
-									{
-										if ($2 == NULL)
-											$$ = newnodelist($1, NULL);
-										else
-											$$ = newnodelist($1, $2);
-									}
+                                    {
+                                        if ($2 == NULL)
+                                            $$ = newnodelist($1, NULL);
+                                        else
+                                            $$ = newnodelist($1, $2);
+                                    }
 ;
 
 statement: assignment
 | RATE '(' exp ')' ':' '{' assignlist '}'
-									{
-										$$ = newrate($3, $7);
-									}
+                                    {
+                                        $$ = newrate($3, $7);
+                                    }
 ;
 
 assignlist: %empty
-									{
-										$$ = NULL;
-									}
+                                    {
+                                        $$ = NULL;
+                                    }
 | assignment assignlist
-									{
-										if ($2 == NULL)
-											$$ = newnodelist($1, NULL);
-										else
-										 	$$ = newnodelist($1, $2);
-									}
+                                    {
+                                        if ($2 == NULL)
+                                            $$ = newnodelist($1, NULL);
+                                        else
+                                             $$ = newnodelist($1, $2);
+                                    }
 ;
 
 ecoli: ECOLI '(' '[' ']' ',' PROG { nowrites = 1; } progcall ')' ';'
-									{
-										$$ = newcompart("ECOLI", $8);
-										nowrites = 0;
-									}
+                                    {
+                                        $$ = newcompart("ECOLI", $8);
+                                        nowrites = 0;
+                                    }
 ;
 
 progcall: VAR '(' explist ')'
-									{
-										$$ = newprogcall(
-										    $1,
-										    NULL,
-										    (struct nodelist*) $3,
-										    NULL);
-									}
+                                    {
+                                        $$ = newprogcall(
+                                            $1,
+                                            NULL,
+                                            (struct nodelist*) $3,
+                                            NULL);
+                                    }
 | VAR '(' explist ')' SHARE symlist
-									{
-										$$ = newprogcall(
-										    $1,
-										    $6,
-										    (struct nodelist*) $3,
-										    NULL);
-									}
+                                    {
+                                        $$ = newprogcall(
+                                            $1,
+                                            $6,
+                                            (struct nodelist*) $3,
+                                            NULL);
+                                    }
 | VAR '(' explist ')' '+' progcall
-									{
-										$$ = newprogcall(
-										    $1,
-										    NULL,
-										    (struct nodelist*) $3,
-										    $6);
-									}
+                                    {
+                                        $$ = newprogcall(
+                                            $1,
+                                            NULL,
+                                            (struct nodelist*) $3,
+                                            $6);
+                                    }
 | VAR '(' explist ')' SHARE symlist '+' progcall
-									{
-										$$ = newprogcall(
-										    $1,
-										    $6,
-										    $3,
-										    $8);
-									}
+                                    {
+                                        $$ = newprogcall(
+                                            $1,
+                                            $6,
+                                            $3,
+                                            $8);
+                                    }
 | VAR '('')'
-									{
-										$$ = newprogcall(
-										    $1,
-										    NULL,
-										    NULL,
-										    NULL);
-									}
+                                    {
+                                        $$ = newprogcall(
+                                            $1,
+                                            NULL,
+                                            NULL,
+                                            NULL);
+                                    }
 | VAR '('')' SHARE symlist
-									{
-										$$ = newprogcall(
-										    $1,
-										    $5,
-										    NULL,
-										    NULL);
-									}
+                                    {
+                                        $$ = newprogcall(
+                                            $1,
+                                            $5,
+                                            NULL,
+                                            NULL);
+                                    }
 | VAR '(' ')' '+' progcall
-									{
-										$$ = newprogcall(
-										    $1,
-										    NULL,
-										    NULL,
-										    $5);
-									}
+                                    {
+                                        $$ = newprogcall(
+                                            $1,
+                                            NULL,
+                                            NULL,
+                                            $5);
+                                    }
 | VAR '(' ')' SHARE symlist '+' progcall
-									{
-										$$ = newprogcall(
-										    $1,
-										    $5,
-										    NULL,
-										    $7);
-									}
+                                    {
+                                        $$ = newprogcall(
+                                            $1,
+                                            $5,
+                                            NULL,
+                                            $7);
+                                    }
 ;
 
-explist: exp 						{
-										if ($1 != NULL)
-											$$ = newnodelist($1, NULL);
-										else
-											$$ = NULL;
-									}
+explist: exp                         {
+                                        if ($1 != NULL)
+                                            $$ = newnodelist($1, NULL);
+                                        else
+                                            $$ = NULL;
+                                    }
 | exp ',' explist
-									{
-										$$ = newnodelist($1, $3);
-									}
+                                    {
+                                        $$ = newnodelist($1, $3);
+                                    }
 ;
 %%
