@@ -25,7 +25,6 @@
     #include "program.h"
     #include "structures.h"
 
-
     // Forward definitions
     extern FILE *yyout;
     extern char ast2str[NUMNODETYPES];
