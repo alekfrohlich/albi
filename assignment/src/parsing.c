@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #include "parsing.h"
 #include "program.h"
@@ -52,11 +53,19 @@ double eval(struct ast *a)
         v = ((struct symref*) a)->sym->value;
         break;
 
+    // Built-in call
+    case BUILTIN:
+        v = callbuiltin(((struct funcall*) a));
+        break;
+
     // Expressions:
     case PLUS:  v = eval(a->left) + eval(a->right); break;
     case MINUS: v = eval(a->left) - eval(a->right); break;
     case TIMES: v = eval(a->left) * eval(a->right); break;
     case DIV:   v = eval(a->left) / eval(a->right); break;
+    case MOD:   v = ((int) eval(a->left)) % ((int) eval(a->right)); break;
+    case POW:   v = pow(eval(a->left), eval(a->right)); break;
+    case UMINUS:v = -eval(a->left); break;
 
     default:
         yyerror("internal error: bad node at eval %d", a->type);
@@ -65,9 +74,35 @@ double eval(struct ast *a)
     return v;
 }
 
+/**
+ * Evaluate and apply builtin function.
+ */
+double callbuiltin(struct funcall *fun)
+{
+    double v = eval(fun->exp);
+
+    switch(fun->_type)
+    {
+        case __builtin_sin:   return sin(v);
+        case __builtin_cos:   return cos(v);
+        case __builtin_tan:   return tan(v);
+        case __builtin_ln:    return log(v);
+        case __builtin_log:   return log10(v);
+        case __builtin_ceil:  return ceil(v);
+        case __builtin_floor: return floor(v);
+        case __builtin_sqrt:  return sqrt(v);
+
+        default:
+            yyerror("Unknown built-in function %d", fun->_type);
+            return 0,0;
+    }
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 //                       INTERMEDIATE CODE GENERATION                        //
 ///////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * Generate intermediate
@@ -110,9 +145,11 @@ void gencompart(struct compart *compartment)
     currcompart++;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 //                          STRUCTURE MANINPULATION                          //
 ///////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * Create list of AST nodes
