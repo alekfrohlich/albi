@@ -41,26 +41,11 @@ static void outexp(struct ast *a, struct maplist *namemap)
     switch (a->type)
     {
         case PLUS:
-            outexp(a->left, namemap);
-            fprintf(yyout, "+" );
-            outexp(a->right, namemap);
-            break;
-
         case MINUS:
-            outexp(a->left, namemap);
-            fprintf(yyout, "-" );
-            outexp(a->right, namemap);
-            break;
-
+        case TIMES:
         case DIV:
             outexp(a->left, namemap);
-            fprintf(yyout, "/" );
-            outexp(a->right, namemap);
-            break;
-
-        case TIMES:
-            outexp(a->left, namemap);
-            fprintf(yyout, "*");
+            fprintf(yyout, "%c", ast2str[a->type]);
             outexp(a->right, namemap);
             break;
 
@@ -74,7 +59,7 @@ static void outexp(struct ast *a, struct maplist *namemap)
             break;
 
         default:
-            printf("internal error: bad node at eval, type %u\n", a->type);
+            printf("internal error: bad node at eval, type %c\n", ast2str[a->type]);
     }
 }
 
