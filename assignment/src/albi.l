@@ -40,8 +40,8 @@ misspelled          [0-9][a-zA-Z0-9_]+
 float               ([+-])?([0-9]+)|([0-9]*"."[0-9]+(E[+-][0-9]{1,2}){0,1})
 
 assignment          ":="
-program_keyword		"program"
-rate_keyword		"rate"
+program_keyword      "program"
+rate_keyword        "rate"
 sharing_keyword     "sharing"
 ecoli_keyword       "ecoli"
 ignore              ("include gro"|"lamba"|"true"|"false"|"let"|"in"|"foreach"|"do"|"end"|"maptocells"|"if"|"then"|"else"|"fun"|"head"|"tail"|"external"|"internal"|"compose"|"exec")
@@ -51,8 +51,8 @@ ignore              ("include gro"|"lamba"|"true"|"false"|"let"|"in"|"foreach"|"
 {ignore}            { }
 {linecomment}       { }
 
-{program_keyword}	{ return PROG;  }
-{rate_keyword}		{ return RATE;  }
+{program_keyword}   { return PROG;  }
+{rate_keyword}      { return RATE;  }
 {sharing_keyword}   { return SHARE; }
 {ecoli_keyword}     { return ECOLI; }
 
