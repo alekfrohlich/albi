@@ -58,8 +58,10 @@ extern int yylex();
 
 // Precendences and associativity
 %right '='
-%left '+' '-'
-%left '*' '/'
+%left  '+' '-'
+%left  '*' '/' '%'
+%right '^'
+%nonassoc UNARYM
 
 // Rule types
 %type <sym_t> progdef
@@ -109,6 +111,22 @@ exp: exp '+' exp
 | exp '/' exp
                                     {
                                         $$ = newast(DIV, $1, $3);
+                                    }
+| exp '%' exp
+                                    {
+                                        $$ = newast(MOD, $1, $3);
+                                    }
+| exp '^' exp
+                                    {
+                                        $$ = newast(POW, $1, $3);
+                                    }
+| '(' exp ')'
+                                    {
+                                        $$ = $2;
+                                    }
+| '-' exp %prec UNARYM
+                                    {
+                                        $$ = newast(UMINUS, $2, NULL);
                                     }
 | NUM
                                     {

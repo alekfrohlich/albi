@@ -28,7 +28,7 @@
 /**
  * AST node to string (indexable by type)
  */
-char ast2str[NUMNODETYPES] = { 'K','+','-','*','/','N','S','=','T','C','R' };
+char ast2str[NUMNODETYPES] = { 'K','+','-','*','/','%','^','-','N','S','=','T','C','R' };
 
 /**
  * Generate AST with proper name corrections (print)
@@ -40,13 +40,13 @@ static void outexp(struct ast *a, struct maplist *namemap)
 
     switch (a->type)
     {
-        case PLUS:
-        case MINUS:
-        case TIMES:
-        case DIV:
+        case CONSLIT:
+            fprintf(yyout, "%0.4lf", ((struct numval*) a)->number);
+            break;
+
+        case UMINUS:
+            fprintf(yyout, "-");
             outexp(a->left, namemap);
-            fprintf(yyout, "%c", ast2str[a->type]);
-            outexp(a->right, namemap);
             break;
 
         case SYM_REF:
@@ -54,12 +54,19 @@ static void outexp(struct ast *a, struct maplist *namemap)
                     getmap(namemap, ((struct symref*) a)->sym->name));
             break;
 
-        case CONSLIT:
-            fprintf(yyout, "%0.4lf", ((struct numval*) a)->number);
+        case PLUS:
+        case MINUS:
+        case TIMES:
+        case DIV:
+        case MOD:
+        case POW:
+            outexp(a->left, namemap);
+            fprintf(yyout, "%c", ast2str[a->type]);
+            outexp(a->right, namemap);
             break;
 
         default:
-            printf("internal error: bad node at eval, type %c\n", ast2str[a->type]);
+            printf("internal error: bad node at outexp, type %c\n", ast2str[a->type]);
     }
 }
 

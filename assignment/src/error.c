@@ -45,10 +45,17 @@ static void errexp(struct ast *a)
 
     switch (a->type)
     {
+        case UMINUS:
+            fprintf(stderr, "-");
+            errexp(a->left);
+            break;
+
         case PLUS:
         case MINUS:
         case TIMES:
         case DIV:
+        case MOD:
+        case POW:
             errexp(a->left);
             fprintf(stderr, "%c", ast2str[a->type]);
             errexp(a->right);
@@ -63,7 +70,7 @@ static void errexp(struct ast *a)
             break;
 
         default:
-            printf("internal error: bad node at eval, type %c\n", ast2str[a->type]);
+            printf("internal error: bad node at errexp, type %c\n", ast2str[a->type]);
     }
 }
 

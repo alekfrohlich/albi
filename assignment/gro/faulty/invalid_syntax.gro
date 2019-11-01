@@ -50,6 +50,7 @@ program prog(X) :=
     // declarations
     E := 25;
     F := 75 + E + 2 + X;
+    G := 1;
     K := 2;
 
     // law of mass-action rate
@@ -57,6 +58,7 @@ program prog(X) :=
     {
         E := E * 1;
         F := F - 1;
+        G := -(2)^(1 % 3);
     }
 };
 

@@ -63,6 +63,9 @@ double eval(struct ast *a)
     case MINUS: v = eval(a->left) - eval(a->right); break;
     case TIMES: v = eval(a->left) * eval(a->right); break;
     case DIV:   v = eval(a->left) / eval(a->right); break;
+    case MOD:   v = ((int) eval(a->left)) % ((int) eval(a->right)); break;
+    case POW:   v = pow(eval(a->left), eval(a->right)); break;
+    case UMINUS:v = -eval(a->left); break;
 
     default:
         yyerror("internal error: bad node at eval %d", a->type);

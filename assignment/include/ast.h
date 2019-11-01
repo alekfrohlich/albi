@@ -24,17 +24,20 @@
 
     #include "symtab.h"
 
-    #define NUMNODETYPES 11
+    #define NUMNODETYPES 15
 
     /**
      * AST node types
      */
     enum nodetypes {
         CONSLIT = 0,    // Constant literal
-        PLUS,           // Arithmetic expression: +
-        MINUS,          // Arithmetic expression: -
-        TIMES,          // Arithmetic expression: *
-        DIV,            // Arithmetic expression: /
+        PLUS,           // Arithmetic expression: A + B
+        MINUS,          // Arithmetic expression: A - B
+        TIMES,          // Arithmetic expression: A * B
+        DIV,            // Arithmetic expression: A / B
+        MOD,            // Arithmetic expression: A % B
+        POW,            // Arithmetic expression: A ^ B
+        UMINUS,         // Arithmetic expression: -A
         NODELIST,       // Grouping of nodes
         SYM_REF,        // Symbol reference
         SYM_ASSIGN,     // Symbol assignment
