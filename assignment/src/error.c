@@ -24,6 +24,7 @@
 
 #include "albi.tab.h"
 #include "ast.h"
+#include "output.h"
 
 // Colorful output
 #define ERROR_RED(s)    fprintf(stderr, "\033[1;31m%s\033[0m", s)
@@ -33,8 +34,6 @@
 int nowrites;           // Symbol table writable?
 int yycolumn;           // Bison location
 char *currfilename;     // Current yyin file name
-
-static char ast2str[] = {'K','+','-','*','/','N', 'S','=','T','C','R'};
 
 /**
  * Display expression to stderr (err)

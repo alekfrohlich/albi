@@ -24,6 +24,8 @@
 
     #include "symtab.h"
 
+    #define NUMNODETYPES 11
+
     /**
      * AST node types
      */

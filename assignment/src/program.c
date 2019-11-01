@@ -99,8 +99,9 @@ static struct nodelist *newreaction(
         struct symassign *assign = ((struct symassign*) it->node);
 
         // Invalid node
-        if (assign->val->type != PLUS || assign->val->type != MINUS ||
-            assign->val->left->type != CONSLIT || assign->val->right != CONSLIT)
+        if ((assign->val->type != PLUS && assign->val->type != MINUS)
+             || (assign->val->left->type != CONSLIT && assign->val->left->type != SYM_REF)
+             || (assign->val->right->type != CONSLIT && assign->val->right->type != SYM_REF))
         {
             yyerrorexp("invalid expression inside rate body", assign->val);
         }

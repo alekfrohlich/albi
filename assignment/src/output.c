@@ -26,6 +26,11 @@
 #include "structures.h"
 
 /**
+ * AST node to string (indexable by type)
+ */
+char ast2str[NUMNODETYPES] = { 'K','+','-','*','/','N','S','=','T','C','R' };
+
+/**
  * Generate AST with proper name corrections (print)
  */
 static void outexp(struct ast *a, struct maplist *namemap)
