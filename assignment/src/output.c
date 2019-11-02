@@ -71,6 +71,14 @@ static void outexp(struct ast *a, struct maplist *namemap)
 }
 
 /**
+ * Declare and define compartment (print)
+ */
+void outcompart(int currcompart) {
+    fprintf(yyout, "compartment ECOLI%d\n", currcompart);
+    fprintf(yyout, "ECOLI%d = 1.0\n", currcompart);
+}
+
+/**
  * Declare and define global variable (print)
  */
 void outparam(char *name, struct ast *val)
@@ -87,7 +95,7 @@ void outdecls(struct nodelist *decls, struct maplist *namemap, int compartnum)
     {
         // Declare it
         fprintf(yyout, "%s %s in ECOLI%d\n",
-                ((struct tsymassign*)it->node)->_type == SPECIE? "Specie" : "Var",
+                ((struct tsymassign*)it->node)->_type == SPECIE? "var" : "const",
                 getmap(namemap, ((struct tsymassign*)it->node)->sym->name), compartnum);
 
         // Define it
