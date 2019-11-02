@@ -34,6 +34,7 @@
 
 
     // Forward definitions
+    extern int surpressout;
     extern int nowrites;
     extern int yycolumn;
     extern char *currfilename;

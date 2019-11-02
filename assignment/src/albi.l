@@ -94,6 +94,7 @@ int main(int argc, char **argv)
     yyin = fopen(argv[1],"r");
     yyout = fopen("parsed.intermediate", "w");
 
+    surpressout = 0;
     nowrites = 0;
     yycolumn = 1;
 
@@ -104,4 +105,5 @@ int main(int argc, char **argv)
         currfilename = argv[1];
 
     yyparse();
+    return surpressout;
 }

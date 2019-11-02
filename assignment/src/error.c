@@ -31,6 +31,7 @@
 #define BEGIN_BOLD      fprintf(stderr, "\033[1;80m")
 #define COLOR_RESET     fprintf(stderr, "\033[0m")
 
+int surpressout;        // Don't generate SBML if error was reported
 int nowrites;           // Symbol table writable?
 int yycolumn;           // Bison location
 char *currfilename;     // Current yyin file name
@@ -99,6 +100,7 @@ int yyerror(const char *s, ...)
     ERROR_RED("error: ");
     vfprintf(stderr, s, ap);
     fprintf(stderr, ".\n");
+    surpressout = 1;
 }
 
 /**

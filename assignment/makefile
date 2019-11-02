@@ -60,3 +60,4 @@ fault: albi
 clean:
 	cd $(SRCDIR) && $(MAKE) clean
 	@rm -f parsed.intermediate
+	@rm -f output.sbml
