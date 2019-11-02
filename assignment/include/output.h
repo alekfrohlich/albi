@@ -28,6 +28,7 @@
     // Forward definitions
     extern FILE *yyout;
     extern char ast2str[NUMNODETYPES];
+    extern void outcompart(int);
     extern void outparam(char *name, struct ast *val);
     extern void outdecls(struct nodelist *decls, struct maplist *namemap, int compartnum);
     extern void outreacs(struct reactionlist *reacs, struct maplist *namemap);

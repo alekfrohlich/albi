@@ -134,8 +134,8 @@ void gencompart(struct compart *compartment)
     // Eval and apply explist. TODO: handle shares
     maps = mergeprograms(progrefs, NULL, explists, currcompart, progcount);
 
-    fprintf(yyout, "Compartment ECOLI%d\n", currcompart);
-
+    outcompart(currcompart);
+    
     // Generate intermediate code (print)
     for (int i = 0; i < progcount; i++)
     {
