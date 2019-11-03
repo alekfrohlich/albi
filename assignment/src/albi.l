@@ -61,6 +61,11 @@ ignore              ("include gro"|"lamba"|"true"|"false"|"let"|"in"|"foreach"|"
 {white}             { }
 {ignore}            { }
 {linecomment}       { }
+"set"[^;]*";"       { }
+"message"[^;]*";"   { }
+"selected"[^}]*"}"  { }
+"needs"[^;]*";"     { }
+"sharing"[^)]*")"   { return ')'; }
 
 {program_keyword}   { return PROG;  }
 {rate_keyword}      { return RATE;  }

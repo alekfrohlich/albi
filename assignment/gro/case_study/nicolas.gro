@@ -29,24 +29,24 @@ program p() := {
  con6 := 0;
 
  //MGEN
- rate(alfa0) : { m1 := m1 + 1; m2 := m2 + 1; m3 := m3 + 1;}
+ rate(alfa0) : { m1 := m1 + 1, m2 := m2 + 1, m3 := m3 + 1};
 
- rate(alfa / (1 + p3^n)) : {m1 := m1 + 1;}
- rate(alfa / (1 + p1^n)) : {m2 := m2 + 1;}
- rate(alfa / (1 + p2^n)) : {m3 := m3 + 1;}
+ rate(alfa / (1 + p3^n)) : {m1 := m1 + 1 };
+ rate(alfa / (1 + p1^n)) : {m2 := m2 + 1 };
+ rate(alfa / (1 + p2^n)) : {m3 := m3 + 1 };
 
- rate (m1) : { m1 := m1 - 1; }
- rate (m2) : { m2 := m2 - 1; }
- rate (m3) : { m3 := m3 - 1; }
+ rate (m1) : { m1 := m1 - 1 };
+ rate (m2) : { m2 := m2 - 1 };
+ rate (m3) : { m3 := m3 - 1 };
 
  //PGEN
 
- rate (beta*m1) : { p1 := p1 + 1; }
- rate (beta*p1) : { p1 := p1 - 1; }
- rate (beta*m2) : { p2 := p2 + 1; }
- rate (beta*p2) : { p2 := p2 - 1; }
- rate (beta*m3) : { p3 := p3 + 1; }
- rate (beta*p3) : { p3 := p3 - 1; }
+ rate (beta*m1) : { p1 := p1 + 1 };
+ rate (beta*p1) : { p1 := p1 - 1 };
+ rate (beta*m2) : { p2 := p2 + 1 };
+ rate (beta*p2) : { p2 := p2 - 1 };
+ rate (beta*m3) : { p3 := p3 + 1 };
+ rate (beta*p3) : { p3 := p3 - 1 };
 
  //CONSGEN
 
@@ -63,33 +63,33 @@ program p() := {
 
  rate ( alpha1 * (p2 / k2) /
  (1 + (p3 / k3) + (p2 / k2) + (p1 / k1) + (p1 * p2 * p3 / (k1 * k2 * k3 * kq)) + (p1 * p2 / (k1 * k2 * kq)) + (p1 * p3 / (k1 * k3 * kq)) + (p2 * p3 / (k2 * k3 * kq)))
- ) : { con1 := con1 + 1; }
- rate ( con1 * kd1) : {con1 := con1 - 1; }
+ ) : { con1 := con1 + 1 };
+ rate ( con1 * kd1) : {con1 := con1 - 1 };
 
  rate ( alpha2 * (p1 * p2 / (k1 * k2 * kq)) /
  (1 + (p3 / k3) + (p2 / k2) + (p1 / k1) + (p1 * p2 * p3 / (k1 * k2 * k3 * kq)) + (p1 * p2 / (k1 * k2 * kq)) + (p1 * p3 / (k1 * k3 * kq)) + (p2 * p3 / (k2 * k3 * kq)))
- ) : {con2 := con2 + 1; }
- rate ( con2 * kd2) : {con2 := con2 - 1; }
+ ) : {con2 := con2 + 1 };
+ rate ( con2 * kd2) : {con2 := con2 - 1 };
 
  rate ( alpha3 * (p1 / k1 ) /
  (1 + (p3 / k3) + (p2 / k2) + (p1 / k1) + (p1 * p2 * p3 / (k1 * k2 * k3 * kq)) + (p1 * p2 / (k1 * k2 * kq)) + (p1 * p3 / (k1 * k3 * kq)) + (p2 * p3 / (k2 * k3 * kq)))
- ) : {con3 := con3 + 1; }
- rate ( con3 * kd3) : {con3 := con3 - 1; }
+ ) : {con3 := con3 + 1 };
+ rate ( con3 * kd3) : {con3 := con3 - 1 };
 
  rate ( alpha4 * (p1 * p3 / (k1 * k3 * kq) ) /
  (1 + (p3 / k3) + (p2 / k2) + (p1 / k1) + (p1 * p2 * p3 / (k1 * k2 * k3 * kq)) + (p1 * p2 / (k1 * k2 * kq)) + (p1 * p3 / (k1 * k3 * kq)) + (p2 * p3 / (k2 * k3 * kq)))
- ) : {con4 := con4 + 1; }
- rate ( con4 * kd4) : {con4 := con4 - 1; }
+ ) : {con4 := con4 + 1 };
+ rate ( con4 * kd4) : {con4 := con4 - 1 };
 
  rate ( alpha5 * (p3 / k3) /
  (1 + (p3 / k3) + (p2 / k2) + (p1 / k1) + (p1 * p2 * p3 / (k1 * k2 * k3 * kq)) + (p1 * p2 / (k1 * k2 * kq)) + (p1 * p3 / (k1 * k3 * kq)) + (p2 * p3 / (k2 * k3 * kq)))
- ) : { con5 := con5 + 1; }
- rate ( con5 * kd5) : { con5 := con5 - 1; }
+ ) : { con5 := con5 + 1 };
+ rate ( con5 * kd5) : { con5 := con5 - 1 };
 
  rate ( alpha6 * (p3 * p2 / (k3 * k2 * kq) ) /
  (1 + (p3 / k3) + (p2 / k2) + (p1 / k1) + (p1 * p2 * p3 / (k1 * k2 * k3 * kq)) + (p1 * p2 / (k1 * k2 * kq)) + (p1 * p3 / (k1 * k3 * kq)) + (p2 * p3 / (k2 * k3 * kq)))
- ) : { con6 := con6 + 1; }
- rate ( con6 * kd6) : {con6 := con6 - 1; }
+ ) : { con6 := con6 + 1 };
+ rate ( con6 * kd6) : {con6 := con6 - 1 };
 
 };
 
