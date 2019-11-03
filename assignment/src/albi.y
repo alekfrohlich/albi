@@ -77,6 +77,7 @@ start_of_prog: %empty
                                     {
                                         struct symassign *assign = (struct symassign *) $2;
                                         symdef(assign->sym, assign->val);
+                                        globalmap = newmaplist(assign->sym->name, assign->sym->name, globalmap);
                                         genparam(assign->sym->name, assign->val);
                                     }
 | start_of_prog program

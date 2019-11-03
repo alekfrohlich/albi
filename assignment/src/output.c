@@ -113,14 +113,22 @@ void outreacs(struct reactionlist *reacs, struct maplist * namemap)
     for (struct reactionlist *it = reacs; it != NULL; it = it->next)
     {
         for (struct nodelist *it2 = it->reac->reactant; it2 != NULL; it2 = it2->next)
+        {
             fprintf(yyout, "%s",
                     getmap(namemap, ((struct symassign *)it2->node)->sym->name));
+            if (it2->next != NULL)
+                fprintf(yyout, " + ");
+        }
 
         fprintf(yyout, "-> ");
 
         for (struct nodelist *it2 = it->reac->product; it2 != NULL; it2 = it2->next)
+        {
             fprintf(yyout, "%s",
                     getmap(namemap, ((struct symassign *)it2->node)->sym->name));
+            if (it2->next != NULL)
+                fprintf(yyout, " + ");
+        }
 
         fprintf(yyout, ";");
         outexp(it->reac->rate, namemap);

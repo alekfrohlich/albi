@@ -97,6 +97,7 @@ int main(int argc, char **argv)
     surpressout = 0;
     nowrites = 0;
     yycolumn = 1;
+    globalmap = NULL;
 
     // only displays relative via second cl argument
     if (argc == 3)

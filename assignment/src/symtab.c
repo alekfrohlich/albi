@@ -27,6 +27,7 @@
 #include "error.h"
 
 int currenv = 0;                            // Current parsing environment
+struct maplist *globalmap;                  // global namemap
 struct symbol globals[SYMTAB_SIZE];         // Global symbol table
 
 /**

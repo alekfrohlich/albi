@@ -47,6 +47,7 @@
     // Forward definitions
     struct ast;
     struct symbol *env[2];
+    struct maplist *globalmap;
     extern int currenv;
     extern struct symbol *lookup(char *sym);
     extern struct symlist *newslist(struct symbol *sym, struct symlist *next);

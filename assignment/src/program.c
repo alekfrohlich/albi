@@ -57,6 +57,9 @@ static struct nodelist *declspecie(
             it = it->next;
         }
 
+        if (it->next == NULL)
+            return species;
+
         struct nodelist *aux = it->next;
         it->next = it->next->next;
         it = aux;
@@ -91,7 +94,6 @@ static struct nodelist *newreaction(
     struct reaction *reac = (struct reaction*) malloc(sizeof(struct reaction));
     program->reactions = newreactionlist(reac, program->reactions);
     reac->rate = rate->exp;
-
     // Build-up reac's reactants and products,
     // also redeclare found species
     for (struct nodelist *it = rate->assigns; it != NULL; it = it->next)
@@ -144,6 +146,9 @@ struct maplist **mergeprograms(
     int progcount)
  {
     struct maplist **maps = (struct maplist**) malloc(sizeof(struct maplist*)*progcount);
+    for (int i = 0; i < progcount; i++) {
+        maps[i] = globalmap;
+    }
 
     for (int i = 0; i < progcount; i++)
     {
@@ -251,4 +256,19 @@ void progdef(struct symbol *name, struct symlist *syms, struct nodelist *stmts)
     program->parameters = syms;
     program->body = stmts;
     makedecls(program);
+    for (struct reactionlist *it = program->reactions; it != NULL; it = it->next)
+    {
+        struct reaction *reac = it->reac;
+        printf("\nREACTION\n");
+        for (struct nodelist *it2 = reac->reactant; it2 != NULL; it2 = it2->next)
+        {
+            printf("\nREACT %s\n", ((struct symassign *) it2->node)->sym->name);
+            errexp(((struct symassign *) it2->node)->val);
+        }
+        for (struct nodelist *it3 = reac->product; it3 != NULL; it3 = it3->next)
+        {
+            printf("\nPROD %s\n", ((struct symassign *) it3->node)->sym->name);
+            errexp(((struct symassign *) it3->node)->val);
+        }
+    }
 }

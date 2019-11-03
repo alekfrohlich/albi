@@ -39,7 +39,7 @@ char *currfilename;     // Current yyin file name
 /**
  * Display expression to stderr (err)
  */
-static void errexp(struct ast *a)
+void errexp(struct ast *a)
 {
     if (a == NULL)
         return;

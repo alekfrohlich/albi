@@ -135,14 +135,14 @@ void gencompart(struct compart *compartment)
     maps = mergeprograms(progrefs, NULL, explists, currcompart, progcount);
 
     outcompart(currcompart);
-    
+    currcompart++;
+
     // Generate intermediate code (print)
     for (int i = 0; i < progcount; i++)
     {
         outdecls(progrefs[i]->prog->declarations, maps[i], currcompart);
         outreacs(progrefs[i]->prog->reactions, maps[i]);
     }
-    currcompart++;
 }
 
 

@@ -38,6 +38,7 @@
     extern int nowrites;
     extern int yycolumn;
     extern char *currfilename;
+    extern void errexp(struct ast *a);
     extern int yyerror(const char *s, ...);
     extern int yyerrorexp(const char *s, struct ast *a, ...);
 
