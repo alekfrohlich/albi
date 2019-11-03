@@ -35,16 +35,16 @@ static struct nodelist *declspecie(
     struct program *program,
     struct symassign *assign,
     struct nodelist *species,
-    struct nodelist *locals)
+    struct nodelist **locals)
 {
     char *declaree = assign->sym->name;
-    struct nodelist *it = locals;
+    struct nodelist *it = *locals;
 
     // Removing head?
     if (it != NULL &&
         strcmp(((struct symassign*) it->node)->sym->name, declaree) == 0)
     {
-        locals = locals->next;
+        *locals = (*locals)->next;
     }
 
     // Removing middle element?
@@ -65,6 +65,11 @@ static struct nodelist *declspecie(
         it = aux;
     }
 
+    //  Locals are NULL
+    else
+    {
+        return species;
+    }
     // Add located specie
     it->next = species;
     species = it;
@@ -89,7 +94,7 @@ static struct nodelist *newreaction(
     struct program *program,
     struct rate *rate,
     struct nodelist *species,
-    struct nodelist *locals)
+    struct nodelist **locals)
 {
     struct reaction *reac = (struct reaction*) malloc(sizeof(struct reaction));
     program->reactions = newreactionlist(reac, program->reactions);
@@ -198,7 +203,7 @@ static void makedecls(struct program *prog)
 
         else if (it->node->type == RATESTATEMENT)
         {
-            species = newreaction(prog, (struct rate*) it->node, species, locals);
+            species = newreaction(prog, (struct rate*) it->node, species, &locals);
         }
 
         else
