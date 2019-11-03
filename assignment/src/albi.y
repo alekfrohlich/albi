@@ -73,7 +73,7 @@ extern int yylex();
 %%
 
 start_of_prog: %empty
-| start_of_prog assignment
+| start_of_prog assignment ';'
                                     {
                                         struct symassign *assign = (struct symassign *) $2;
                                         symdef(assign->sym, assign->val);
@@ -90,7 +90,7 @@ start_of_prog: %empty
                                     }
 ;
 
-assignment: VAR ":=" { nowrites = 1; } exp ';'
+assignment: VAR ":=" { nowrites = 1; } exp
                                     {
                                         $$ = newassign($1, $4);
                                         nowrites = 0;
@@ -184,23 +184,20 @@ stmtlist: %empty
                                     }
 ;
 
-statement: assignment
-| RATE '(' exp ')' ':' '{' assignlist '}'
+statement: assignment ';'
+| RATE '(' exp ')' ':' '{' assignlist '}' ';'
                                     {
                                         $$ = newrate($3, $7);
                                     }
 ;
 
-assignlist: %empty
+assignlist: assignment
                                     {
-                                        $$ = NULL;
+                                        $$ = newnodelist($1, NULL);
                                     }
-| assignment assignlist
+| assignment ',' assignlist
                                     {
-                                        if ($2 == NULL)
-                                            $$ = newnodelist($1, NULL);
-                                        else
-                                             $$ = newnodelist($1, $2);
+                                        $$ = newnodelist($1, $3);
                                     }
 ;
 

@@ -51,7 +51,7 @@ else:
     if status is 0:
         with open(BISON_OUTPUT, "r") as f:
             r = te.loada(f.read())
-            with open('output.sbml', 'w') as sbml:
+            with open('output.xml', 'w') as sbml:
                 sbml.write(r.getSBML())
 
     run(["rm", BISON_OUTPUT])

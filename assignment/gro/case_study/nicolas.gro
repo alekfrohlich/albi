@@ -76,7 +76,7 @@ program p() := {
  ) : {con3 := con3 + 1; }
  rate ( con3 * kd3) : {con3 := con3 - 1; }
 
- rate ( alpha4 * (p1 * p3 / (k1 * k3 * k1) ) /
+ rate ( alpha4 * (p1 * p3 / (k1 * k3 * kq) ) /
  (1 + (p3 / k3) + (p2 / k2) + (p1 / k1) + (p1 * p2 * p3 / (k1 * k2 * k3 * kq)) + (p1 * p2 / (k1 * k2 * kq)) + (p1 * p3 / (k1 * k3 * kq)) + (p2 * p3 / (k2 * k3 * kq)))
  ) : {con4 := con4 + 1; }
  rate ( con4 * kd4) : {con4 := con4 - 1; }
