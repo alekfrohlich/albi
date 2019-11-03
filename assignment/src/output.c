@@ -37,7 +37,7 @@ static void outexp(struct ast *a, struct maplist *namemap)
 {
     if (a == NULL)
         return;
-
+    fprintf(yyout, "(");
     switch (a->type)
     {
         case CONSLIT:
@@ -68,6 +68,7 @@ static void outexp(struct ast *a, struct maplist *namemap)
         default:
             printf("internal error: bad node at outexp, type %c\n", ast2str[a->type]);
     }
+    fprintf(yyout, ")");
 }
 
 /**

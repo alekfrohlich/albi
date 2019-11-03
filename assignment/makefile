@@ -26,6 +26,7 @@ export INCDIR  	= $(CURDIR)/include
 export SRCDIR  	= $(CURDIR)/src
 export GRODIR  	= $(CURDIR)/gro
 export FAULTDIR = $(GRODIR)/faulty
+export SCASEDIR = $(GRODIR)/case_study
 
 # Gro translator.
 export TRANSLATOR = $(SRCDIR)/translator
@@ -55,6 +56,10 @@ test: albi
 fault: albi
 	@echo "\nA demonstration of Albi's syntax errors...\n"
 	@$(TRANSLATOR) $(FAULTDIR)/invalid_syntax.gro invalid_syntax.gro
+
+repress: albi
+	@echo "\nBehold the repressilator...\n"
+	@$(TRANSLATOR) $(SCASEDIR)/repressilator.gro repressilator.gro	
 
 # Cleans compilation files.
 clean:
