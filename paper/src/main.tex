@@ -46,10 +46,11 @@ Florianopolis – SC – Brazil
     
     As language support goes, gro is still tightly coupled with it's original simulator. Although the simulator has recently undergone big improvements in the sense that simulations behave more realistically \cite{Gutirrez2017}, it doesn't change the fact that using it is the only available way to validate gro models. This hinders the reproducibility of experiments built with the language. SBML models, on the other hand, are supported by more than 100 software systems \cite{Hucka2007}, making them more likely to be verified and reused.
     
-    Another great opportunity the language was missing is BioModels integration \cite{LeNovere2006}. BioModels is a database of curated SBML and CellML models maintained with the intent of providing researches with models related to a particular disease, biological process or molecular complex. If gro code is to be translated into SBML, then models written in it are automatically more likely to be peer reviewed or stored as reference models for their respective biological behavior.
+    If gro code were to be translated into SBML, it could be further preserved as an entry in BioModels. BioModels is a database of curated SBML and CellML models maintained with the intent of providing researches with models related to a particular disease, biological process or molecular complex \cite{LeNovere2006}. 
 
     % fix cohesion and formatting
-    In the second section, we introduce the parser and show some examples of gro source code being translated to SBML models; In the third section, we explain how we used tellurium to generate the SBML; The fourth section, we compile the repressilator into equivalent SBML code and then simulate it in Copasi; Lastly, we conclude by confirming what we've done and proposing future works.
+    % is it really repression of TFs?
+    Now we layout the structure of the next following sections: In the second section, \textit{The Parser}, we introduce the gro parser and show some examples of source code being translated into SBML models; In the third section, \textit{The Tellurium framework}, we explain how we used tellurium to generate the SBML; In the fourth section, \textit{Study case: The Repressilator} we compile repressilator, a oscillatory mathematical model based on repression of transcription factors into equivalent SBML code and then simulate it in Copasi, a pathway simulator \cite{Hoops2006}; Lastly, we conclude by going back to the goals outlayed at the beginning of this paper.
     
     
 % Topics:
