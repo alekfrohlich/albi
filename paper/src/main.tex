@@ -27,7 +27,9 @@ Florianopolis – SC – Brazil
 %       => Introduce the objective of making it compatible
 \begin{abstract}
 
+
     The growth of research areas such as synthetic biology and systems biology leads to an increased willing to develop new, larger mathematical models to describe complex biological behavior. In order to enable natural flow of development of those models, scientists must have access to tools which increase the level of abstraction and enable reuse of biological components. Increased efforts are being put on solving these two problems. The present work tackles those problems by interfacing the existing programming language gro with SBML for model interchangeability and ease of model representation.
+
 
 \end{abstract}
 
@@ -36,15 +38,39 @@ Florianopolis – SC – Brazil
 %       => What are the reasons we chose gro as albi's primary language?
 %       => What are the disadvantages of the gro simulator
 %       => What are the advantages of having the SBML model for a gro program?
+%       => Prepare next sections
 \section{Introduction}
 
-    Even though a Systems Biology Markup Language API library (LibSBML) has already been developed \cite{Bornstein2008}, it only ought to be useful in cases where a new model is to be developed. In cases where there is a preexisting model, on the other hand, the availability of a SBML library doesn't help much since the previous model would have to be entirely rewritten to fit the API. Instead, the present work proposes a language parser that generates SBML code from previously built gro models. gro is a language for programming, modeling, specifying and simulating the behavior of cells in growing micro colonies of microorganisms \cite{Jang2012}. It has been made the primary source of the parser considering it has many interesting syntactical constructs such as rate statements, program definitions and bacterial instantiation which can be neatly represented in SBML documents as reactions, local name spaces and compartments, respectively.
-    
-    % too much its
-    As language support goes, gro is still tightly coupled with it's original simulator. Although it has recently undergone big improvements in it's simulation methods making it behave more realistically \cite{Gutirrez2017}, it doesn't change the fact that it is the only available way to evaluate gro models. This hinders the reproducibility of experiments built with the language. As the SBML standard is now supported by more than 100 simulators \cite{Hucka2007}, If gro models were to be exported to SBML, they would more likely be peer-review or even become reference models for the biological behavior they describe.
-    
-    Another great opportunity the language was missing is BioModels integration \cite{LeNovere2006}. BioModels is a database of curated SBML and CellML models maintained with the intent of providing researches with models related to a particular disease, biological process or molecular complex. If gro code is to be translated into SBML, then models written in it are automatically more likely to be peer reviewed or stored as reference models for their respective biological behavior.
 
+    Even though a Systems Biology Markup Language API library (LibSBML) has already been developed 
+    \cite{Bornstein2008}, it only ought to be useful in cases where a new model is to be developed. In cases where 
+    there is a preexisting model, on the other hand, the availability of a SBML library doesn't help much since the 
+    previous model would have to be entirely rewritten to fit the API. Instead, the present work proposes a language 
+    parser that generates SBML code from previously built gro models. gro is a language for programming, modeling, 
+    specifying and simulating the behavior of cells in growing micro colonies of microorganisms \cite{Jang2012}. It 
+    has been made the primary source of the parser considering it has many interesting syntactical constructs such as
+    rate statements, program definitions and bacterial instantiation which can be neatly represented in SBML  
+    documents as reactions, local name spaces and compartments, respectively.
+    
+    % too much its, lacks cohesion at the end
+    As language support goes, gro is still tightly coupled with it's original simulator. Although the simulator has 
+    recently undergone big improvements making simulations behave more realistically \cite{Gutirrez2017}, it doesn't 
+    change the fact that the original simulator is the only available way to validate gro models. This hinders the 
+    reproducibility of experiments built with the language. SBML models are now supported by more than 100 simulators \cite{Hucka2007},
+    
+    Another great opportunity the language was missing is BioModels integration \cite{LeNovere2006}. BioModels is a 
+    database of curated SBML and CellML models maintained with the intent of providing researches with models related
+    to a particular disease, biological process or molecular complex. If gro code is to be translated into SBML, then
+    models written in it are automatically more likely to be peer reviewed or stored as reference models for their 
+    respective biological behavior.
+
+    % fix cohesion and formatting
+    In the second section, we introduce the parser and show some examples of gro source code being translated to SBML
+    models; In the third section, we explain how we used tellurium to generate the SBML; The fourth section, we 
+    compile the repressilator into equivalent SBML code and then simulate it in Copasi; Lastly, we conclude by 
+    confirming what we've done and proposing future works.
+    
+    
 % Topics:
 %       => Which syntax does the parser recognize?
 %       => Examples of generated SBML
