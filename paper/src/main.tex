@@ -3,7 +3,6 @@
 % packages
 \usepackage{sbc-template}
 \usepackage{graphicx,url}
-% \usepackage[brazil]{babel}   references and labels in English
 \usepackage[utf8]{inputenc}  
 \usepackage{lipsum}
 \usepackage{caption} % Subfigure package
@@ -14,20 +13,26 @@
 
 % gro language definition
 \definecolor{COLOR_COMMENTS}{RGB}{16, 97, 35}
+\definecolor{COLOR_BACKGROUND}{rgb}{0.95,0.95,0.92}
 \lstdefinelanguage{GROLANG}{
-    morekeywords={include,program,rate,ecoli},
-    sensitive=false,
-    morecomment=[l]{//},
-    morestring=[b]",
+    morekeywords    =   {include,program,rate,ecoli},
+    sensitive       =   false,
+    morecomment     =   [l]{//},
+    morestring      =   [b]",
 }
 \lstdefinestyle{GROSRC}
 {
-  language     = GROLANG,
-  basicstyle   = \footnotesize,
-  commentstyle = \color{COLOR_COMMENTS},
-  frame=single,
-  tabsize=2,
-  framexleftmargin=8pt,
+  language          =   GROLANG,
+  basicstyle        =   \footnotesize,
+  commentstyle      =   \color{COLOR_COMMENTS},
+  backgroundcolor   =   \color{COLOR_BACKGROUND},
+  frame             =   single,
+  caption           =   Dummy gro file.,
+  tabsize           =   4,
+  numbers           =   left,
+  framesep          =   25pt,
+  xleftmargin       =   25pt,
+  xrightmargin      =   25pt,
 }
 
 % info
@@ -69,49 +74,27 @@ Florianopolis – SC – Brazil
     
     If Gro code were to be translated into SBML, the document could be further preserved as an entry in BioModels. BioModels is a database of curated SBML and CellML models maintained with the intent of providing researches with models related to a particular disease, biological process or molecular complex \cite{LeNovere2006}. Having a model curated is an even stronger guarantee of trustworthiness since the process is done manually for each model \cite{LeNovere2006}: Newly submitted models go through a series of syntactical analysis to confirm that they are valid syntactically and well formatted; The model is then numerically verified against the results claimed by the authoring paper; Finally, the validated model gets manually annotated and cross-linked to facilitate later search for it.
     
-    The rest of the paper is structured as follows: In Sect. 2, we introduce the language parser and explain the process of converting gro files to SBML models from start to end; In Sect. 3, we compile a Gro implementation of the repressilator, a synthetic oscillator, to equivalent SBML and then simulate it on COPASI, a pathway simulator \cite{Hoops2006}; In Sect. 4, we summarize what's been done and compare it with goals laid out at the start; In Sect. 5 we conclude by presenting possible extensions of the current work.
+    The rest of the paper is structured as follows: In Sect. 2, we introduce the language parser and explain the process of converting gro files to SBML models from start to finish; In Sect. 3, we compile a Gro implementation of the repressilator, a synthetic oscillator, to equivalent SBML and then simulate it on COPASI, a pathway simulator \cite{Hoops2006}; In Sect. 4, we summarize what's been done and compare it with goals laid out at the start; In Sect. 5 we conclude by presenting possible extensions of the current work.
     
-    
+    % How does tellurium does it's things?
+%       => compilation steps
 \section{Architecture}
+
+    
+    The compilation process is divided in three steps: First, the code is validated, that is, it's checked against syntax errors such as missing semicolon in rate statements and semantic error such as using undeclared variables; Then the code gets compiled to an intermediate format; This format guides Tellurium in building the final SBML document. As we'll see in the following subsections, Tellurium makes use of the aforementioned libSBML API for code generation purposes.
+
 
 %       => present Albi's syntax
 %       => the transition between single cell systems biology to multi cell ??
 %       => examples of generated SBML
 \subsection{The parser}
     
-    Currently, the parser only recognizes a subset of gro's syntax. Valid programs are constituted by global variable declarations, program definitions and E. coli instantiations. Parameters, messages and guarded statements are also recognized as valid syntax, however no semantic value is assigned to them as control statements and user interaction function do not make sense in the context of an SBML model. Below is the gro code for the Repressilator, whose mathematical model shall be explained in the next section.
+    Currently, the parser only recognizes a subset of gro's syntax. Valid programs are constituted by global variable declarations, program definitions and E. coli instantiations. Parameters, messages and guarded statements are also recognized as valid syntax, however no semantic value is assigned to them as control statements and user interaction do not make sense in the context of an SBML model. Below is an example of gro code containing the syntactical constructs just described.
     
     % repressilator source code
-    \input{repressilator_gro_src.tex}
+    \input{gro_example.tex}
     
     This gro model of the repressilator is then compiled down to the intermediate representation accepted by the code generation framework Tellurium.
-    
-    \begin{lstlisting}[style=GROSRC]
-        beta = 0.2000;
-        n = 2.0000;
-        alfa0 = 0.0300;
-        compartment ECOLI0
-        ECOLI0 = 1.0
-        var ECOLI0_prog_m1 in ECOLI0
-        ECOLI0_prog_m1 = 0.0000
-        var ECOLI0_prog_m2 in ECOLI0
-        ECOLI0_prog_m2 = 0.0000
-        var ECOLI0_prog_m3 in ECOLI0
-        ECOLI0_prog_m3 = 0.0000
-        var ECOLI0_prog_p1 in ECOLI0
-        ECOLI0_prog_p1 = 0.0000
-        var ECOLI0_prog_p2 in ECOLI0
-        ECOLI0_prog_p2 = 5.0000
-        var ECOLI0_prog_p3 in ECOLI0
-        ECOLI0_prog_p3 = 15.0000
-        -> ECOLI0_prog_p3;(((beta)*(ECOLI0_prog_m3))-((beta)*(ECOLI0_prog_p3)));
-        -> ECOLI0_prog_p2;(((beta)*(ECOLI0_prog_m2))-((beta)*(ECOLI0_prog_p2)));
-        -> ECOLI0_prog_p1;(((beta)*(ECOLI0_prog_m1))-((beta)*(ECOLI0_prog_p1)));
-        -> ECOLI0_prog_m3;(((alfa)/((1.0000)+((ECOLI0_prog_p2)^(n))))-(ECOLI0_prog_m3));
-        -> ECOLI0_prog_m2;(((alfa)/((1.0000)+((ECOLI0_prog_p1)^(n))))-(ECOLI0_prog_m2));
-        -> ECOLI0_prog_m1;(((alfa)/((1.0000)+((ECOLI0_prog_p3)^(n))))-(ECOLI0_prog_m1));
-        -> ECOLI0_prog_m3 + ECOLI0_prog_m2 + ECOLI0_prog_m1;(alfa0);
-    \end{lstlisting}
     
 \subsection{The Tellurium framework}
     \lipsum[1]
