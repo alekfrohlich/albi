@@ -1,21 +1,37 @@
 \documentclass[12pt]{article}
 
-% Packages
+% packages
 \usepackage{sbc-template}
 \usepackage{graphicx,url}
 % \usepackage[brazil]{babel}   references and labels in English
 \usepackage[utf8]{inputenc}  
 \usepackage{lipsum}
-
-% Subfigure package
-\usepackage{caption}
-\usepackage{subcaption}
-%
+\usepackage{caption} % Subfigure package
+% \usepackage{subcaption}
 \usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
 
+% gro language definition
+\definecolor{COLOR_COMMENTS}{RGB}{16, 97, 35}
+\lstdefinelanguage{GROLANG}{
+    morekeywords={include,program,rate,ecoli},
+    sensitive=false,
+    morecomment=[l]{//},
+    morestring=[b]",
+}
+\lstdefinestyle{GROSRC}
+{
+  language     = GROLANG,
+  basicstyle   = \footnotesize,
+  commentstyle = \color{COLOR_COMMENTS},
+  frame=single,
+  tabsize=2,
+  framexleftmargin=8pt,
+}
+
+% info
 \sloppy
-
-% Info
 \title{Albi:\\ A Gro compiler to the SBML standard}
 \author{Alek Frohlich\inst{1}, Gustavo Biage\inst{1}}
 \address{Departamento de Informatica e Estatística – Universidade Federal de Santa Catarina \\
@@ -23,13 +39,14 @@ Florianopolis – SC – Brazil
   \email{\{alek.frohlich,gustavo.c.biage\}@grad.ufsc.br}
 }
 
+% paper
 \begin{document}
 \maketitle
 
-%       => The Growth of the area leads to the development of multicellular devices
-%       => Gro is well suited for this purpose
-%       => However it isn't ready for compatibility
-%       => Introduce the objective of making it compatible
+%       => the Growth of the area leads to the development of multicellular devices
+%       => gro is well suited for this purpose
+%       => however it isn't ready for compatibility
+%       => introduce the objective of making it compatible
 \begin{abstract}
 
 
@@ -38,11 +55,11 @@ Florianopolis – SC – Brazil
 
 \end{abstract}
 
-%       => What does albi fix that libSBML does not?
-%       => What are the reasons we chose Gro as albi's primary language?
-%       => What are the disadvantages of the Gro simulator
-%       => What are the advantages of having the SBML model for a Gro program?
-%       => Prepare next sections
+%       => what does albi fix that libSBML does not?
+%       => what are the reasons we chose Gro as albi's primary language?
+%       => what are the disadvantages of the Gro simulator
+%       => what are the advantages of having the SBML model for a Gro program?
+%       => introduce following sections
 \section{Introduction}
 
 
@@ -57,28 +74,56 @@ Florianopolis – SC – Brazil
     
 \section{Architecture}
 
-% Topics:
-%       => Present Albi's syntax
-%       => The transition between single cell systems biology to multi cell ??
-%       => Examples of generated SBML
+%       => present Albi's syntax
+%       => the transition between single cell systems biology to multi cell ??
+%       => examples of generated SBML
 \subsection{The parser}
     
+    Currently, the parser only recognizes a subset of gro's syntax. Valid programs are constituted by global variable declarations, program definitions and E. coli instantiations. Parameters, messages and guarded statements are also recognized as valid syntax, however no semantic value is assigned to them as control statements and user interaction function do not make sense in the context of an SBML model. Below is the gro code for the Repressilator, whose mathematical model shall be explained in the next section.
     
-    Currently, the parser recognizes a subset of gro's syntax. Valid programs are constituted by global variable declarations, program definitions and E. coli instantiations. Parameters, messages and guarded statements are also recognized as valid syntax, however no semantic value is assigned to them as control statements and user interaction function do not make sense in the context of an SBML model. An example of a valid program is shown below.
+    % repressilator source code
+    \input{repressilator_gro_src.tex}
     
     This gro model of the repressilator is then compiled down to the intermediate representation accepted by the code generation framework Tellurium.
     
-    Which in turn is further compiled into the final SBML document.
-    
+    \begin{lstlisting}[style=GROSRC]
+        beta = 0.2000;
+        n = 2.0000;
+        alfa0 = 0.0300;
+        compartment ECOLI0
+        ECOLI0 = 1.0
+        var ECOLI0_prog_m1 in ECOLI0
+        ECOLI0_prog_m1 = 0.0000
+        var ECOLI0_prog_m2 in ECOLI0
+        ECOLI0_prog_m2 = 0.0000
+        var ECOLI0_prog_m3 in ECOLI0
+        ECOLI0_prog_m3 = 0.0000
+        var ECOLI0_prog_p1 in ECOLI0
+        ECOLI0_prog_p1 = 0.0000
+        var ECOLI0_prog_p2 in ECOLI0
+        ECOLI0_prog_p2 = 5.0000
+        var ECOLI0_prog_p3 in ECOLI0
+        ECOLI0_prog_p3 = 15.0000
+        -> ECOLI0_prog_p3;(((beta)*(ECOLI0_prog_m3))-((beta)*(ECOLI0_prog_p3)));
+        -> ECOLI0_prog_p2;(((beta)*(ECOLI0_prog_m2))-((beta)*(ECOLI0_prog_p2)));
+        -> ECOLI0_prog_p1;(((beta)*(ECOLI0_prog_m1))-((beta)*(ECOLI0_prog_p1)));
+        -> ECOLI0_prog_m3;(((alfa)/((1.0000)+((ECOLI0_prog_p2)^(n))))-(ECOLI0_prog_m3));
+        -> ECOLI0_prog_m2;(((alfa)/((1.0000)+((ECOLI0_prog_p1)^(n))))-(ECOLI0_prog_m2));
+        -> ECOLI0_prog_m1;(((alfa)/((1.0000)+((ECOLI0_prog_p3)^(n))))-(ECOLI0_prog_m1));
+        -> ECOLI0_prog_m3 + ECOLI0_prog_m2 + ECOLI0_prog_m1;(alfa0);
+    \end{lstlisting}
     
 \subsection{The Tellurium framework}
     \lipsum[1]
 
+\subsection{libSBML}
+    \lipsum[1]
+    
 \section{Study case: The Repressilator}
 
 The study case for this articles aims to identify and explain subtle differences in how simulations occurs and the benefits of each, also to explore the applicability of the Gro to SBML parser and establish a certainty of both models, to achieve such goal we will set off from the mathematical model presented in octave, later extract the elements and construct the Gro algorithm structure. 
 
-From the algorithm we should make use of the parser and generate a SBML standart file to be simulated in COPASI software presenting the same behaviour and mathematical model, primarily the derivatives. Even though, if both deterministic simulations achieved present similar comportment, it is still necessary to conclude that the Gro delivers the same conduct.
+From the algorithm we should make use of the parser and generate a SBML standard file to be simulated in COPASI software presenting the same behaviour and mathematical model, primarily the derivatives. Even though, if both deterministic simulations achieved present similar comportment, it is still necessary to conclude that the Gro delivers the same conduct.
 
 \subsection{Mathematical Model}
 
