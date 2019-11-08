@@ -5,8 +5,7 @@
 \usepackage{graphicx,url}
 \usepackage[utf8]{inputenc}  
 \usepackage{lipsum}
-\usepackage{caption} % Subfigure package
-% \usepackage{subcaption}
+\usepackage{caption}
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{xcolor}
@@ -15,10 +14,10 @@
 \definecolor{COLOR_COMMENTS}{RGB}{16, 97, 35}
 \definecolor{COLOR_BACKGROUND}{rgb}{0.95,0.95,0.92}
 \lstdefinelanguage{GROLANG}{
-    morekeywords    =   {include,program,rate,ecoli},
-    sensitive       =   false,
-    morecomment     =   [l]{//},
-    morestring      =   [b]",
+  morekeywords    =   {include,program,rate,ecoli},
+  sensitive       =   false,
+  morecomment     =   [l]{//},
+  morestring      =   [b]",
 }
 \lstdefinestyle{GROSRC}
 {
@@ -35,7 +34,24 @@
   xrightmargin      =   25pt,
 }
 
-% info
+% parsed.intermediate style definition
+\lstdefinestyle{INTERMEDIATE}{
+  basicstyle        =   \footnotesize,
+  backgroundcolor   =   \color{COLOR_BACKGROUND},
+  caption           =   Compiled dummy.,
+  framesep          =   25pt,
+  xleftmargin       =   25pt,
+  xrightmargin      =   25pt,
+}
+
+% output.xml style definiton
+\lstdefinestyle{SBML}{
+    language        =   XML,
+    basicstyle      =   \tiny,
+    caption         =   Final SBML document.,
+}
+
+% header info
 \sloppy
 \title{Albi:\\ A Gro compiler to the SBML standard}
 \author{Alek Frohlich\inst{1}, Gustavo Biage\inst{1}}
@@ -74,57 +90,76 @@ Florianopolis – SC – Brazil
     
     If Gro code were to be translated into SBML, the document could be further preserved as an entry in BioModels. BioModels is a database of curated SBML and CellML models maintained with the intent of providing researches with models related to a particular disease, biological process or molecular complex \cite{LeNovere2006}. Having a model curated is an even stronger guarantee of trustworthiness since the process is done manually for each model \cite{LeNovere2006}: Newly submitted models go through a series of syntactical analysis to confirm that they are valid syntactically and well formatted; The model is then numerically verified against the results claimed by the authoring paper; Finally, the validated model gets manually annotated and cross-linked to facilitate later search for it.
     
-    The rest of the paper is structured as follows: In Sect. 2, we introduce the language parser and explain the process of converting gro files to SBML models from start to finish; In Sect. 3, we compile a Gro implementation of the repressilator, a synthetic oscillator, to equivalent SBML and then simulate it on COPASI, a pathway simulator \cite{Hoops2006}; In Sect. 4, we summarize what's been done and compare it with goals laid out at the start; In Sect. 5 we conclude by presenting possible extensions of the current work.
+    The rest of the paper is structured as follows: In Sect. 2, we introduce the language parser and explain the process of converting gro files to SBML models from start to finish; In Sect. 3, we compile a Gro implementation of the repressilator, a synthetic delay oscillator, to equivalent SBML and then simulate it on COPASI, a pathway simulator \cite{Hoops2006}; In Sect. 4, we summarize what's been done and compare it with goals laid out at the start; In Sect. 5 we conclude by presenting possible extensions of the current work.
     
-    % How does tellurium does it's things?
+
 %       => compilation steps
 \section{Architecture}
 
     
-    The compilation process is divided in three steps: First, the code is validated, that is, it's checked against syntax errors such as missing semicolon in rate statements and semantic error such as using undeclared variables; Then the code gets compiled to an intermediate format; This format guides Tellurium in building the final SBML document. As we'll see in the following subsections, Tellurium makes use of the aforementioned libSBML API for code generation purposes.
+    The compilation process is divided in three steps: First, the code is validated, that is, it's checked against syntax errors such as missing semicolon in rate statements and semantic error such as using undeclared variables; Then the code gets compiled to Antimony, a modular model definition language \cite{Smith2009}; This format guides Tellurium in building the final SBML document. As we'll see in the following subsections, Tellurium makes use of the aforementioned libSBML API for code generation purposes.
 
 
 %       => present Albi's syntax
-%       => the transition between single cell systems biology to multi cell ??
-%       => examples of generated SBML
+%       => compiling gro source code
+%       => explain renaming of variables according to program name space
+%       => reduction of arithmetic expressions and parameter passing
+%       => var, compartment, specie and const
 \subsection{The parser}
     
-    Currently, the parser only recognizes a subset of gro's syntax. Valid programs are constituted by global variable declarations, program definitions and E. coli instantiations. Parameters, messages and guarded statements are also recognized as valid syntax, however no semantic value is assigned to them as control statements and user interaction do not make sense in the context of an SBML model. Below is an example of gro code containing the syntactical constructs just described.
+    Currently, the parser only recognizes a subset of gro's syntax. Valid programs are constituted by global variable declarations, program definitions and E. coli instantiations. Parameters, messages and guarded statements are also recognized as valid syntax, however no semantic value is assigned to them since control statements and user interaction do not make sense in the context of an SBML model. Below is an example of gro code containing the syntactical constructs just described.
     
-    % repressilator source code
+    % dummy gro source code
     \input{gro_example.tex}
     
-    This gro model of the repressilator is then compiled down to the intermediate representation accepted by the code generation framework Tellurium.
+    Compiling this file gives us \textit{parsed.intermediate}, the input file for Tellurium. As we can see, the compiler properly reduces arithmetic expressions and parameter passing. The compiler also renames symbols declared inside program definitions to avoid name space clashes between multiple programs instantiated in the same compartment. If this renaming hadn't been done, there wouldn't be a way to differentiate the symbol E, whose name space is limited to reactions inside of prog, from the symbol E declared inside of dupl.
+    
+    % compiled dummy source code
+    \input{compiled_example.tex}
     
 \subsection{The Tellurium framework}
-    \lipsum[1]
 
-\subsection{libSBML}
-    \lipsum[1]
+    Tellurium is a Python-based modeling environment for systems and synthetic biology \cite{Choi2018}. It aggregates multiple preexisting libraries such as libSBML, libAntimony and libSBOL to provide the modelling community access to a integrated modelling environment. Tellurium is organized in three functional pillars: Standards support, modelling support and utilities. We make extensive use of the libAntimony integration provided by standard support to build our SBML documents.
     
+    % final SBML document
+    % \input{example_sbml.tex}
+
+
 \section{Study case: The Repressilator}
 
-The study case for this articles aims to identify and explain subtle differences in how simulations occurs and the benefits of each, also to explore the applicability of the Gro to SBML parser and establish a certainty of both models, to achieve such goal we will set off from the mathematical model presented in octave, later extract the elements and construct the Gro algorithm structure. 
+%There must be at least three genes in the loop in order for the network to oscillate
+    The Repressilator is a genetic regulatory network constituted by grouping together promoter-repressor pairs. The network was first conceptualized by \cite{Elowitz2000}, who used a three-repressor scheme based upon the genes LacI and letR from E. coli and cI from phage lambda. As when each 
+    %The repressilator dodges steady-state 
+    
+    The study case for this articles aims to identify and explain subtle differences in how simulations occurs and the benefits of each, also to explore the applicability of the Gro to SBML parser and establish a certainty of both models, to achieve such goal we will set off from the mathematical model presented in octave, later extract the elements and construct the Gro algorithm structure. 
+    
+    From the algorithm we should make use of the parser and generate a SBML standard file to be simulated in COPASI software presenting the same behaviour and mathematical model, primarily the derivatives. Even though, if both deterministic simulations achieved present similar comportment, it is still necessary to conclude that the Gro delivers the same conduct.
 
-From the algorithm we should make use of the parser and generate a SBML standard file to be simulated in COPASI software presenting the same behaviour and mathematical model, primarily the derivatives. Even though, if both deterministic simulations achieved present similar comportment, it is still necessary to conclude that the Gro delivers the same conduct.
 
 \subsection{Mathematical Model}
 
-% Introduz o modelo aqui
+% Introduction
+    aa
+    
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale = 0.4]{repressilator_tic_2.png}
+    \caption{Gene circuit for the repressilator model}
+    \label{fig:my_label}
+\end{figure}
 
-%derivatives
-
-$\frac{d}{dt}m_{1}(t) = \alpha_{0} + \frac{\alpha}{1 + [p_{3}(t)]^{n}} - m_{1}(t)$
-
-$\frac{d}{dt}m_{2}(t) = \alpha_{0} + \frac{\alpha}{1 + [p_{1}(t)]^{n}} - m_{2}(t)$
-
-$\frac{d}{dt}m_{3}(t) = \alpha_{0} + \frac{\alpha}{1 + [p_{2}(t)]^{n}} - m_{3}(t)$
-
-$\frac{d}{dt}p_{1}(t) = \beta{m_{1}}(t) - \beta{p_{1}}(t)$
-
-$\frac{d}{dt}p_{2}(t) = \beta{m_{2}}(t) - \beta{p_{2}}(t)$
-
-$\frac{d}{dt}p_{3}(t) = \beta{m_{3}}(t) - \beta{p_{3}}(t)$ 
+    % derivatives
+    $\frac{d}{dt}m_{1}(t) = \alpha_{0} + \frac{\alpha}{1 + [p_{3}(t)]^{n}} - m_{1}(t)$
+    
+    $\frac{d}{dt}m_{2}(t) = \alpha_{0} + \frac{\alpha}{1 + [p_{1}(t)]^{n}} - m_{2}(t)$
+    
+    $\frac{d}{dt}m_{3}(t) = \alpha_{0} + \frac{\alpha}{1 + [p_{2}(t)]^{n}} - m_{3}(t)$
+    
+    $\frac{d}{dt}p_{1}(t) = \beta{m_{1}}(t) - \beta{p_{1}}(t)$
+    
+    $\frac{d}{dt}p_{2}(t) = \beta{m_{2}}(t) - \beta{p_{2}}(t)$
+    
+    $\frac{d}{dt}p_{3}(t) = \beta{m_{3}}(t) - \beta{p_{3}}(t)$ 
 
 In the process of obtaining the the oscillatory comportment, it is needed to establish a bi-stability, the information obtained is the manners of concentrations rapidly changing from a high "voltage" to a low "voltage", in the computer science perspective, which in this case the binary states are defined by the protein and molecules level of concentration. The initial concentrations values for this model is $m_{1} = m_{2} = m_{3} = 0$, $p1 = 0$, $p_{2} = 5$ and $p_{3} = 15$; the parameters are $n = 2$, $\alpha = 298.2$, $\alpha_{0} = 0.03$ and $\beta = 0.2$, of the same nature as the ones accomplished in the simulation graphs. \cite{ingalls2013mathematical}.
 
@@ -185,11 +220,8 @@ The amount of simulations used in the mean average was ten, with the objective t
 \section{Conclusion}
     \lipsum[1]
     
-% Topics:
-%       => It would be nice if SBML were to be upgraded to fit multicellular models
-%       => Then we could extend the parser's syntax to make Gro the multicellular systems biology %              programming language
 \section{Future works}
-    As it is now, there isn't a multicellular systems biology programming language. The authors believe nonetheless, that Gro could be that language, if only a model exchange format such as SBML were to handle it. After that's done, extending the parser's syntax even without the help of APIs in the likes of libSBML and Tellurium, would be a relatively simple task.
+    \lipsum[1]
 
 % References
 \bibliographystyle{sbc}
