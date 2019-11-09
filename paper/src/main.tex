@@ -18,10 +18,6 @@
 % utils
 \usepackage{lipsum}
 
-%subfigures
-\usepackage{caption}
-\usepackage{subcaption}
-
 % gro language definition
 \definecolor{COLOR_COMMENTS}{RGB}{16, 97, 35}
 \definecolor{COLOR_BACKGROUND}{rgb}{0.95,0.95,0.92}
@@ -123,7 +119,6 @@ Florianopolis – SC – Brazil
     
     Currently, the parser only recognizes a subset of gro's syntax. Valid programs are constituted by global variable declarations, program definitions and E. coli instantiations. Parameters, messages and guarded statements are also recognized as valid syntax, however no semantic value is assigned to them given that control statements and user interaction do not make sense in the context of an SBML model. Below is an example of gro code containing the syntactical constructs just described.
     
-    % dummy gro source code
     \input{example_gro.tex}
     
     % reforcar o antimony
@@ -131,7 +126,6 @@ Florianopolis – SC – Brazil
     
     ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI
     
-    % compiled dummy source code
     \input{example_compiled.tex}
     
 \subsection{The Tellurium framework}
@@ -178,7 +172,6 @@ Florianopolis – SC – Brazil
     
     On repeating this process for each ODE, we ended up with a total of 7 reactions, from which the new ones are listed below:
     
-    % são todas abertas?
     \begin{equation}
     \begin{aligned}[c]
         \ce{ <=>[\alpha/(1 + p_{3}^n)][m_{1}] m_{1}} & & \\
@@ -192,9 +185,8 @@ Florianopolis – SC – Brazil
     \end{aligned}
     \end{equation}
     
-    Which led us to the development of the following gro code:
+    From which the source code for the Repressilator was implemented. One thing to note about the gro simulator, however, is that it does not provide a way to express reversible reactions. That's the reason for the 13, and not 7, rate statements in the following gro code.
     
-    % repressilator source code
     \input{repressilator_gro.tex}
 
 \subsection{Extracting behavior from Gro}
@@ -210,34 +202,22 @@ Florianopolis – SC – Brazil
 
 % The repressilator, in particular, oscillation occurs influenced by the noise in a non deterministic simulation, as it can be observed in figure \ref{fig:phase_plane_repressilator}, can have its comportment varied, consequently, the outliers or unexpected presentation could manages to fall into a steady state where no more oscillation occurs, reciprocally, simulations present in steady states could also fall of to an oscillatory state.
 
-\begin{center}
-    \begin{figure}[h]
-        
-        % \begin{subfigure}
-        %     \includegraphics[scale = 0.4]{p}
-        %     \caption{Caption1}
-        %     \label{fig:subim1}
-        % \end{subfigure}
-        % \caption{techau}
-        % \subfigure{
-            % \includegraphics[scale = 0.25]{p2_plot-inc.eps}}
-        \begin{subfigure}[h]{.3\textwidth}
-            \includegraphics[scale = 0.1]{p1_med_figure.png}
-            \caption{A}
-        \end{subfigure} %
-        \begin{subfigure}[h]{.3\textwidth}
-            \includegraphics[scale = 0.1]{p3_med_figure.png}
-            \caption{B}
-        \end{subfigure} %
-        \begin{subfigure}[h]{.3\textwidth}
-            \includegraphics[scale = 0.1]{p2_med_figure.png}
-            \caption{C}
-        \end{subfigure}
-        
-        \caption{
-        Behaviour of the proteins in the repressilator model simulations using Gro. \textbf{A)} representations of $p_{1}$ protein where the average mean of the many simulations is highlighted in red. \textbf{B)} Representation of the $p2$ protein is shown in cyan plotted from the results of the simulations and is highlighted in green the mean taken of all values portrait by the $dts$ points over the abscissa line. \textbf{C)} Representation of the $p3$ protein achieved, the average mean of values is hightlighted in yellow representing the mean of behaviour from the oscillations expected.}
+    \begin{figure}[ht]
+    \centering
+    \minipage{0.32\textwidth}
+      \includegraphics[width=\linewidth]{p1_med_figure.png}
+    \endminipage\hfill
+    \minipage{0.32\textwidth}
+      \includegraphics[width=\linewidth]{p2_med_figure.png}
+    \endminipage\hfill
+    \minipage{0.32\textwidth}%
+      \includegraphics[width=\linewidth]{p3_med_figure.png}
+    \endminipage
+    \caption{
+        Behaviour of the proteins in the repressilator model simulations using Gro. \textbf{A)} representations of $p_{1}$ protein where the average mean of the many simulations is highlighted in red. \textbf{B)} Representation of the $p2$ protein is shown in cyan plotted from the results of the simulations and is highlighted in green the mean taken of all values portrait by the $dts$ points over the abscissa line. \textbf{C)} Representation of the $p3$ protein achieved, the average mean of values is hightlighted in yellow representing the mean of behaviour from the oscillations expected.
+    }
+    \label{fig:tons_of_simulations}
     \end{figure}
-\end{center}
 
 % It was developed to improve the performance of simulations involving a large number of cells (in the
 % order of 105 cells) through the use of a new algorithm. We
@@ -247,8 +227,6 @@ Florianopolis – SC – Brazil
 % proteins with a noisy behavior based on probabilities
     
     A simulation with Gro is particularly interesting, taken that it is the only stochastic simulation used to represent the oscillatory model. The simulation helps greatly in identifying the core representative structure that describes multiple behaviours over different levels of descriptions. Nevertheless, SBML is a model of illustration that facilitates a realistic presentation of such models, giving easy reaction descriptions and featuring a community that provides models in cellular organisms. However, there are limitations in how large cellular circuits can be built with most models showing great behaviour from a mathematical point of view but cannot be fully reproduced in a microbiology laboratory.
-    
-    As seen in the conversion from a Gro algorithm to SBML model, the Gro reactions is constructed using a rate in which the reactions occur, not ignoring the reaction speed but implicit inside its derivative form, but indifferently from an mathematical language, like octave or mat lab, its stochastic simulation works from a discrete point of view, therefore, you can not have half a reaction occurring, making concentrations of variables always an integer. Obviously, something to elevate from this type of simulation is the non-deterministic results, one of a probabilistic conduct, leading us to use multiple consecutive simulations to understand the behaviour taken from such model.
     
     % The time
     % resolution of each subprocess of the simulation is controlled by
