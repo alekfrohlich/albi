@@ -124,7 +124,7 @@ Florianopolis – SC – Brazil
     Currently, the parser only recognizes a subset of gro's syntax. Valid programs are constituted by global variable declarations, program definitions and E. coli instantiations. Parameters, messages and guarded statements are also recognized as valid syntax, however no semantic value is assigned to them given that control statements and user interaction do not make sense in the context of an SBML model. Below is an example of gro code containing the syntactical constructs just described.
     
     % dummy gro source code
-    \input{gro_example.tex}
+    \input{example_gro.tex}
     
     % reforcar o antimony
     Compiling this file gives us \textit{parsed.intermediate}, the input file for Tellurium. As we can see, the compiler properly reduced arithmetic expressions and parameter passing. The compiler also renamed symbols declared inside program definitions to avoid name space clashes between multiple programs instantiated in the same compartment. If this renaming hadn't been done, there wouldn't be a way to differentiate the symbol E, whose name space is limited to reactions inside of prog, from the symbol E which was declared inside of dupl.
@@ -132,7 +132,7 @@ Florianopolis – SC – Brazil
     ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI
     
     % compiled dummy source code
-    \input{compiled_example.tex}
+    \input{example_compiled.tex}
     
 \subsection{The Tellurium framework}
 
@@ -150,7 +150,7 @@ Florianopolis – SC – Brazil
 
     \begin{figure}[h]
         \centering
-        \includegraphics[scale = 0.7]{Repressilator_GRN.png}
+        \includegraphics[scale = 0.7]{repressilator_model.png}
         \caption{Repressilator's genetic regulatory network.}
         \label{fig:repressilator_model}
     \end{figure}
@@ -176,25 +176,39 @@ Florianopolis – SC – Brazil
     \ce{ ->[\alpha_{0}] m_{1} + m_{2} + m_{3}}
     \end{equation}
     
-    On repeting this process we ended up with a total of 7 reactions, all of which are listed bellow.
+    On repeating this process for each ODE, we ended up with a total of 7 reactions, from which the new ones are listed below:
     
+    % são todas abertas?
+    \begin{equation}
+    \begin{aligned}[c]
+        \ce{ <=>[\alpha/(1 + p_{3}^n)][m_{1}] m_{1}} & & \\
+        \ce{ <=>[\alpha/(1 + p_{1}^n)][m_{2}] m_{2}} & & \\
+        \ce{ <=>[\alpha/(1 + p_{2}^n)][m_{3}] m_{3}} & &
+    \end{aligned}
+    \begin{aligned}[c]
+        \ce{ <=>[\beta*m_{1}][\beta*p_{1}] p_{1}} \\
+        \ce{ <=>[\beta*m_{2}][\beta*p_{2}] p_{2}} \\
+        \ce{ <=>[\beta*m_{3}][\beta*p_{3}] p_{3}}
+    \end{aligned}
+    \end{equation}
     
-
-% MOVE PARA PROXIMA SUBSECAO
-% In the process of obtaining the the oscillatory comportment, it is needed to establish a bi-stability, the information obtained is the manners of concentrations rapidly changing from a high "voltage" to a low "voltage", in the computer science perspective, which in this case the binary states are defined by the protein and molecules level of concentration. The initial concentrations values for this model is $m_{1} = m_{2} = m_{3} = 0$, $p1 = 0$, $p_{2} = 5$ and $p_{3} = 15$; the parameters are $n = 2$, $\alpha = 298.2$, $\alpha_{0} = 0.03$ and $\beta = 0.2$, of the same nature as the ones accomplished in the simulation graphs. \cite{ingalls2013mathematical}.
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[scale = 0.5]{apagar.png}
-    \caption{Caption}
-    \label{fig:phase_plane_repressilator}
-\end{figure}
-When using deterministic simulations for a mathematical model in a hard to predict experiment, depending on how sensible to variables changes the model is, it can have a different performance than the one expected.\cite{Hahl2016} Stochastic simulations take in consideration that reactions occur randomly accordingly to their rate, this happens because intracellular concentration normally does not represent high values, there is a probability of odd behaviour, which should be accounted for.\cite{Bratsun2005}
-
-The repressilator, in particular, oscillation occurs influenced by the noise in a non deterministic simulation, as it can be observed in figure \ref{fig:phase_plane_repressilator}, can have its comportment varied, consequently, the outliers or unexpected presentation could manages to fall into a steady state where no more oscillation occurs, reciprocally, simulations present in steady states could also fall of to an oscillatory state. 
-
+    Which led us to the development of the following gro code:
+    
+    % repressilator source code
+    \input{repressilator_gro.tex}
 
 \subsection{Extracting behavior from Gro}
+% MOVE PARA PROXIMA SUBSECAO
+% In the process of obtaining the the oscillatory comportment, it is needed to establish a bi-stability, the information obtained is the manners of concentrations rapidly changing from a high "voltage" to a low "voltage", in the computer science perspective, which in this case the binary states are defined by the protein and molecules level of concentration. The initial concentrations values for this model is $m_{1} = m_{2} = m_{3} = 0$, $p1 = 0$, $p_{2} = 5$ and $p_{3} = 15$; the parameters are $n = 2$, $\alpha = 298.2$, $\alpha_{0} = 0.03$ and $\beta = 0.2$, of the same nature as the ones accomplished in the simulation graphs. \cite{ingalls2013mathematical}.
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale = 0.5]{apagar.png}
+%     \caption{Caption}
+%     \label{fig:phase_plane_repressilator}
+% \end{figure}
+% When using deterministic simulations for a mathematical model in a hard to predict experiment, depending on how sensible to variables changes the model is, it can have a different performance than the one expected.\cite{Hahl2016} Stochastic simulations take in consideration that reactions occur randomly accordingly to their rate, this happens because intracellular concentration normally does not represent high values, there is a probability of odd behaviour, which should be accounted for.\cite{Bratsun2005}
+
+% The repressilator, in particular, oscillation occurs influenced by the noise in a non deterministic simulation, as it can be observed in figure \ref{fig:phase_plane_repressilator}, can have its comportment varied, consequently, the outliers or unexpected presentation could manages to fall into a steady state where no more oscillation occurs, reciprocally, simulations present in steady states could also fall of to an oscillatory state.
 
 \begin{center}
     \begin{figure}[h]
