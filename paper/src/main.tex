@@ -5,9 +5,10 @@
 \usepackage{graphicx,url}
 \usepackage[utf8]{inputenc}
 
-% math equations
+% equations
 \usepackage{amsmath}
 \usepackage{multicol}
+\usepackage[version=4]{mhchem}
 
 % code snippets
 \usepackage{graphicx}
@@ -156,35 +157,26 @@ Florianopolis – SC – Brazil
     
     The Repressilator is a genetic regulatory network constituted by stitching together promoter-repressor pairs. It was first conceptualized by \cite{Elowitz2000}, who used the genes LacI and letR from E. coli and cI from phage lambda to build a three-repressor scheme. As illustrated in Figure~\ref{fig:repressilator_model}, the Repressilator works based on the fact that each gene expresses a protein which represses the next gene in the loop, meaning that a constituent gene in high concentration represses itself indirectly, leading to oscillatory behavior. In the original experiment, there was another biological component involved: the reporter, a green fluorescent protein (GFP) producing gene. It was used to visualize the network's oscillation.
     
-    \begin{multicols}{2}
-        \begin{equation*}
-            \frac{dm_{1}(t)}{dt} = \alpha_{0} + \frac{\alpha}{1 + p_{3}(t)^{n}} - m_{1}(t)
-        \end{equation*}\break
-        \begin{equation*}
-            \frac{dp_{1}(t)}{dt} = \beta \cdot m_{1}(t) - \beta \cdot p_{1}(t)
-        \end{equation*}
-    \end{multicols}
+    \begin{equation}
+    \begin{aligned}[c]
+        \frac{dm_{1}(t)}{dt} & = \alpha_{0} + \frac{\alpha}{1 + p_{3}(t)^{n}} - m_{1}(t) & \\
+        \frac{dm_{2}(t)}{dt} & = \alpha_{0} + \frac{\alpha}{1 + p_{1}(t)^{n}} - m_{2}(t) & \\
+        \frac{dm_{3}(t)}{dt} & = \alpha_{0} + \frac{\alpha}{1 + p_{2}(t)^{n}} - m_{3}(t) &
+    \end{aligned}
+    \begin{aligned}[c]
+        \frac{dp_{1}(t)}{dt} & = \beta \cdot m_{1}(t) - \beta \cdot p_{1}(t) \\
+        \frac{dp_{2}(t)}{dt} & = \beta \cdot m_{2}(t) - \beta \cdot p_{2}(t) \\
+        \frac{dp_{3}(t)}{dt} & = \beta \cdot m_{3}(t) - \beta \cdot p_{3}(t)
+    \end{aligned}
+    \end{equation}
+
+    As shown in \cite{Elowitz2000}, the high-level model from Figure~\ref{fig:repressilator_model} could also be presented as the above system of Ordinary Differential Equations (ODE). With that system of equations, we then built the corresponding gro model. The process was simple as we just separated the reactions from the equations, meaning, for example, that $\alpha_{0}$ from the left equations became the open reaction:
     
-    \begin{multicols}{2}
-    \begin{equation*}
-    \frac{dm_{2}(t)}{dt} = \alpha_{0} + \frac{\alpha}{1 + p_{1}(t)^{n}} - m_{2}(t)
-    \end{equation*}\break
-    \begin{equation*}
-    \frac{dp_{2}(t)}{dt} = \beta \cdot m_{2}(t) - \beta \cdot p_{2}(t)
-    \end{equation*}
-    \end{multicols}
+    \begin{equation}
+    \ce{ ->[\alpha_{0}] m_{1} + m_{2} + m_{3}}
+    \end{equation}
     
-    \begin{multicols}{2}
-    \begin{equation*}
-    \frac{dm_{3}(t)}{dt} = \alpha_{0} + \frac{\alpha}{1 + p_{2}(t)^{n}} - m_{3}(t)
-    \end{equation*}\break
-    \begin{equation*}
-    \frac{dp_{3}(t)}{dt} = \beta \cdot m_{3}(t) - \beta \cdot p_{3}(t)
-    \end{equation*}
-    \end{multicols}
-    
-    % needs details
-    As shown in \cite{Elowitz2000}, the high-level model from Figure~\ref{fig:repressilator_model} could also be presented as the above system of Ordinary Differential Equations (ODE). Having this system of EDOs we represented the derivatives of $m1, m2, m3, p1, p2, p3$ as gro rate statements.
+    On repeting this process we ended up with a total of 7 reactions, all of which are listed bellow.
     
     
 
