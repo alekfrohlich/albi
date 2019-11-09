@@ -16,7 +16,10 @@
 
 % utils
 \usepackage{lipsum}
+
+%subfigures
 \usepackage{caption}
+\usepackage{subcaption}
 
 % gro language definition
 \definecolor{COLOR_COMMENTS}{RGB}{16, 97, 35}
@@ -79,7 +82,7 @@ Florianopolis – SC – Brazil
 \begin{abstract}
 
 
-    The Growth of research areas such as synthetic biology and systems biology leads to an increased willing to develop new, larger mathematical models to describe complex biological behavior. In order to enable natural flow of development of those models, scientists must have access to tools which increase the level of abstraction and enable reuse of biological components. Increased efforts are being put on solving these two problems. The present work tackles those problems by interfacing the existing programming language Gro with SBML for model interchangeability and ease of model representation.
+    The growth of research areas such as synthetic biology and systems biology leads to an increased tendency to develop larger mathematical models to describe complex biological behavior. In order to enable natural flow of development of those models, scientists must have access to tools which increase the level of abstraction and enable reuse of biological components. The present work tackles those two problems by interfacing the existing programming language gro with SBML for model interchangeability and ease of model representation.
 
 
 \end{abstract}
@@ -91,14 +94,16 @@ Florianopolis – SC – Brazil
 %       => introduce following sections
 \section{Introduction}
 
-
-    Even though a Systems Biology Markup Language API library (LibSBML) has already been developed \cite{Bornstein2008}, it only ought to be useful in cases where a new model is to be developed. In cases where there is a preexisting model, the availability of an SBML library doesn't help much since the previous model would have to be entirely rewritten to fit the API. Instead, the present work proposes a language parser that generates SBML code from previously built Gro models. Gro is a language for programming, modeling, specifying and simulating the behavior of cells in Growing micro colonies of microorganisms \cite{Jang2012}. It has been made the primary source of the parser considering it has many interesting syntactical constructs such as rate statements, program definitions and bacterial instantiation which can be neatly represented, respectively, in SBML documents as reactions, local name spaces and compartments.
+    % virgula apos does not help much
+    % gro minusculo!
+    Even though a Systems Biology Markup Language API library (LibSBML) has already been developed \cite{Bornstein2008}, it only ought to be useful in cases where a new model is to be developed. In cases where there is a preexisting model, the availability of an SBML library does not help much since the previous model would have to be entirely rewritten to fit the API. Instead, the present work proposes a language parser that generates SBML code from previously built Gro models. gro is a language for programming, modeling, specifying and simulating the behavior of cells in growing micro colonies of microorganisms \cite{Jang2012}. The parser has been built upon it considering gro has many interesting syntactical constructs such as rate statements, program definitions and bacterial instantiation which can be expressed, respectively, as reactions, local name spaces and compartments in SBML documents.
     
-    As language support goes, Gro is still tightly coupled with it's original simulator. Although the simulator has recently undergone big improvements in the sense that simulations behave more realistically \cite{Gutirrez2017}, it doesn't change the fact that using it is the only available way to validate Gro models. This hinders the reproducibility of experiments built with the language. SBML models, on the other hand, are supported by more than 100 software systems \cite{Hucka2007}, making them more likely to be verified and reused.
+    In regards to language support, gro is still tightly coupled with it's original simulator. Although the simulator has recently undergone big improvements in the sense that simulations behave more realistically \cite{Gutirrez2017}, it doesn't change the fact that using it is the only available way to validate gro models. This hinders the reproducibility of experiments built with the language. SBML models, on the other hand, are supported by more than 100 software systems \cite{Hucka2007}, making them more likely to be verified and reused.
     
-    If Gro code were to be translated into SBML, the document could be further preserved as an entry in BioModels. BioModels is a database of curated SBML and CellML models maintained with the intent of providing researches with models related to a particular disease, biological process or molecular complex \cite{LeNovere2006}. Having a model curated is an even stronger guarantee of trustworthiness since the process is done manually for each model \cite{LeNovere2006}: Newly submitted models go through a series of syntactical analysis to confirm that they are valid syntactically and well formatted; The model is then numerically verified against the results claimed by the authoring paper; Finally, the validated model gets manually annotated and cross-linked to facilitate later search for it.
+    % researches vs researches
+    If gro code were translated into SBML, the document could be further preserved as an entry in BioModels. BioModels is a database of curated SBML and CellML models maintained intended to provide researches with models related to a particular disease, biological process or molecular complex \cite{LeNovere2006}. Having a model curated is an even stronger guarantee of trustworthiness since the process is done manually for each model: Newly submitted models go through a series of syntactical analysis to confirm that they are valid and well formatted; The model is then numerically verified against the results claimed by the authoring paper; Finally, the validated model gets manually annotated and cross-linked to facilitate later search for it \cite{LeNovere2006}.
     
-    The rest of the paper is structured as follows: In Sect. 2, we introduce the language parser and explain the process of converting gro files to SBML models from start to finish; In Sect. 3, we compile a Gro implementation of the repressilator, a synthetic delay oscillator, to equivalent SBML and then simulate it on COPASI, a pathway simulator \cite{Hoops2006}; In Sect. 4, we summarize what's been done and compare it with goals laid out at the start; In Sect. 5 we conclude by presenting possible extensions of the current work.
+    The rest of the paper is structured as follows: In Sect. 2, we introduce the language parser and explain the process of converting gro files to SBML models from start to finish; In Sect. 3, we compile a Gro implementation of the repressilator, a synthetic delay oscillator, to equivalent SBML and then simulate it on COPASI, a pathway simulator \cite{Hoops2006}; In Sect. 4, we summarize what has been done and compare it with goals laid out at the start; In Sect. 5 we conclude by presenting possible extensions of the current work.
     
 
 %       => compilation steps
@@ -115,12 +120,13 @@ Florianopolis – SC – Brazil
 %       => var, compartment, specie and const
 \subsection{The parser}
     
-    Currently, the parser only recognizes a subset of gro's syntax. Valid programs are constituted by global variable declarations, program definitions and E. coli instantiations. Parameters, messages and guarded statements are also recognized as valid syntax, however no semantic value is assigned to them since control statements and user interaction do not make sense in the context of an SBML model. Below is an example of gro code containing the syntactical constructs just described.
+    Currently, the parser only recognizes a subset of gro's syntax. Valid programs are constituted by global variable declarations, program definitions and E. coli instantiations. Parameters, messages and guarded statements are also recognized as valid syntax, however no semantic value is assigned to them given that control statements and user interaction do not make sense in the context of an SBML model. Below is an example of gro code containing the syntactical constructs just described.
     
     % dummy gro source code
     \input{gro_example.tex}
     
-    Compiling this file gives us \textit{parsed.intermediate}, the input file for Tellurium. As we can see, the compiler properly reduced arithmetic expressions and parameter passing. The compiler also renamed symbols declared inside program definitions to avoid name space clashes between multiple programs instantiated in the same compartment. If this renaming hadn't been done, there wouldn't be a way to differentiate the symbol E, whose name space is limited to reactions inside of prog, from the symbol E declared inside of dupl.
+    % reforcar o antimony
+    Compiling this file gives us \textit{parsed.intermediate}, the input file for Tellurium. As we can see, the compiler properly reduced arithmetic expressions and parameter passing. The compiler also renamed symbols declared inside program definitions to avoid name space clashes between multiple programs instantiated in the same compartment. If this renaming hadn't been done, there wouldn't be a way to differentiate the symbol E, whose name space is limited to reactions inside of prog, from the symbol E which was declared inside of dupl.
     
     ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI
     
@@ -129,28 +135,26 @@ Florianopolis – SC – Brazil
     
 \subsection{The Tellurium framework}
 
-    Tellurium is a Python-based modeling environment for systems and synthetic biology \cite{Choi2018}. It aggregates multiple preexisting libraries such as libSBML, libAntimony and libSBOL to provide the modelling community access to a integrated modelling environment. Tellurium is organized in three functional pillars: Standards support, modelling support and utilities. We make extensive use of the libAntimony integration provided by standard support to build our SBML documents.
+    Tellurium is a Python-based modeling environment for systems and synthetic biology \cite{Choi2018}. It aggregates multiple preexisting libraries such as libSBML, libAntimony and libSBOL to provide the modelling community access to an integrated modelling environment. Tellurium is organized in three functional pillars: Standards support, modelling support and utilities. We made extensive use of the libAntimony integration provided by standard support to build our SBML documents.
 
 
 \section{Study case: The Repressilator}
 
-
-    The goal of this experiment is to illustrate the proposed gro to SBML conversion scheme. The experiment was conducted as follows: We fist simulated a gro model for a well-known biological device, the Repressilator in gro's built-in simulator; We Then compiled the gro source code down to SBML following the steps shown in Sect. 2; Finally we simulated the compiled gro code, an SBML document, in COPASI. Both simulations were done with the same starting conditions. We also redone the second simulation multiple times, each with a different simulation method to show the hinted gain of flexibility, as the built-in simulator is limited to one method, while COPASI clearly is not.
+    % passo-a-passo
+    % ultima frase
+    The goal of this experiment was to illustrate the proposed gro to SBML conversion scheme and so the experiment was conducted as follows: We first simulated the gro model for a well-known biological device, the Repressilator, in gro's built-in simulator; We Then compiled the source code down to SBML following the steps shown in Sect. 2; Finally we simulated the compiled gro code, an SBML document, in COPASI. Both simulations were done with the same initial conditions. We also demonstrated the the second simulation multiple times, each with a different simulation method to show the hinted gain of flexibility, as the built-in simulator is limited to one method, while COPASI clearly is not.
 
 
 \subsection{Mathematical Model}
 
-    The Repressilator is a genetic regulatory network constituted by stitching together promoter-repressor pairs. It was first conceptualized by \cite{Elowitz2000}, who used the genes LacI and letR from E. coli and cI from phage lambda to build a three-repressor scheme. As illustrated in Figure~\ref{fig:repressilator_model}, the Repressilator works based on the fact that each gene expresses a protein which represses the next gene in the loop, meaning that a constituent gene in high concentration ought to repress itself indirectly, leading to oscillatory behavior. In the original experiment, there was another biological component involved: the reporter, a green fluorescent protein (GFP) producing gene. It was used to visualize the network's oscillation.
-    
     \begin{figure}[h]
         \centering
         \includegraphics[scale = 0.7]{Repressilator_GRN.png}
         \caption{Repressilator's genetic regulatory network.}
         \label{fig:repressilator_model}
     \end{figure}
-
     
-    The model from Figure~\ref{fig:repressilator_model} can be further represented by the system of Ordinary Differential Equations (ODE) shown bellow
+    The Repressilator is a genetic regulatory network constituted by stitching together promoter-repressor pairs. It was first conceptualized by \cite{Elowitz2000}, who used the genes LacI and letR from E. coli and cI from phage lambda to build a three-repressor scheme. As illustrated in Figure~\ref{fig:repressilator_model}, the Repressilator works based on the fact that each gene expresses a protein which represses the next gene in the loop, meaning that a constituent gene in high concentration represses itself indirectly, leading to oscillatory behavior. In the original experiment, there was another biological component involved: the reporter, a green fluorescent protein (GFP) producing gene. It was used to visualize the network's oscillation.
     
     \begin{multicols}{2}
         \begin{equation*}
@@ -179,17 +183,23 @@ Florianopolis – SC – Brazil
     \end{equation*}
     \end{multicols}
     
+    % needs details
+    As shown in \cite{Elowitz2000}, the high-level model from Figure~\ref{fig:repressilator_model} could also be presented as the above system of Ordinary Differential Equations (ODE). Having this system of EDOs we represented the derivatives of $m1, m2, m3, p1, p2, p3$ as gro rate statements.
+    
+    
 
 % MOVE PARA PROXIMA SUBSECAO
 % In the process of obtaining the the oscillatory comportment, it is needed to establish a bi-stability, the information obtained is the manners of concentrations rapidly changing from a high "voltage" to a low "voltage", in the computer science perspective, which in this case the binary states are defined by the protein and molecules level of concentration. The initial concentrations values for this model is $m_{1} = m_{2} = m_{3} = 0$, $p1 = 0$, $p_{2} = 5$ and $p_{3} = 15$; the parameters are $n = 2$, $\alpha = 298.2$, $\alpha_{0} = 0.03$ and $\beta = 0.2$, of the same nature as the ones accomplished in the simulation graphs. \cite{ingalls2013mathematical}.
-% Phase plane
-% \begin{figure}[h]
-%     \centering
-%     \includegraphics[scale = 0.5]{apagar.png}
-%     \caption{Caption}
-%     \label{fig:phase_plane_repressilator}
-% \end{figure}
-% When using deterministic simulations for a mathematical model in a hard to predict experiment, depending on how sensible to variables changes the model is, it can have a different performance than the one expected, that is why in stochastic simulations the frequency of the clock varies. The repressilator, in particular, oscillation occurs very close to a region of stable steady state, as it can be observed in figure \ref{fig:phase_plane_repressilator}, therefore, of the many simulations to determine the behaviour, the outliers or unexpected presentation could manages to fall into a steady state where no more oscillation occurs, in a way that based on how the derivatives achieved the value of 0 it can no longer leave that state, even through outside impact. What should be concluded by it, is that this model can come to stop the oscillations and and start it again if observed multiple times by a long period of time.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale = 0.5]{apagar.png}
+    \caption{Caption}
+    \label{fig:phase_plane_repressilator}
+\end{figure}
+When using deterministic simulations for a mathematical model in a hard to predict experiment, depending on how sensible to variables changes the model is, it can have a different performance than the one expected.\cite{Hahl2016} Stochastic simulations take in consideration that reactions occur randomly accordingly to their rate, this happens because intracellular concentration normally does not represent high values, there is a probability of odd behaviour, which should be accounted for.\cite{Bratsun2005}
+
+The repressilator, in particular, oscillation occurs influenced by the noise in a non deterministic simulation, as it can be observed in figure \ref{fig:phase_plane_repressilator}, can have its comportment varied, consequently, the outliers or unexpected presentation could manages to fall into a steady state where no more oscillation occurs, reciprocally, simulations present in steady states could also fall of to an oscillatory state. 
 
 
 \subsection{Extracting behavior from Gro}
@@ -202,27 +212,46 @@ Florianopolis – SC – Brazil
         %     \caption{Caption1}
         %     \label{fig:subim1}
         % \end{subfigure}
-        
-        \begin{subfigure}{}
-            \includegraphics[scale = 0.25]{p2_plot-inc.eps}
-        \end{subfigure}
-        \begin{subfigure}{}
-            \includegraphics[scale = 0.25]{p3_plot-inc.eps}
+        % \caption{techau}
+        % \subfigure{
+            % \includegraphics[scale = 0.25]{p2_plot-inc.eps}}
+        \begin{subfigure}[h]{.3\textwidth}
+            \includegraphics[scale = 0.1]{p1_med_figure.png}
+            \caption{A}
+        \end{subfigure} %
+        \begin{subfigure}[h]{.3\textwidth}
+            \includegraphics[scale = 0.1]{p3_med_figure.png}
+            \caption{B}
+        \end{subfigure} %
+        \begin{subfigure}[h]{.3\textwidth}
+            \includegraphics[scale = 0.1]{p2_med_figure.png}
+            \caption{C}
         \end{subfigure}
         
         \caption{
         Behaviour of the proteins in the repressilator model simulations using Gro. \textbf{A)} representations of $p_{1}$ protein where the average mean of the many simulations is highlighted in red. \textbf{B)} Representation of the $p2$ protein is shown in cyan plotted from the results of the simulations and is highlighted in green the mean taken of all values portrait by the $dts$ points over the abscissa line. \textbf{C)} Representation of the $p3$ protein achieved, the average mean of values is hightlighted in yellow representing the mean of behaviour from the oscillations expected.}
-        % Behaviour of the proteins in the repressilator model simulations using Gro. \textbf{A)} representations of $p_{1}$ protein where the average mean of the many simulations is highlighted in red. \textbf{B)} Representation of the $p2$ protein is shown in cyan plotted from the results of the simulations and is highlighted in green the mean taken of all values portrait by the $dts$ points over the abscissa line. \textbf{C)} Representation of the $p3$ protein achieved, the average mean of values is hightlighted in yellow representing the mean of behaviour from the oscillations expected.
     \end{figure}
 \end{center}
 
-A simulation with Gro is particularly interesting, taken that it is the only stochastic simulation used in this research to represent the oscillatory model. The simulation helps greatly in identifying the core representative structure that describes multiple behaviours over different levels of descriptions. Nevertheless, SBML is a model of illustration that facilitates a realistic presentation of such models, giving easy reaction descriptions and featuring a community that provides models in cellular organisms. However, there are limitations in how large cellular circuits can be built with most models showing great behaviour from a mathematical point of view but cannot be fully reproduced in a microbiology laboratory.
+% It was developed to improve the performance of simulations involving a large number of cells (in the
+% order of 105 cells) through the use of a new algorithm. We
+% developed a Probabilistic Timed Automata based library,
+% CellPro, that encapsulates and simulates gene expression with
+% simplified and easy to compute digital (bearing values of 0 or 1)
+% proteins with a noisy behavior based on probabilities
+    
+    A simulation with Gro is particularly interesting, taken that it is the only stochastic simulation used to represent the oscillatory model. The simulation helps greatly in identifying the core representative structure that describes multiple behaviours over different levels of descriptions. Nevertheless, SBML is a model of illustration that facilitates a realistic presentation of such models, giving easy reaction descriptions and featuring a community that provides models in cellular organisms. However, there are limitations in how large cellular circuits can be built with most models showing great behaviour from a mathematical point of view but cannot be fully reproduced in a microbiology laboratory.
+    
+    As seen in the conversion from a Gro algorithm to SBML model, the Gro reactions is constructed using a rate in which the reactions occur, not ignoring the reaction speed but implicit inside its derivative form, but indifferently from an mathematical language, like octave or mat lab, its stochastic simulation works from a discrete point of view, therefore, you can not have half a reaction occurring, making concentrations of variables always an integer. Obviously, something to elevate from this type of simulation is the non-deterministic results, one of a probabilistic conduct, leading us to use multiple consecutive simulations to understand the behaviour taken from such model.
+    
+    % The time
+    % resolution of each subprocess of the simulation is controlled by
+    % the time step parameter dt, which can be adjusted in gro
+    % programs to reduce inaccuracies due to numerical errors
 
-As seen in the conversion from a Gro algorithm to SBML model, the Gro reactions is constructed using a rate in which the reactions occur, not ignoring the reaction speed but implicit inside its derivative form, but indifferently from an mathematical language, like octave or mat lab, its stochastic simulation works from a discrete point of view, therefore, you can not have half a reaction occurring, making concentrations of variables always an integer. Obviously, something to elevate from this type of simulation is the non-deterministic results, one of a probabilistic conduct, leading us to use multiple consecutive simulations to understand the behaviour taken from such model.
-
-There are many problems encountered in the process of simulation, one of which is the use of highly miss directing $\delta{t}$ values that can influence the results reached, high value can represent incredibly fast and imprecise simulations, while low values can obtain slow models that could differ from the model described by the algorithm, since the reproduction of an experiment aggregates trustworthy, the values used for the reproduction of such simulations is using $\delta{t}$ = $0.0001$, print of concentrations every $0.001\delta{t}$ in the time scale, with initial concentration and parameters for the oscillations is presented in the mathematical model of the represselator.
-
-The amount of simulations used in the mean average was ten, with the objective to extract the habits of this model, it can be observed the the mean of all simulations on some particular points is far from both stability points of the model, the use of Gro with the varieties of the frequency of the clock, all values are either close to its low concentration level or its high level stability, although, because some fraction of then suffers from a occasionally postpones, with time the mean tends to stabilise somewhere in the middle of of the stability points even if it is impossible for the concentrations to do the same.
+    There are many problems encountered in the process of simulation, one of which is the use of highly miss directing $\delta{t}$ values that can influence the results reached, high value can represent incredibly fast and imprecise simulations, while low values can obtain slow models that could differ from the model described by the algorithm.\cite{Jang2012} Since the reproduction of an experiment aggregates trustworthy, the values used for the reproduction of such simulations is using $\delta{t}$ = $0.0001$, print of concentrations every $0.001\delta{t}$ in the time scale, with initial concentration and parameters for the oscillations is presented in the mathematical model of the represselator.
+    
+    The amount of simulations used in the mean average was ten, with the objective to extract the habits of this model, it can be observed that the mean of all simulations on some particular points is far from both stability points of the model, the use of Gro with the varieties of the frequency of the clock, all values are either close to its low concentration level or its high level stability, although, because some fraction of then suffers from a occasionally postpones, with time the mean tends to stabilise somewhere in the middle of of the stability points even if it is impossible for the concentrations to do the same.
 
 \subsection{Simulating output on COPASI}
     \lipsum[1]
