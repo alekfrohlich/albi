@@ -190,18 +190,9 @@ Florianopolis – SC – Brazil
     \input{repressilator_gro.tex}
 
 \subsection{Extracting behavior from Gro}
-% MOVE PARA PROXIMA SUBSECAO
-% In the process of obtaining the the oscillatory comportment, it is needed to establish a bi-stability, the information obtained is the manners of concentrations rapidly changing from a high "voltage" to a low "voltage", in the computer science perspective, which in this case the binary states are defined by the protein and molecules level of concentration. The initial concentrations values for this model is $m_{1} = m_{2} = m_{3} = 0$, $p1 = 0$, $p_{2} = 5$ and $p_{3} = 15$; the parameters are $n = 2$, $\alpha = 298.2$, $\alpha_{0} = 0.03$ and $\beta = 0.2$, of the same nature as the ones accomplished in the simulation graphs. \cite{ingalls2013mathematical}.
-% \begin{figure}[h]
-%     \centering
-%     \includegraphics[scale = 0.5]{apagar.png}
-%     \caption{Caption}
-%     \label{fig:phase_plane_repressilator}
-% \end{figure}
-% When using deterministic simulations for a mathematical model in a hard to predict experiment, depending on how sensible to variables changes the model is, it can have a different performance than the one expected.\cite{Hahl2016} Stochastic simulations take in consideration that reactions occur randomly accordingly to their rate, this happens because intracellular concentration normally does not represent high values, there is a probability of odd behaviour, which should be accounted for.\cite{Bratsun2005}
 
-% The repressilator, in particular, oscillation occurs influenced by the noise in a non deterministic simulation, as it can be observed in figure \ref{fig:phase_plane_repressilator}, can have its comportment varied, consequently, the outliers or unexpected presentation could manages to fall into a steady state where no more oscillation occurs, reciprocally, simulations present in steady states could also fall of to an oscillatory state.
-
+    \lipsum[1]
+    
     \begin{figure}[ht]
     \centering
     \minipage{0.32\textwidth}
@@ -213,29 +204,25 @@ Florianopolis – SC – Brazil
     \minipage{0.32\textwidth}%
       \includegraphics[width=\linewidth]{p3_med_figure.png}
     \endminipage
-    \caption{
-        Behaviour of the proteins in the repressilator model simulations using Gro. \textbf{A)} representations of $p_{1}$ protein where the average mean of the many simulations is highlighted in red. \textbf{B)} Representation of the $p2$ protein is shown in cyan plotted from the results of the simulations and is highlighted in green the mean taken of all values portrait by the $dts$ points over the abscissa line. \textbf{C)} Representation of the $p3$ protein achieved, the average mean of values is hightlighted in yellow representing the mean of behaviour from the oscillations expected.
-    }
+    \caption{Resulting plots for protein concentration over time from simulating the gro code for the repressilator multiple times, with the same initial conditions as just described. Black lines indicate average between simulations within the same time step, whilst the various grey lines indicate the concentration of the respective protein at each simulation.}
     \label{fig:tons_of_simulations}
     \end{figure}
 
-% It was developed to improve the performance of simulations involving a large number of cells (in the
-% order of 105 cells) through the use of a new algorithm. We
-% developed a Probabilistic Timed Automata based library,
-% CellPro, that encapsulates and simulates gene expression with
-% simplified and easy to compute digital (bearing values of 0 or 1)
-% proteins with a noisy behavior based on probabilities
-    
-    A simulation with Gro is particularly interesting, taken that it is the only stochastic simulation used to represent the oscillatory model. The simulation helps greatly in identifying the core representative structure that describes multiple behaviours over different levels of descriptions. Nevertheless, SBML is a model of illustration that facilitates a realistic presentation of such models, giving easy reaction descriptions and featuring a community that provides models in cellular organisms. However, there are limitations in how large cellular circuits can be built with most models showing great behaviour from a mathematical point of view but cannot be fully reproduced in a microbiology laboratory.
+    % It was developed to improve the performance of simulations involving a large number of cells (in the
+    % order of 105 cells) through the use of a new algorithm. We
+    % developed a Probabilistic Timed Automata based library,
+    % CellPro, that encapsulates and simulates gene expression with
+    % simplified and easy to compute digital (bearing values of 0 or 1)
+    % proteins with a noisy behavior based on probabilities
+    % A simulation with Gro is particularly interesting, taken that it is the only stochastic simulation used to represent the oscillatory model. The simulation helps greatly in identifying the core representative structure that describes multiple behaviours over different levels of descriptions. Nevertheless, SBML is a model of illustration that facilitates a realistic presentation of such models, giving easy reaction descriptions and featuring a community that provides models in cellular organisms. However, there are limitations in how large cellular circuits can be built with most models showing great behaviour from a mathematical point of view but cannot be fully reproduced in a microbiology laboratory.
     
     % The time
     % resolution of each subprocess of the simulation is controlled by
     % the time step parameter dt, which can be adjusted in gro
     % programs to reduce inaccuracies due to numerical errors
-
-    There are many problems encountered in the process of simulation, one of which is the use of highly miss directing $\delta{t}$ values that can influence the results reached, high value can represent incredibly fast and imprecise simulations, while low values can obtain slow models that could differ from the model described by the algorithm.\cite{Jang2012} Since the reproduction of an experiment aggregates trustworthy, the values used for the reproduction of such simulations is using $\delta{t}$ = $0.0001$, print of concentrations every $0.001\delta{t}$ in the time scale, with initial concentration and parameters for the oscillations is presented in the mathematical model of the represselator.
+    % There are many problems encountered in the process of simulation, one of which is the use of highly miss directing $\delta{t}$ values that can influence the results reached, high value can represent incredibly fast and imprecise simulations, while low values can obtain slow models that could differ from the model described by the algorithm.\cite{Jang2012} Since the reproduction of an experiment aggregates trustworthy, the values used for the reproduction of such simulations is using $\delta{t}$ = $0.0001$, print of concentrations every $0.001\delta{t}$ in the time scale, with initial concentration and parameters for the oscillations is presented in the mathematical model of the represselator.
     
-    The amount of simulations used in the mean average was ten, with the objective to extract the habits of this model, it can be observed that the mean of all simulations on some particular points is far from both stability points of the model, the use of Gro with the varieties of the frequency of the clock, all values are either close to its low concentration level or its high level stability, although, because some fraction of then suffers from a occasionally postpones, with time the mean tends to stabilise somewhere in the middle of of the stability points even if it is impossible for the concentrations to do the same.
+    % The amount of simulations used in the mean average was ten, with the objective to extract the habits of this model, it can be observed that the mean of all simulations on some particular points is far from both stability points of the model, the use of Gro with the varieties of the frequency of the clock, all values are either close to its low concentration level or its high level stability, although, because some fraction of then suffers from a occasionally postpones, with time the mean tends to stabilise somewhere in the middle of of the stability points even if it is impossible for the concentrations to do the same.
 
 \subsection{Simulating output on COPASI}
     \lipsum[1]
