@@ -20,7 +20,7 @@
 
 % gro language definition
 \definecolor{COLOR_COMMENTS}{RGB}{16, 97, 35}
-\definecolor{COLOR_BACKGROUND}{rgb}{0.95,0.95,0.92}
+\definecolor{COLOR_BACKGROUND}{RGB}{230, 230, 230}
 \lstdefinelanguage{GROLANG}{
   morekeywords    =   {include,program,rate,ecoli},
   sensitive       =   false,
@@ -68,6 +68,13 @@ Florianopolis – SC – Brazil
   \email{\{alek.frohlich,gustavo.c.biage\}@grad.ufsc.br}
 }
 
+
+%                           ANNOTATIONS                                             %
+%
+%   => How to call the simulator? Gro`s simulator or is it ok to just call it gro?
+%   => gro or Gro?
+%   => list steps in sect. 2: Archicture and Sect. 3: Case Study
+
 % paper
 \begin{document}
 \maketitle
@@ -79,7 +86,7 @@ Florianopolis – SC – Brazil
 \begin{abstract}
 
 
-    The growth of research areas such as synthetic biology and systems biology leads to an increased tendency to develop larger mathematical models to describe complex biological behavior. In order to enable natural flow of development of those models, scientists must have access to tools which increase the level of abstraction and enable reuse of biological components. The present work tackles those two problems by interfacing the existing programming language gro with SBML for model interchangeability and ease of model representation.
+    The growth of research areas such as synthetic biology and systems biology leads to an increased tendency to develop larger mathematical models for describing complex biological behavior. In order to enable natural flow of development of those models, scientists must have access to tools which increase the level of abstraction and enable the reuse of biological components. The present work tackles those two problems by integrating the existing programming language gro with the SBML standard for model interchangeability and ease of model design.
 
 
 \end{abstract}
@@ -92,13 +99,12 @@ Florianopolis – SC – Brazil
 \section{Introduction}
 
     % virgula apos does not help much
-    % gro minusculo!
-    Even though a Systems Biology Markup Language API library (LibSBML) has already been developed \cite{Bornstein2008}, it only ought to be useful in cases where a new model is to be developed. In cases where there is a preexisting model, the availability of an SBML library does not help much since the previous model would have to be entirely rewritten to fit the API. Instead, the present work proposes a language parser that generates SBML code from previously built Gro models. gro is a language for programming, modeling, specifying and simulating the behavior of cells in growing micro colonies of microorganisms \cite{Jang2012}. The parser has been built upon it considering gro has many interesting syntactical constructs such as rate statements, program definitions and bacterial instantiation which can be expressed, respectively, as reactions, local name spaces and compartments in SBML documents.
+    Even though a Systems Biology Markup Language API library (LibSBML) has already been developed \cite{Bornstein2008}, it only ought to be useful in cases where a new model is to be developed. In cases where there is a preexisting model, the availability of an SBML library does not help much since the previous model would have to be entirely rewritten to fit the API. Instead, the present work proposes a language parser that generates SBML documents from previously built gro models. Gro is a language for programming, modeling, specifying and simulating the behavior of cells in growing microcolonies of microorganisms \cite{Jang2012}. The parser has been built upon it considering gro has many interesting syntactical constructs such as rate statements, program definitions and bacterial instantiation which can be expressed, respectively, as reactions, local name spaces and compartments in SBML documents.
     
     In regards to language support, gro is still tightly coupled with it's original simulator. Although the simulator has recently undergone big improvements in the sense that simulations behave more realistically \cite{Gutirrez2017}, it doesn't change the fact that using it is the only available way to validate gro models. This hinders the reproducibility of experiments built with the language. SBML models, on the other hand, are supported by more than 100 software systems \cite{Hucka2007}, making them more likely to be verified and reused.
     
     % researches vs researches
-    If gro code were translated into SBML, the document could be further preserved as an entry in BioModels. BioModels is a database of curated SBML and CellML models maintained intended to provide researches with models related to a particular disease, biological process or molecular complex \cite{LeNovere2006}. Having a model curated is an even stronger guarantee of trustworthiness since the process is done manually for each model: Newly submitted models go through a series of syntactical analysis to confirm that they are valid and well formatted; The model is then numerically verified against the results claimed by the authoring paper; Finally, the validated model gets manually annotated and cross-linked to facilitate later search for it \cite{LeNovere2006}.
+    If gro code were translated into SBML, the resulting document could then be further preserved as an entry in BioModels. BioModels is a database of curated SBML and CellML models intended to provide researchers with models related to a particular disease, biological process or molecular complex \cite{LeNovere2006}. Having a model curated is an even stronger guarantee of trustworthiness since the process is done manually for each model: Newly submitted models go through a series of syntactical analysis to confirm that they are valid and well formatted; The model is then numerically verified against the results claimed by the authoring paper; Finally, the validated model gets manually annotated and cross-linked to facilitate later search for it \cite{LeNovere2006}.
     
     The rest of the paper is structured as follows: In Sect. 2, we introduce the language parser and explain the process of converting gro files to SBML models from start to finish; In Sect. 3, we compile a Gro implementation of the repressilator, a synthetic delay oscillator, to equivalent SBML and then simulate it on COPASI, a pathway simulator \cite{Hoops2006}; In Sect. 4, we summarize what has been done and compare it with goals laid out at the start; In Sect. 5 we conclude by presenting possible extensions of the current work.
     
@@ -133,11 +139,10 @@ Florianopolis – SC – Brazil
     Tellurium is a Python-based modeling environment for systems and synthetic biology \cite{Choi2018}. It aggregates multiple preexisting libraries such as libSBML, libAntimony and libSBOL to provide the modelling community access to an integrated modelling environment. Tellurium is organized in three functional pillars: Standards support, modelling support and utilities. We made extensive use of the libAntimony integration provided by standard support to build our SBML documents.
 
 
-\section{Study case: The Repressilator}
+\section{Case study: The Repressilator}
 
-    % passo-a-passo
-    % ultima frase
-    The goal of this experiment was to illustrate the proposed gro to SBML conversion scheme and so the experiment was conducted as follows: We first simulated the gro model for a well-known biological device, the Repressilator, in gro's built-in simulator; We Then compiled the source code down to SBML following the steps shown in Sect. 2; Finally we simulated the compiled gro code, an SBML document, in COPASI. Both simulations were done with the same initial conditions. We also demonstrated the the second simulation multiple times, each with a different simulation method to show the hinted gain of flexibility, as the built-in simulator is limited to one method, while COPASI clearly is not.
+
+    The goal of this experiment was to illustrate the proposed gro to SBML conversion scheme and so the experiment was conducted as follows: We first simulated the gro model for a well-known biological device, the Repressilator, in gro's built-in simulator; We Then compiled the source code down to SBML following the steps shown in Sect. 2; Finally we simulated the compiled gro code, an SBML document, in COPASI. Both simulations were done with the same initial conditions. We also compared the results from both simulators.
 
 
 \subsection{Mathematical Model}
@@ -189,19 +194,26 @@ Florianopolis – SC – Brazil
     
     \input{repressilator_gro.tex}
 
-\subsection{Extracting behavior from Gro}
+\subsection{Simulating the Repressilator on gro`s simulator}
 
-    \lipsum[1]
+    gro`s simulation algorithm is simple to compensate the heavy load inherited by concurrently simulating growth, geometry and signal dynamics. The simulation loop is described below. 
+    
+    \begin{enumerate}
+        \item The volume and guarded command program of each cell is updated, and division conditions are checked. If the cell divides, the variables in the mother and daughter cell are adjusted, and a copy of the program and its internal state are associated with the daughter cell.
+        \item Dead cells are removed.
+        \item The concentrations of signaling molecules are updated to a numerically integrated reaction/diffusion process.
+        \item Growth dynamics and contact forces are numerically integrated by the underlying 2D physics engine.
+    \end{enumerate}
     
     \begin{figure}[ht]
     \centering
-    \minipage{0.32\textwidth}
+    \minipage{0.33\textwidth}
       \includegraphics[width=\linewidth]{p1_med_figure.png}
     \endminipage\hfill
-    \minipage{0.32\textwidth}
+    \minipage{0.33\textwidth}
       \includegraphics[width=\linewidth]{p2_med_figure.png}
     \endminipage\hfill
-    \minipage{0.32\textwidth}%
+    \minipage{0.33\textwidth}%
       \includegraphics[width=\linewidth]{p3_med_figure.png}
     \endminipage
     \caption{Resulting plots for protein concentration over time from simulating the gro code for the repressilator multiple times, with the same initial conditions as just described. Black lines indicate average between simulations within the same time step, whilst the various grey lines indicate the concentration of the respective protein at each simulation.}
