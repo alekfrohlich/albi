@@ -69,12 +69,19 @@ Florianopolis – SC – Brazil
 }
 
 
-%                           ANNOTATIONS                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %   => How to call the simulator? Gro`s simulator or is it ok to just call it gro?
 %   => gro or Gro?
 %   => list steps in sect. 2: Archicture and Sect. 3: Case Study
 %   => Talk more about antimony where parsed.itermidiate is referenced
+%   => more explanation about reaction parameters if fig2/3
+%   => black/white plots
+%   => footnote under sys of ODE
+%   => fix gro code snipets
+%   => add averge repressilator graph
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % end of preamble
 \begin{document}
@@ -179,7 +186,6 @@ Florianopolis – SC – Brazil
 \subsection{Gro}
     
     Gro simulates multiple different aspects of the bacterial colony, including growth, division and contact forces between cells. Although that makes for a realistic multicellular simulator, it doesn't carry weight in single cell simulation such as the ones we did for the Repressilator shown in the last section. In it's case, the uniquely relevant aspect of it's simulation was how gro evaluated rate statements. As is indicated by \cite{Hoops2006}, at each simulation step, each guard is evaluated. If it evaluates to true, then the corresponding block is executed, meaning, in our case, that a reaction occurred. To model stochastic events, gro provides the \textit{rate} (\textit{r}) function that evaluates to true under the probability of r*dt, where the dt is the step size of the simulation. Simulation parameters in the likes of dt can be set by using the \textit{set} (\textit{key}, \textit{value}) function. Gro makes further use of the \textit{rate} function to approximate the Master Equation with Euler integration. 
-
     
     \begin{figure}[ht]
     \centering
@@ -192,11 +198,27 @@ Florianopolis – SC – Brazil
     \minipage{0.33\textwidth}%
       \includegraphics[width=\linewidth]{p3_med_figure.png}
     \endminipage
-    \caption{Resulting plots for protein concentration over time from simulating the gro code for the repressilator multiple times, with the same initial conditions as just described. Black lines indicate average between simulations within the same time step, whilst the various grey lines indicate the concentration of the respective protein at each simulation.}
+    \caption{Multiple simulations of the Repressilator gro model. From left to right: p1, p2, p3. Black lines are used to indicate an average simulation, whilst the various grey lines are used to indicate the concentration of the respective protein at each individual simulation.}
     \label{fig:tons_of_simulations}
     \end{figure}
+    
+   In Figure~\ref{fig:tons_of_simulations}, we see the results of simulating the Repressilator model within gro itself. Simulation parameters taken from \cite{ingalls2013mathematical}: $\alpha_{0} = 0.03$ (molecules per $cell*min^{-1}$), $\alpha = 298.2$ (molecules per $cell*min^{-1}$), $\beta = 0.2$ ($min^{-1}$), $n = 2$ and $\delta t = 0.0001$. The average simulation containing all of $p_{1}, p_{2}, p_{3}, m_{1}, m_{2}, m_{3}$ and illustrated by Figure~\ref{fig:repressilator_average} shows that the original period and amplitude varied during the course of time, probably due to stochastic fluctuations. From a naive perspective, nonetheless, the model maintained it's oscillatory behavior. Delving deeper, we are able to conclude by analysis of the bifurcation graph from Figure~\ref{fig:biffurcation} for $\alpha$ and $\beta$ that, that the initial values picked for the simulations could be tuned to increase the robustness of the outcome under stochastic simulations.
 
-\subsection{Simulating output on COPASI}
+    \begin{figure}[ht]
+    \centering
+    \minipage{0.5\textwidth}
+      \includegraphics[width=\linewidth]{p1_med_figure.png}
+      \caption{TROCAR PELO PLOT DAS MEDIAS CONTENDO TODAS AS 6 PROTEINAS/MRNA.}
+      \label{fig:repressilator_average}
+    \endminipage\hfill
+    \minipage{0.5\textwidth}
+      \includegraphics[width=\linewidth]{biffurcation_a_b.png}
+      \caption{IA FICAR MELHOR SEM ESSE B NO CANTO SUPERIOR ESQUERDO.}
+      \label{fig:biffurcation}
+    \endminipage\hfill
+    \end{figure}
+
+\subsection{COPASI}
     \lipsum[1]
 
 \section{Conclusion}
@@ -205,7 +227,7 @@ Florianopolis – SC – Brazil
 \section{Future works}
     \lipsum[1]
 
-% References
+% references
 \bibliographystyle{sbc}
 \bibliography{sbc-template}
 
