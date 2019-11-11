@@ -15,9 +15,6 @@
 \usepackage{listings}
 \usepackage{xcolor}
 
-% utils
-\usepackage{lipsum}
-
 % gro language definition
 \definecolor{COLOR_COMMENTS}{RGB}{16, 97, 35}
 \definecolor{COLOR_BACKGROUND}{RGB}{230, 230, 230}
@@ -71,15 +68,10 @@ Florianopolis – SC – Brazil
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   => How to call the simulator? Gro`s simulator or is it ok to just call it gro?
-%   => gro or Gro?
-%   => list steps in sect. 2: Archicture and Sect. 3: Case Study
 %   => Talk more about antimony where parsed.itermidiate is referenced
 %   => more explanation about reaction parameters if fig2/3
-%   => black/white plots
 %   => footnote under sys of ODE
 %   => fix gro code snipets
-%   => add averge repressilator graph
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -115,11 +107,11 @@ Florianopolis – SC – Brazil
     
     Currently, the parser only recognizes a subset of gro's syntax. Valid programs are constituted by global variable declarations, program definitions and E. coli instantiations. Parameters, messages and guarded statements are also recognized as valid syntax, however no semantic value is assigned to them given that control statements and user interaction do not make sense in the context of an SBML model. Below is an example of gro code containing the syntactical constructs just described.
     
+    % The only part developed was the basic functionality needed for a reaction description, the goal for the study case is to also explore how higher level of descriptions can be well translated in a more precise format, this includes: if and else; for each; and or other programming instructions that that differentiates from how biological reactions work. Take for instance how reactions can not be turned off and "if and else" instructions needs remodelling to a chemical point of view, however, a lot of bi-stability models, including switcher, present good expectations.
+
     \input{example_gro.tex}
     
     Compiling this file gives us \textit{parsed.intermediate}, the input file for Tellurium. As we can see, the compiler properly handled arithmetic expressions and parameter passing. The compiler also renamed symbols declared inside program definitions to avoid name space clashes between multiple programs instantiated in the same compartment. If this renaming hadn't been done, there wouldn't be a way to differentiate the symbol E, whose name space is limited to reactions inside of prog, from the symbol E which was declared inside of dupl.
-    
-    ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI ADICOES DO BIAGE AQUI
     
     \input{example_compiled.tex}
     
@@ -158,13 +150,21 @@ Florianopolis – SC – Brazil
     \end{aligned}
     \end{equation}
 
-    As shown in \cite{Elowitz2000}, the high-level model from Figure~\ref{fig:repressilator_model} could also be presented as the above system of Ordinary Differential Equations (ODE). With that system of equations, we then built the corresponding gro model. The process was simple as we just separated the reactions from the equations, meaning, for example, that $\alpha_{0}$ from the left equations became the open reaction:
+    As shown in \cite{Elowitz2000}, the high-level model from Figure~\ref{fig:repressilator_model} could also be presented as the above system of Ordinary Differential Equations (ODE)\footnote{AA}. With that system of equations, we then built the corresponding gro model. The process was simple as we just separated the reactions from the equations, meaning, for example, that $\alpha_{0}$ from the left equations became the open reaction:
     
     \begin{equation}
     \ce{ ->[\alpha_{0}] m_{1} + m_{2} + m_{3}}
     \end{equation}
     
     On repeating this process for each ODE, we ended up with a total of 7 reactions, from which the new ones are listed below:
+    
+    % Substituir reações pela imagem da network, valores indentificaods segundo o livro.
+    \begin{figure}[h]
+        \centering
+        \includegraphics[scale = 0.6] {Topicos_reaction_network.png}
+        \caption{Caption}
+        \label{fig:my_label}
+    \end{figure}
     
     \begin{equation}
     \begin{aligned}[c]
@@ -185,50 +185,87 @@ Florianopolis – SC – Brazil
 
 \subsection{Gro}
     
-    Gro simulates multiple different aspects of the bacterial colony, including growth, division and contact forces between cells. Although that makes for a realistic multicellular simulator, it doesn't carry weight in single cell simulation such as the ones we did for the Repressilator shown in the last section. In it's case, the uniquely relevant aspect of it's simulation was how gro evaluated rate statements. As is indicated by \cite{Hoops2006}, at each simulation step, each guard is evaluated. If it evaluates to true, then the corresponding block is executed, meaning, in our case, that a reaction occurred. To model stochastic events, gro provides the \textit{rate} (\textit{r}) function that evaluates to true under the probability of r*dt, where the dt is the step size of the simulation. Simulation parameters in the likes of dt can be set by using the \textit{set} (\textit{key}, \textit{value}) function. Gro makes further use of the \textit{rate} function to approximate the Master Equation with Euler integration. 
+    Gro simulates multiple different aspects of the bacterial colony, including growth, division and contact forces between cells \cite{Jang2012}. Although that makes for a realistic multicellular simulator, it doesn't carry weight in single cell simulation such as the ones we did for the Repressilator shown in the last section. In it's case, the uniquely relevant aspect of it's simulation was how gro evaluated rate statements. As is indicated by \cite{Hoops2006}, at each simulation step, each guard is evaluated. If it evaluates to true, then the corresponding block is executed, meaning, in our case, that a reaction occurred. To model stochastic events, gro provides the \textit{rate} (\textit{r}) function that evaluates to true under the probability of r*dt, where the dt is the step size of the simulation. Simulation parameters in the likes of dt can be set by using the \textit{set} (\textit{key}, \textit{value}) function. Gro makes further use of the \textit{rate} function to approximate the Master Equation with Euler integration. 
     
     \begin{figure}[ht]
     \centering
     \minipage{0.33\textwidth}
-      \includegraphics[width=\linewidth]{p1_med_figure.png}
+      \includegraphics[width=\linewidth]{img1.png}
     \endminipage\hfill
     \minipage{0.33\textwidth}
-      \includegraphics[width=\linewidth]{p2_med_figure.png}
+      \includegraphics[width=\linewidth]{img2.png}
     \endminipage\hfill
     \minipage{0.33\textwidth}%
-      \includegraphics[width=\linewidth]{p3_med_figure.png}
+      \includegraphics[width=\linewidth]{img3.png}
     \endminipage
     \caption{Multiple simulations of the Repressilator gro model. From left to right: p1, p2, p3. Black lines are used to indicate an average simulation, whilst the various grey lines are used to indicate the concentration of the respective protein at each individual simulation.}
     \label{fig:tons_of_simulations}
     \end{figure}
-    
+
    In Figure~\ref{fig:tons_of_simulations}, we see the results of simulating the Repressilator model within gro itself. Simulation parameters taken from \cite{ingalls2013mathematical}: $\alpha_{0} = 0.03$ (molecules per $cell*min^{-1}$), $\alpha = 298.2$ (molecules per $cell*min^{-1}$), $\beta = 0.2$ ($min^{-1}$), $n = 2$ and $\delta t = 0.0001$. The average simulation containing all of $p_{1}, p_{2}, p_{3}, m_{1}, m_{2}, m_{3}$ and illustrated by Figure~\ref{fig:repressilator_average} shows that the original period and amplitude varied during the course of time, probably due to stochastic fluctuations. From a naive perspective, nonetheless, the model maintained it's oscillatory behavior. Delving deeper, we are able to conclude by analysis of the bifurcation graph from Figure~\ref{fig:biffurcation} for $\alpha$ and $\beta$ that, that the initial values picked for the simulations could be tuned to increase the robustness of the outcome under stochastic simulations.
 
     \begin{figure}[ht]
     \centering
     \minipage{0.5\textwidth}
-      \includegraphics[width=\linewidth]{p1_med_figure.png}
-      \caption{TROCAR PELO PLOT DAS MEDIAS CONTENDO TODAS AS 6 PROTEINAS/MRNA.}
+      \includegraphics[width=\linewidth]{all_med_thick.png}
+      \caption{Average of the protein's concentrations over multiple simulations. $p_{1}$, $p_{2}$ and $p_{3}$ is represented, respectively, by the color red, green and blue}
       \label{fig:repressilator_average}
     \endminipage\hfill
     \minipage{0.5\textwidth}
-      \includegraphics[width=\linewidth]{biffurcation_a_b.png}
-      \caption{IA FICAR MELHOR SEM ESSE B NO CANTO SUPERIOR ESQUERDO.}
+      \includegraphics[width=\linewidth]{biffurcation_a_b_2.png}
+      \caption{
+      Phase plane from the $\alpha$ and $\beta$ values parameter values, for the parameters used above, $\alpha$ stands around $10^{2}$ and $\beta$ in $10^{-1}$ power of magnitude.}
       \label{fig:biffurcation}
     \endminipage\hfill
     \end{figure}
 
 \subsection{COPASI}
-    \lipsum[1]
-
-\section{Conclusion}
-    \lipsum[1]
     
-\section{Future works}
-    \lipsum[1]
+    COPASI is a software package for simulating chemical reactions. We chose to simulate the resulting SBML document on it because of the variety of simulation methods that it supports. Ranging all the way from deterministic methods such as LSODA \cite{Petzold1983} to stochastic ones like Gillespie’s algorithm \cite{Gillespie1976}. Unfortunately, as gro does not implement any well-known method\footnote{Gro concurrently simulate growth, geometry, and signal dynamics. Meaning that any other resource-intensive simulation methods would be impractical due to performance reasons.} we shall compare COPASI's output only with that of \cite{Goeldner2019}, whom implement the same starting conditions as \cite{ingalls2013mathematical}. The simulation is presented in Figure~\ref{fig:biffurcation}
+    
+    \begin{figure}[ht]
+    \centering
+    \minipage{0.5\textwidth}
+      \includegraphics[width=\linewidth]{octave_plot_thick.png}
+      \caption{Plot generated by octave from the derivatives presented in the mathematical model, using $\delta{t} = 0.01$ and and $10000$ intervals}
+      \label{fig:repressilator_octave}
+    \endminipage\hfill
+    \minipage{0.5\textwidth}
+      \includegraphics[width=\linewidth]{SBML_copasi_LSODA.png}
+      \caption{Copasi LSODA deterministic simulation using the SBML file generate using Albi from the repressilator model in Gro, was simulated up to $100$ seconds with $10000$ interevals.}
+      \label{fig:repressilator_copasi}
+    \endminipage\hfill
+    \end{figure}
+    
+    As per simple analysis of both graphs we can conclude that the behavior of both models was indeed similar. In order to prove that both models are identical, however, we need to compare the underlying systems of equations. Since the Octave model from Figure~\ref{fig:repressilator_octave} was implemented based on (1), the only remaining thing there is to show is the equations used by COPASI. To accomplish this, we explore the fact that COPASI infers the math equations back from the SBML model. Hence, by looking at the equations bellow, we can conclude that our integration scheme achieved it's purposed goal.
+    
+    \begin{multline*}
+        \frac{d([ECOLI0\_prog\_m1]*V_{ECOLI0})}{dt} = +V_{ECOLI0}*(\frac{alfa + [ECOLI\_prog_p3]^n}{V\_{ECOLI0}}) \\ +V_{ECOLI0}*(\frac{alfa0}{V_{ECOLI0}}) -V_{ECOLI0}*(\frac{[ECOLI0\_prog\_m1]}{V_{ECOLI0}})
+    \end{multline*}
+    \begin{multline*}
+        \frac{d([ECOLI0\_prog\_m2]*V_{ECOLI0})}{dt} = +V_{ECOLI0}*(\frac{alfa + [ECOLI\_prog_p1]^n}{V\_{ECOLI0}}) \\ +V_{ECOLI0}*(\frac{alfa0}{V_{ECOLI0}}) -V_{ECOLI0}*(\frac{[ECOLI0\_prog\_m2]}{V_{ECOLI0}})
+    \end{multline*}
+    \begin{multline*}
+        \frac{d([ECOLI0_prog_m3]*V_{ECOLI0})}{dt} = +V_{ECOLI0}*(\frac{alfa + [ECOLI_prog_p2]^n}{V_{ECOLI0}}) \\ +V_{ECOLI0}*(\frac{alfa0}{V_{ECOLI0}}) -V_{ECOLI0}*(\frac{[ECOLI0_prog_m1]}{V_{ECOLI0}})
+    \end{multline*}
+    \begin{multline*}
+        \frac{d([ECOLI0_prog_p1]*V_{ECOLI0})}{dt} = -V_{ECOLI0}*(\frac{beta*[ECOLI_prog_p1]^n}{V_{ECOLI0}}) \\ +V_{ECOLI0}*(\frac{beta*[ECOLI_prog_m1]^n}{V_{ECOLI0}})
+    \end{multline*}
+    \begin{multline*}
+        \frac{d([ECOLI0_prog_p2]*V_{ECOLI0})}{dt} = -V_{ECOLI0}*(\frac{beta*[ECOLI_prog_p2]^n}{V_{ECOLI0}}) \\ +V_{ECOLI0}*(\frac{beta*[ECOLI_prog_m2]^n}{V_{ECOLI0}})
+    \end{multline*}
+    \begin{multline*}
+        \frac{d([ECOLI0_prog_p3]*V_{ECOLI0})}{dt} = -V_{ECOLI0}*(\frac{beta*[ECOLI_prog_p3]^n}{V_{ECOLI0}}) \\ +V_{ECOLI0}*(\frac{beta*[ECOLI_prog_m3]^n}{V_{ECOLI0}})
+    \end{multline*}
+    
+
+\section{Conclusion \& Future works}
+    
+    
+    We have presented an SBML integration scheme for the gro language with the intent of facilitating the development of new SBML models through the now possible use of the gro programming language as a modelling tool. Also, the proposed scheme aimed to recover previously built gro models, as done in section 3. with the Repressilator. For those goals to be effectively reached, the language parser should be able to handle all possible gro programs. That's not currently the case as signalling and structures have not yet been implemented and could serve as practical extension of the current work.
+
 
 % references
 \bibliographystyle{sbc}
 \bibliography{sbc-template}
-
 \end{document}
