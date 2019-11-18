@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -32,7 +32,7 @@
      */
     struct symbol {
         char *name;
-        double value;           
+        double value;
         struct program *prog;
     };
 
@@ -46,7 +46,8 @@
 
     // Forward definitions
     struct ast;
-    struct symbol* env[2];
+    struct symbol *env[2];
+    struct maplist *globalmap;
     extern int currenv;
     extern struct symbol *lookup(char *sym);
     extern struct symlist *newslist(struct symbol *sym, struct symlist *next);

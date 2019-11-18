@@ -1,0 +1,28 @@
+\lstset{style=INTERMEDIATE}
+\begin{lstlisting}
+compartment ECOLI0
+ECOLI0 = 1.0
+var ECOLI0_prog_E in ECOLI0
+ECOLI0_prog_E = 25.0000
+var ECOLI0_prog_F in ECOLI0
+ECOLI0_prog_F = 100.0000
+const ECOLI0_prog_K in ECOLI0
+ECOLI0_prog_K = 127.0000
+ECOLI0_prog_F-> ECOLI0_prog_E;(ECOLI0_prog_K);
+var ECOLI0_dupl_E in ECOLI0
+ECOLI0_dupl_E = 35.0000
+var ECOLI0_dupl_F in ECOLI0
+ECOLI0_dupl_F = 110.0000
+const ECOLI0_dupl_K in ECOLI0
+ECOLI0_dupl_K = 147.0000
+ECOLI0_dupl_F-> ECOLI0_dupl_E;((ECOLI0_dupl_K)*(40.0000));
+compartment ECOLI1
+ECOLI1 = 1.0
+var ECOLI1_prog_E in ECOLI1
+ECOLI1_prog_E = 25.0000
+var ECOLI1_prog_F in ECOLI1
+ECOLI1_prog_F = 100.0000
+const ECOLI1_prog_K in ECOLI1
+ECOLI1_prog_K = 127.0000
+ECOLI1_prog_F-> ECOLI1_prog_E;(ECOLI1_prog_K);
+\end{lstlisting}

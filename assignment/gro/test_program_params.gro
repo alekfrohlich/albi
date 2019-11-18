@@ -1,0 +1,25 @@
+////////////////////////////////////////////////
+//         TEST PARAMETER APPLICATION         //
+////////////////////////////////////////////////
+
+include gro
+
+program p1(x) := {
+    A := 75 + x;
+    B := A * 2 - 1;
+};
+
+program p2(x, y) := {
+    C := x * y;
+    D := C / 10;
+};
+
+program p3(a,b,c,d,e) :=
+{
+        C := a*b*c*d*e;
+
+};
+
+ecoli([], program p1(10));
+ecoli([], program p2(-10*5, 2));
+ecoli([], program p1(1) + p2(2, 3));

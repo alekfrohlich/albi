@@ -2,7 +2,7 @@
  *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
- * 	  This file is a part of Albi.
+ *       This file is a part of Albi.
  *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
@@ -29,11 +29,11 @@
  */
 struct maplist *newmaplist(char *key, char *value, struct maplist *next)
 {
-	struct maplist *ml = (struct maplist*) malloc(sizeof(struct maplist));
-	ml->key = key;
-	ml->value = value;
-	ml->next = next;
-	return ml;
+    struct maplist *ml = (struct maplist*) malloc(sizeof(struct maplist));
+    ml->key = key;
+    ml->value = value;
+    ml->next = next;
+    return ml;
 }
 
 /**
@@ -41,9 +41,9 @@ struct maplist *newmaplist(char *key, char *value, struct maplist *next)
  */
 char *getmap(struct maplist *map, char *key)
 {
-	if (map == NULL)
-		return NULL;
-	if (strcmp(map->key, key) == 0)
-		return map->value;
-	return getmap(map->next, key);
+    if (map == NULL)
+        return NULL;
+    if (strcmp(map->key, key) == 0)
+        return map->value;
+    return getmap(map->next, key);
 }

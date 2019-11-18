@@ -1,0 +1,24 @@
+////////////////////////////////////////////////
+//         TEST COMPARTMENT CREATION          //
+////////////////////////////////////////////////
+
+include gro
+
+program p() := {
+
+};
+
+program q() := {
+
+};
+
+program r() := {
+
+};
+
+program s() := {
+
+};
+
+ecoli([], program p() + q() + r() + s());
+ecoli([], program p() + q() + r() + s());

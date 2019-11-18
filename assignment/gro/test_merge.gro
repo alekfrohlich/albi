@@ -1,0 +1,22 @@
+////////////////////////////////////////////////
+//             TEST PROGRAM MERGING           //
+////////////////////////////////////////////////
+
+include gro
+
+program prog() := {
+    E := 25;
+    F := 75 + E;
+    K := 2 + F + E;
+    rate(K) : { E := E + 1, F := F - 1 };
+};
+
+program dupl(X) := {
+    E := 25 + X;
+    F := 75 + E;
+    K := 2 + F + E;
+    rate(K*40) : { E := E + 1, F := F - 1 };
+};
+
+ecoli([], program prog() + dupl(10));
+ecoli([], program prog());

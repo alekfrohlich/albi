@@ -22,13 +22,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #include "parsing.h"
 #include "program.h"
 #include "structures.h"
 #include "output.h"
+#include "error.h"
 
-struct symbol* env[2];         // [ Global | Local ] parsing tables
+struct symbol *env[2];         // [ Global | Local ] parsing tables
 int currcompart = 0;           // Current compartment count
 
 /**
@@ -43,12 +45,17 @@ double eval(struct ast *a)
 
     // Constants
     case CONSLIT:
-        v = ((struct numval *) a)->number;
+        v = ((struct numval*) a)->number;
         break;
 
     // Symbol references
     case SYM_REF:
-        v = ((struct symref *) a)->sym->value;
+        v = ((struct symref*) a)->sym->value;
+        break;
+
+    // Built-in call
+    case BUILTIN:
+        v = callbuiltin(((struct funcall*) a));
         break;
 
     // Expressions:
@@ -56,17 +63,46 @@ double eval(struct ast *a)
     case MINUS: v = eval(a->left) - eval(a->right); break;
     case TIMES: v = eval(a->left) * eval(a->right); break;
     case DIV:   v = eval(a->left) / eval(a->right); break;
+    case MOD:   v = ((int) eval(a->left)) % ((int) eval(a->right)); break;
+    case POW:   v = pow(eval(a->left), eval(a->right)); break;
+    case UMINUS:v = -eval(a->left); break;
 
     default:
-        printf("internal error: bad node at eval, type %u\n", a->type);
+        yyerror("internal error: bad node at eval %d", a->type);
     }
 
     return v;
 }
 
+/**
+ * Evaluate and apply builtin function.
+ */
+double callbuiltin(struct funcall *fun)
+{
+    double v = eval(fun->exp);
+
+    switch(fun->_type)
+    {
+        case __builtin_sin:   return sin(v);
+        case __builtin_cos:   return cos(v);
+        case __builtin_tan:   return tan(v);
+        case __builtin_ln:    return log(v);
+        case __builtin_log:   return log10(v);
+        case __builtin_ceil:  return ceil(v);
+        case __builtin_floor: return floor(v);
+        case __builtin_sqrt:  return sqrt(v);
+
+        default:
+            yyerror("Unknown built-in function %d", fun->_type);
+            return 0,0;
+    }
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 //                       INTERMEDIATE CODE GENERATION                        //
 ///////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * Generate intermediate
@@ -98,7 +134,7 @@ void gencompart(struct compart *compartment)
     // Eval and apply explist. TODO: handle shares
     maps = mergeprograms(progrefs, NULL, explists, currcompart, progcount);
 
-    fprintf(yyout, "Compartment ECOLI%d\n", currcompart);
+    outcompart(currcompart);
 
     // Generate intermediate code (print)
     for (int i = 0; i < progcount; i++)
@@ -109,16 +145,18 @@ void gencompart(struct compart *compartment)
     currcompart++;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 //                          STRUCTURE MANINPULATION                          //
 ///////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * Create list of AST nodes
  */
 struct nodelist *newnodelist(struct ast *node, struct nodelist *next)
 {
-    struct nodelist * list = (struct nodelist *) malloc(sizeof(struct nodelist));
+    struct nodelist *list = (struct nodelist*) malloc(sizeof(struct nodelist));
     list->node = node;
     list->next = next;
     return list;
@@ -141,7 +179,7 @@ struct progcall *newprogcall(
     struct nodelist *explist,
     struct progcall *next)
 {
-    struct progcall * p = (struct progcall *) malloc(sizeof(struct progcall));
+    struct progcall *p = (struct progcall*) malloc(sizeof(struct progcall));
     p->progref = progref;
     p->shares = shares;
     p->explist = explist;
@@ -155,7 +193,7 @@ void progcallfree(struct progcall *progcall)
 {
     while (progcall != NULL)
     {
-        struct progcall * aux = progcall;
+        struct progcall *aux = progcall;
         progcall = progcall->next;
         free(aux);
     }

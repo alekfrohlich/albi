@@ -44,6 +44,7 @@
 
     // Forward definitions
     extern double eval(struct ast *a);
+    extern double callbuiltin(struct funcall *fun);
     extern void genparam(char *name, struct ast *val);
     extern void gencompart(struct compart *compartment);
     extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
@@ -53,8 +54,5 @@
             struct nodelist *parameters,
             struct progcall *call);
     extern void progcallfree(struct progcall *prog);
-
-    // Toolchain definitions
-    extern int yyerror(const char *s);
 
 #endif  // PARSING_H

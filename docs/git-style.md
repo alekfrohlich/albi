@@ -13,12 +13,13 @@ type/issue#/objective
 ```
 
 where type may be:
-1. fature
+1. feature
 2. bug
 3. hotfix
 4. test
 5. build
 6. docs
+7. article
 
 and issue# is the number given by github to the associated issue.
 

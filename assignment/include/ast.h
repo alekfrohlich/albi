@@ -1,9 +1,9 @@
-/*	  
- *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com> 
+/*
+ *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
  * 	  This file is a part of Albi.
- * 
+ *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation; either version 2 of the License, or
@@ -24,29 +24,49 @@
 
     #include "symtab.h"
 
+    #define NUMNODETYPES 15
+
     /**
      * AST node types
      */
     enum nodetypes {
-        CONSLIT = 1,    // Constant literal
-        PLUS,           // Arithmetic expression: +
-        MINUS,          // Arithmetic expression: -
-        TIMES,          // Arithmetic expression: *
-        DIV,            // Arithmetic expression: /
+        CONSLIT = 0,    // Constant literal
+        PLUS,           // Arithmetic expression: A + B
+        MINUS,          // Arithmetic expression: A - B
+        TIMES,          // Arithmetic expression: A * B
+        DIV,            // Arithmetic expression: A / B
+        MOD,            // Arithmetic expression: A % B
+        POW,            // Arithmetic expression: A ^ B
+        UMINUS,         // Arithmetic expression: -A
         NODELIST,       // Grouping of nodes
         SYM_REF,        // Symbol reference
         SYM_ASSIGN,     // Symbol assignment
         T_SYM_ASSIGN,   // Typed symbol assignment
         COMPART,        // Compartment
         RATESTATEMENT,  // Reaction rate
+        BUILTIN,        // Built-in function
     };
 
     /**
      * SBML types
      */
     enum sbmltypes {
-        SPECIE = 1,     // Specie
+        SPECIE = 0,     // Specie
         LOCAL,          // Var
+    };
+
+    /**
+     * Built-in compiler functions
+     */
+    enum funtypes {
+        __builtin_sin = 0,
+        __builtin_cos,
+        __builtin_tan,
+        __builtin_ln,
+        __builtin_log,
+        __builtin_ceil,
+        __builtin_floor,
+        __builtin_sqrt,
     };
 
     /**
@@ -54,8 +74,8 @@
      */
     struct ast {
         enum nodetypes type;
-        struct ast * left;
-        struct ast * right;
+        struct ast *left;
+        struct ast *right;
     };
 
     /**
@@ -111,6 +131,15 @@
         struct nodelist *assigns;
     };
 
+    /**
+     * Built-in function call
+     */
+    struct funcall {
+        enum nodetypes type;
+        enum funtypes _type;
+        struct ast *exp;
+    };
+
     // Forward definitions
     extern struct ast *newast(enum nodetypes type, struct ast *left, struct ast *right);
     extern struct ast *newcompart(char *sym, struct progcall *progcall);
@@ -119,6 +148,7 @@
     extern struct ast *newassign(struct symbol *sym, struct ast *val);
     extern struct ast *newtassign(enum sbmltypes type, struct symbol *sym, struct ast *val);
     extern struct ast *newrate(struct ast *exp, struct nodelist *assigns);
+    extern struct ast *newfuncall(enum funtypes type, struct ast *exp);
     extern void treefree(struct ast *a);
 
 #endif  // AST_H
