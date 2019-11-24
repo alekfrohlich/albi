@@ -8,7 +8,7 @@ Albi is a reaction extractor. It's goal is to parse a subset of Gro that is sema
 
 Albi's dependencies are limited to ```telurium``` and ```roadrunner```, to install them run:
 
-```$ pip install -r requirements.txt```
+```$ pip3 install -r requirements.txt```
 
 ### Building
 
@@ -18,7 +18,7 @@ To build the framework change directory to ```assignment```. Being there, run ``
 
 To build an SBML document from gro source code, run:
 
-```$ python albi path/to/gro/file```
+```$ python3 albi path/to/gro/file```
 
 The resulting file is output.xml.
 
