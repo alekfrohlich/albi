@@ -1,6 +1,6 @@
 # Albi
 
-Albi is a reaction extractor. It's goal is to parse a subset of Gro that is semantically meaningful to simulators and synthesis tools cabable of handling the SBML standard.
+Albi is a gro to SBML transpiler. It's goal is to translate a subset of the gro programming language that is semantically meaningful to simulators and synthesis tools cabable of handling the SBML standard.
 
 ## Installing
 
@@ -8,7 +8,7 @@ Albi is a reaction extractor. It's goal is to parse a subset of Gro that is sema
 
 Albi's dependencies are limited to ```telurium``` and ```roadrunner```, to install them run:
 
-```$ pip3 install -r requirements.txt```
+```$ pip install -r requirements.txt```
 
 ### Building
 
@@ -18,7 +18,7 @@ To build the framework change directory to ```assignment```. Being there, run ``
 
 To build an SBML document from gro source code, run:
 
-```$ python3 albi path/to/gro/file```
+```$ python albi path/to/gro/file```
 
 The resulting file is output.xml.
 
