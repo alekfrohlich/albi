@@ -22,37 +22,35 @@
 #ifndef PARSING_H
 #define PARSING_H
 
-    #include "ast.h"
+#include "ast.h"
 
-    /**
-     * List of AST nodes
-     */
-    struct nodelist {
-        struct ast *node;
-        struct nodelist *next;
-    };
+/**
+ * List of AST nodes
+ */
+struct nodelist {
+  struct ast *node;
+  struct nodelist *next;
+};
 
-    /**
-     * Program call list
-     */
-    struct progcall {
-        struct symbol *progref;     // Called program
-        struct symlist *shares;     // Shared variables
-        struct nodelist *explist;   // Parameters
-        struct progcall *next;      // Next called program
-    };
+/**
+ * Program call list
+ */
+struct progcall {
+  struct symbol *progref;   // Called program
+  struct symlist *shares;   // Shared variables
+  struct nodelist *explist; // Parameters
+  struct progcall *next;    // Next called program
+};
 
-    // Forward definitions
-    extern double eval(struct ast *a);
-    extern double callbuiltin(struct funcall *fun);
-    extern void genparam(char *name, struct ast *val);
-    extern void gencompart(struct compart *compartment);
-    extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
-    extern struct progcall *newprogcall(
-            struct symbol *sym,
-            struct symlist *symlist,
-            struct nodelist *parameters,
-            struct progcall *call);
-    extern void progcallfree(struct progcall *prog);
+// Forward definitions
+extern double eval(struct ast *a);
+extern double callbuiltin(struct funcall *fun);
+extern void genparam(char *name, struct ast *val);
+extern void gencompart(struct compart *compartment);
+extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
+extern struct progcall *newprogcall(struct symbol *sym, struct symlist *symlist,
+                                    struct nodelist *parameters,
+                                    struct progcall *call);
+extern void progcallfree(struct progcall *prog);
 
-#endif  // PARSING_H
+#endif // PARSING_H

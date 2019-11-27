@@ -22,15 +22,16 @@
 #ifndef OUTPUT_H
 #define OUTPUT_H
 
-    #include "program.h"
-    #include "structures.h"
+#include "program.h"
+#include "structures.h"
 
-    // Forward definitions
-    extern FILE *yyout;
-    extern char ast2str[NUMNODETYPES];
-    extern void outcompart(int);
-    extern void outparam(char *name, struct ast *val);
-    extern void outdecls(struct nodelist *decls, struct maplist *namemap, int compartnum);
-    extern void outreacs(struct reactionlist *reacs, struct maplist *namemap);
+// Forward definitions
+extern FILE *yyout;
+extern char ast2str[NUMNODETYPES];
+extern void outcompart(int);
+extern void outparam(char *name, struct ast *val);
+extern void outdecls(struct nodelist *decls, struct maplist *namemap,
+                     int compartnum);
+extern void outreacs(struct reactionlist *reacs, struct maplist *namemap);
 
-#endif  // OUTPUT_H
+#endif // OUTPUT_H

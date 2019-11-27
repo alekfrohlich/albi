@@ -22,133 +22,135 @@
 #ifndef AST_H
 #define AST_H
 
-    #include "symtab.h"
+#include "symtab.h"
 
-    #define NUMNODETYPES 15
+#define NUMNODETYPES 15
 
-    /**
-     * AST node types
-     */
-    enum nodetypes {
-        CONSLIT = 0,    // Constant literal
-        PLUS,           // Arithmetic expression: A + B
-        MINUS,          // Arithmetic expression: A - B
-        TIMES,          // Arithmetic expression: A * B
-        DIV,            // Arithmetic expression: A / B
-        MOD,            // Arithmetic expression: A % B
-        POW,            // Arithmetic expression: A ^ B
-        UMINUS,         // Arithmetic expression: -A
-        NODELIST,       // Grouping of nodes
-        SYM_REF,        // Symbol reference
-        SYM_ASSIGN,     // Symbol assignment
-        T_SYM_ASSIGN,   // Typed symbol assignment
-        COMPART,        // Compartment
-        RATESTATEMENT,  // Reaction rate
-        BUILTIN,        // Built-in function
-    };
+/**
+ * AST node types
+ */
+enum nodetypes {
+  CONSLIT = 0,   // Constant literal
+  PLUS,          // Arithmetic expression: A + B
+  MINUS,         // Arithmetic expression: A - B
+  TIMES,         // Arithmetic expression: A * B
+  DIV,           // Arithmetic expression: A / B
+  MOD,           // Arithmetic expression: A % B
+  POW,           // Arithmetic expression: A ^ B
+  UMINUS,        // Arithmetic expression: -A
+  NODELIST,      // Grouping of nodes
+  SYM_REF,       // Symbol reference
+  SYM_ASSIGN,    // Symbol assignment
+  T_SYM_ASSIGN,  // Typed symbol assignment
+  COMPART,       // Compartment
+  RATESTATEMENT, // Reaction rate
+  BUILTIN,       // Built-in function
+};
 
-    /**
-     * SBML types
-     */
-    enum sbmltypes {
-        SPECIE = 0,     // Specie
-        LOCAL,          // Var
-    };
+/**
+ * SBML types
+ */
+enum sbmltypes {
+  SPECIE = 0, // Specie
+  LOCAL,      // Var
+};
 
-    /**
-     * Built-in compiler functions
-     */
-    enum funtypes {
-        __builtin_sin = 0,
-        __builtin_cos,
-        __builtin_tan,
-        __builtin_ln,
-        __builtin_log,
-        __builtin_ceil,
-        __builtin_floor,
-        __builtin_sqrt,
-    };
+/**
+ * Built-in compiler functions
+ */
+enum funtypes {
+  __builtin_sin = 0,
+  __builtin_cos,
+  __builtin_tan,
+  __builtin_ln,
+  __builtin_log,
+  __builtin_ceil,
+  __builtin_floor,
+  __builtin_sqrt,
+};
 
-    /**
-     * Generic expression node
-     */
-    struct ast {
-        enum nodetypes type;
-        struct ast *left;
-        struct ast *right;
-    };
+/**
+ * Generic expression node
+ */
+struct ast {
+  enum nodetypes type;
+  struct ast *left;
+  struct ast *right;
+};
 
-    /**
-     * Compartment instantiation node
-     */
-    struct compart {
-        enum nodetypes type;
-        char *name;
-        struct progcall *call;  // E. coli parameters
-    };
+/**
+ * Compartment instantiation node
+ */
+struct compart {
+  enum nodetypes type;
+  char *name;
+  struct progcall *call; // E. coli parameters
+};
 
-    /**
-     * Numeric value node
-     */
-    struct numval {
-        enum nodetypes type;
-        double number;
-    };
+/**
+ * Numeric value node
+ */
+struct numval {
+  enum nodetypes type;
+  double number;
+};
 
-    /**
-     * Symbol reference node
-     */
-    struct symref {
-        enum nodetypes type;
-        struct symbol *sym;
-    };
+/**
+ * Symbol reference node
+ */
+struct symref {
+  enum nodetypes type;
+  struct symbol *sym;
+};
 
-    /**
-     * Symbol assignment node
-     */
-    struct symassign {
-        enum nodetypes type;
-        struct symbol *sym;
-        struct ast *val;
-    };
+/**
+ * Symbol assignment node
+ */
+struct symassign {
+  enum nodetypes type;
+  struct symbol *sym;
+  struct ast *val;
+};
 
-    /**
-     * Typed symbol assignment node
-     */
-    struct tsymassign {
-        enum nodetypes type;
-        enum sbmltypes _type;
-        struct symbol *sym;
-        struct ast *val;
-    };
+/**
+ * Typed symbol assignment node
+ */
+struct tsymassign {
+  enum nodetypes type;
+  enum sbmltypes _type;
+  struct symbol *sym;
+  struct ast *val;
+};
 
-    /**
-     * Rate expresion node
-     */
-    struct rate {
-        enum nodetypes type;
-        struct ast *exp;
-        struct nodelist *assigns;
-    };
+/**
+ * Rate expresion node
+ */
+struct rate {
+  enum nodetypes type;
+  struct ast *exp;
+  struct nodelist *assigns;
+};
 
-    /**
-     * Built-in function call
-     */
-    struct funcall {
-        enum nodetypes type;
-        enum funtypes _type;
-        struct ast *exp;
-    };
+/**
+ * Built-in function call
+ */
+struct funcall {
+  enum nodetypes type;
+  enum funtypes _type;
+  struct ast *exp;
+};
 
-    // Forward definitions
-    extern struct ast *newast(enum nodetypes type, struct ast *left, struct ast *right);
-    extern struct ast *newcompart(char *sym, struct progcall *progcall);
-    extern struct ast *newnum(double d);
-    extern struct ast *newref(struct symbol *sym);
-    extern struct ast *newassign(struct symbol *sym, struct ast *val);
-    extern struct ast *newtassign(enum sbmltypes type, struct symbol *sym, struct ast *val);
-    extern struct ast *newrate(struct ast *exp, struct nodelist *assigns);
-    extern struct ast *newfuncall(enum funtypes type, struct ast *exp);
-    extern void treefree(struct ast *a);
+// Forward definitions
+extern struct ast *newast(enum nodetypes type, struct ast *left,
+                          struct ast *right);
+extern struct ast *newcompart(char *sym, struct progcall *progcall);
+extern struct ast *newnum(double d);
+extern struct ast *newref(struct symbol *sym);
+extern struct ast *newassign(struct symbol *sym, struct ast *val);
+extern struct ast *newtassign(enum sbmltypes type, struct symbol *sym,
+                              struct ast *val);
+extern struct ast *newrate(struct ast *exp, struct nodelist *assigns);
+extern struct ast *newfuncall(enum funtypes type, struct ast *exp);
+extern void treefree(struct ast *a);
 
-#endif  // AST_H
+#endif // AST_H

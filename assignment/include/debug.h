@@ -20,21 +20,21 @@
  */
 
 #ifdef DEBUG
-    #define DEBUG1 for (struct reactionlist *it = program->reactions; it != NULL; it = it->next) \
-                        { \
-                            struct reaction *reac = it->reac; \
-                            printf("\nREACTION\n"); \
-                            for (struct nodelist *it2 = reac->reactant; it2 != NULL; it2 = it2->next) \
-                            { \
-                                printf("\nREACT %s\n", ((struct symassign *) it2->node)->sym->name); \
-                                errexp(((struct symassign *) it2->node)->val); \
-                            } \
-                            for (struct nodelist *it3 = reac->product; it3 != NULL; it3 = it3->next) \
-                            { \
-                                printf("\nPROD %s\n", ((struct symassign *) it3->node)->sym->name); \
-                                errexp(((struct symassign *) it3->node)->val); \
-                            } \
-                        }
+#define DEBUG1                                                                 \
+  for (struct reactionlist *it = program->reactions; it != NULL;               \
+       it = it->next) {                                                        \
+    struct reaction *reac = it->reac;                                          \
+    printf("\nREACTION\n");                                                    \
+    for (struct nodelist *it2 = reac->reactant; it2 != NULL;                   \
+         it2 = it2->next) {                                                    \
+      printf("\nREACT %s\n", ((struct symassign *)it2->node)->sym->name);      \
+      errexp(((struct symassign *)it2->node)->val);                            \
+    }                                                                          \
+    for (struct nodelist *it3 = reac->product; it3 != NULL; it3 = it3->next) { \
+      printf("\nPROD %s\n", ((struct symassign *)it3->node)->sym->name);       \
+      errexp(((struct symassign *)it3->node)->val);                            \
+    }                                                                          \
+  }
 #else
-    #define DEBUG1
+#define DEBUG1
 #endif

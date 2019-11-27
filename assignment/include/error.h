@@ -22,24 +22,24 @@
 #ifndef ERROR_H
 #define ERROR_H
 
-    #include "ast.h"
+#include "ast.h"
 
-    /**
-     * Keep track of current location
-     */
-    #define YY_USER_ACTION \
-        yylloc.first_line = yylloc.last_line = yylineno; \
-        yylloc.first_column = yycolumn; yylloc.last_column = yycolumn+yyleng-1; \
-        yycolumn += yyleng;
+/**
+ * Keep track of current location
+ */
+#define YY_USER_ACTION                                                         \
+  yylloc.first_line = yylloc.last_line = yylineno;                             \
+  yylloc.first_column = yycolumn;                                              \
+  yylloc.last_column = yycolumn + yyleng - 1;                                  \
+  yycolumn += yyleng;
 
+// Forward definitions
+extern int surpressout;
+extern int nowrites;
+extern int yycolumn;
+extern char *currfilename;
+extern void errexp(struct ast *a);
+extern int yyerror(const char *s, ...);
+extern int yyerrorexp(const char *s, struct ast *a, ...);
 
-    // Forward definitions
-    extern int surpressout;
-    extern int nowrites;
-    extern int yycolumn;
-    extern char *currfilename;
-    extern void errexp(struct ast *a);
-    extern int yyerror(const char *s, ...);
-    extern int yyerrorexp(const char *s, struct ast *a, ...);
-
-#endif  // ERROR_H
+#endif // ERROR_H

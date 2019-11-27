@@ -19,110 +19,96 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include "symtab.h"
-#include "parsing.h"
 #include "error.h"
+#include "parsing.h"
+#include "symtab.h"
 
-int currenv = 0;                            // Current parsing environment
-struct maplist *globalmap;                  // global namemap
-struct symbol globals[SYMTAB_SIZE];         // Global symbol table
+int currenv = 0;                    // Current parsing environment
+struct maplist *globalmap;          // global namemap
+struct symbol globals[SYMTAB_SIZE]; // Global symbol table
 
 /**
  * Parsing environments
  */
-struct symbol *env[2] = {
-    globals,
-    NULL
-};
+struct symbol *env[2] = {globals, NULL};
 
 /**
  * Hash function for symbol tables
  */
-static unsigned symhash(char *sym)
-{
-    unsigned int hash = 0;
-    unsigned c;
+static unsigned symhash(char *sym) {
+  unsigned int hash = 0;
+  unsigned c;
 
-    while (c = *sym++)
-        hash = hash*9 ^ c;
+  while (c = *sym++)
+    hash = hash * 9 ^ c;
 
-    return hash;
+  return hash;
 }
 
 /**
  * Look-up key in hash table
  */
-struct symbol *lookup(char *sym)
-{
-    // Search for symbol in both environments
-    for (int i = currenv; i >= 0; i--)
-    {
-        struct symbol *entry = &env[i][symhash(sym) % SYMTAB_SIZE];
-        int iter = SYMTAB_SIZE;
-
-        while (--iter >= 0)
-        {
-            // Key already exists
-            if (entry->name && !strcmp(entry->name, sym))
-                return entry;
-
-            // Loop back
-            if (++entry >= env[i] + SYMTAB_SIZE)
-                entry = env[i];
-        }
-    }
-
-    if (nowrites)
-        yyerror("undeclared variable %s", sym);
-
-    struct symbol *entry = &env[currenv][symhash(sym) % SYMTAB_SIZE];
+struct symbol *lookup(char *sym) {
+  // Search for symbol in both environments
+  for (int i = currenv; i >= 0; i--) {
+    struct symbol *entry = &env[i][symhash(sym) % SYMTAB_SIZE];
     int iter = SYMTAB_SIZE;
 
-    // New symbol, insert it into current environment
-    while (--iter >= 0)
-    {
-        if (!entry->name)
-        {
-            entry->name = strdup(sym);
-            entry->value = 0;
-            return entry;
-        }
+    while (--iter >= 0) {
+      // Key already exists
+      if (entry->name && !strcmp(entry->name, sym))
+        return entry;
 
-        // Loop back
-        if (++entry >= env[currenv] + SYMTAB_SIZE)
-            entry = env[currenv];
+      // Loop back
+      if (++entry >= env[i] + SYMTAB_SIZE)
+        entry = env[i];
+    }
+  }
+
+  if (nowrites)
+    yyerror("undeclared variable %s", sym);
+
+  struct symbol *entry = &env[currenv][symhash(sym) % SYMTAB_SIZE];
+  int iter = SYMTAB_SIZE;
+
+  // New symbol, insert it into current environment
+  while (--iter >= 0) {
+    if (!entry->name) {
+      entry->name = strdup(sym);
+      entry->value = 0;
+      return entry;
     }
 
-    yyerror("internal error: symbol table overflow");
+    // Loop back
+    if (++entry >= env[currenv] + SYMTAB_SIZE)
+      entry = env[currenv];
+  }
+
+  yyerror("internal error: symbol table overflow");
 }
 
 /**
  * Define symbol
  */
-void symdef(struct symbol *sym, struct ast *val)
-{
-    sym->value = eval(val);
-}
+void symdef(struct symbol *sym, struct ast *val) { sym->value = eval(val); }
 
 /**
  * Free symbol
  */
-void symbolfree(struct symbol *sym)
-{
-    free(sym->name);
-    free(sym->prog);
+void symbolfree(struct symbol *sym) {
+  free(sym->name);
+  free(sym->prog);
 }
 
 /**
  * Create symbol list
  */
-struct symlist* newslist(struct symbol *sym, struct symlist *next)
-{
-    struct symlist *list = (struct symlist*) malloc(sizeof(struct symlist));
-    list->sym = sym;
-    list->next = next;
-    return list;
+struct symlist *newslist(struct symbol *sym, struct symlist *next) {
+  struct symlist *list = (struct symlist *)malloc(sizeof(struct symlist));
+  list->sym = sym;
+  list->next = next;
+  return list;
 }
