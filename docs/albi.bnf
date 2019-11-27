@@ -21,41 +21,52 @@
 
 # Albi's BNF grammar
 
-<start_of_prog> ::= ""
-                  | <start_of_prog> <assignment>
-                  | <start_of_prog> <program>
-                  | <start_of_prog> <ecolli>
+start_of_prog ::= ""
+                | start_of_prog assignment ';'
+                | start_of_prog program
+                | start_of_prog ecoli
 
-<assignment> ::= VAR ASSIGN <exp> ';'
+assignment ::= VAR ":=" exp
 
-<exp> ::= <exp> '+' <exp>
-        | <exp> '-' <exp>
-        | <exp> '*' <exp>
-        | <exp> '/' <exp>
-        | NUM
-        | VAR
+exp ::= exp '+' exp
+      | exp '-' exp
+      | exp '*' exp
+      | exp '/' exp
+      | exp '%' exp
+      | exp '^' exp
+      | '(' exp ')'
+      | '-' exp %prec UNARYM
+      | NUM
+      | VAR
+      | FUNC '(' exp ')'
 
-<program> ::= PROG VAR '(' <symlist> ')' ASSIGN '{' <list> '}' ';'
-            | PROG VAR '(' ')' ASSIGN '{' <list> '}' ';'
+program ::= progdef '(' symlist ')' ":=" '{' stmtlist '}' ';'
+          | progdef '(' ')' ":=" '{' stmtlist '}' ';'
 
-<symlist> ::= VAR
-            | VAR ',' <symlist>
+progdef ::= PROG VAR
 
-<list> ::= ""
-         | <statement> ';' <list>
+symlist ::= VAR
+          | VAR ',' symlist
 
-<statement> ::= <assignment>
-              | RATE '(' VAR ')' ':' '{' <assignment_list> '}'
+stmtlist ::= ""
+           | statement stmtlist
 
-<assignment_list> ::= ""
-                    | <assignment> <assignment_list>
+statement ::= assignment ';'
+            | RATE '(' exp ')' ':' '{' assignlist '}' ';'
 
-<ecolli> ::= ECOLLI '(' '[' ']' ',' PROG <proglist> ')' ';'
+assignlist ::= assignment
+             | assignment ',' assignlist
 
-<proglist> ::= VAR '(' <explist> ')'
-             | VAR '(' <explist> ')' SHARE <symlist>
-             | VAR '(' <explist> ')' '+' <proglist>
-             | VAR '(' <explist> ')' SHARE <symlist> '+' <proglist>
+ecoli ::= ECOLI '(' '[' ']' ',' PROG { nowrites = 1; } progcall ')' ';'
 
-<explist> ::= ""
-         | <exp> ',' <exp_list>
+progcall ::= VAR '(' explist ')'
+           | VAR '(' explist ')' SHARE symlist
+           | VAR '(' explist ')' '+' progcall
+           | VAR '(' explist ')' SHARE symlist '+' progcall
+           | VAR '('')'
+           | VAR '('')' SHARE symlist
+           | VAR '(' ')' '+' progcall
+           | VAR '(' ')' SHARE symlist '+' progcall
+
+explist ::= exp
+          | exp ',' explist
