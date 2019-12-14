@@ -22,46 +22,44 @@
 #ifndef PROGRAM_H
 #define PROGRAM_H
 
-    #include "symtab.h"
-    #include "parsing.h"
-    #include "structures.h"
+#include "parsing.h"
+#include "structures.h"
+#include "symtab.h"
 
-    /**
+/**
      * Parsed program
      */
-    struct program {
-        struct symbol *symtab;
-        struct nodelist *body;
-        struct nodelist *declarations;
-        struct nodelist *dependences;  // TODO
-        struct symlist *parameters;
-        struct reactionlist *reactions;
-    };
+struct program {
+    struct symbol * symtab;
+    struct nodelist * body;
+    struct nodelist * declarations;
+    struct nodelist * dependences;  // TODO
+    struct symlist * parameters;
+    struct reactionlist * reactions;
+};
 
-    /**
+/**
      * Parsed reaction
      */
-    struct reaction {
-        struct nodelist *reactant;
-        struct nodelist *product;
-        struct ast *rate;
-    };
+struct reaction {
+    struct nodelist * reactant;
+    struct nodelist * product;
+    struct ast * rate;
+};
 
-    /**
+/**
      * List of parsed reactions
      */
-    struct reactionlist {
-        struct reaction *reac;
-        struct reactionlist *next;
-    };
+struct reactionlist {
+    struct reaction * reac;
+    struct reactionlist * next;
+};
 
-    // Forward definitions
-    void progdef(struct symbol *name, struct symlist *syms, struct nodelist *stmts);
-    struct maplist **mergeprograms(
-        struct symbol **progrefs,
-        struct symlist **export,
-        struct nodelist **params,
-        int compartnum,
-        int size);
+// Forward definitions
+void progdef(
+    struct symbol * name, struct symlist * syms, struct nodelist * stmts);
+struct maplist ** mergeprograms(struct symbol ** progrefs,
+    struct symlist ** export, struct nodelist ** params, int compartnum,
+    int size);
 
 #endif  // PROGRAM_H

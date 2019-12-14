@@ -19,33 +19,30 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <stdio.h>
-#include <stdarg.h>
-
 #include "albi.tab.h"
 #include "ast.h"
 #include "output.h"
 
-// Colorful output
-#define ERROR_RED(s)    fprintf(stderr, "\033[1;31m%s\033[0m", s)
-#define BEGIN_BOLD      fprintf(stderr, "\033[1;80m")
-#define COLOR_RESET     fprintf(stderr, "\033[0m")
+#include <stdarg.h>
+#include <stdio.h>
 
-int surpressout;        // Don't generate SBML if error was reported
-int nowrites;           // Symbol table writable?
-int yycolumn;           // Bison location
-char *currfilename;     // Current yyin file name
+// Colorful output
+#define ERROR_RED(s) fprintf(stderr, "\033[1;31m%s\033[0m", s)
+#define BEGIN_BOLD fprintf(stderr, "\033[1;80m")
+#define COLOR_RESET fprintf(stderr, "\033[0m")
+
+int surpressout;      // Don't generate SBML if error was reported
+int nowrites;         // Symbol table writable?
+int yycolumn;         // Bison location
+char * currfilename;  // Current yyin file name
 
 /**
  * Display expression to stderr (err)
  */
-void errexp(struct ast *a)
-{
-    if (a == NULL)
-        return;
+void errexp(struct ast * a) {
+    if (a == NULL) return;
 
-    switch (a->type)
-    {
+    switch (a->type) {
         case UMINUS:
             fprintf(stderr, "-");
             errexp(a->left);
@@ -63,37 +60,34 @@ void errexp(struct ast *a)
             break;
 
         case SYM_REF:
-            fprintf(stderr, "%s", ((struct symref*) a)->sym->name);
+            fprintf(stderr, "%s", ((struct symref *) a)->sym->name);
             break;
 
         case CONSLIT:
-            fprintf(stderr, "%0.4lf", ((struct numval*) a)->number);
+            fprintf(stderr, "%0.4lf", ((struct numval *) a)->number);
             break;
 
         default:
-            printf("internal error: bad node at errexp, type %c\n", ast2str[a->type]);
+            printf("internal error: bad node at errexp, type %c\n",
+                ast2str[a->type]);
     }
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //                      VISIBLE ERROR DISPLAY FUNCTIONS                      //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 /**
  * Display error message (err)
  */
-int yyerror(const char *s, ...)
-{
+int yyerror(const char * s, ...) {
     va_list ap;
     va_start(ap, s);
 
-    if (yylloc.first_line)
-    {
+    if (yylloc.first_line) {
         BEGIN_BOLD;
         fprintf(stderr, "%s:%d:%d: ", currfilename, yylloc.last_line,
-                yylloc.last_column);
+            yylloc.last_column);
         COLOR_RESET;
     }
 
@@ -106,8 +100,7 @@ int yyerror(const char *s, ...)
 /**
  * Display invalid expression (err)
  */
-int yyerrorexp(const char *s, struct ast *a, ...)
-{
+int yyerrorexp(const char * s, struct ast * a, ...) {
     yyerror(s);
     ERROR_RED("-> ");
     errexp(a);

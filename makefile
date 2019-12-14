@@ -59,10 +59,14 @@ fault: albi
 
 repress: albi
 	@echo "\nBehold the repressilator...\n"
-	@$(TRANSLATOR) $(SCASEDIR)/repressilator.gro repressilator.gro	
+	@$(TRANSLATOR) $(SCASEDIR)/repressilator.gro repressilator.gro
 
 # Cleans compilation files.
 clean:
 	cd $(SRCDIR) && $(MAKE) clean
 	@rm -f parsed.intermediate
 	@rm -f output.sbml
+
+format:
+	cd docs && find .. -regex '.*\.\(cc\|c\|h\)'\
+		-exec clang-format-8 style=.clang-format -i {} \;

@@ -22,36 +22,36 @@
 #ifndef SYMTAB_H
 #define SYMTAB_H
 
-    /**
+/**
      * Size of symbol table
      */
-    #define SYMTAB_SIZE 9997
+#define SYMTAB_SIZE 9997
 
-    /**
+/**
      * Symbol table entry
      */
-    struct symbol {
-        char *name;
-        double value;
-        struct program *prog;
-    };
+struct symbol {
+    char * name;
+    double value;
+    struct program * prog;
+};
 
-    /**
+/**
      * List of symbols
      */
-    struct symlist {
-        struct symbol *sym;
-        struct symlist *next;
-    };
+struct symlist {
+    struct symbol * sym;
+    struct symlist * next;
+};
 
-    // Forward definitions
-    struct ast;
-    struct symbol *env[2];
-    struct maplist *globalmap;
-    extern int currenv;
-    struct symbol *lookup(char *sym);
-    struct symlist *newslist(struct symbol *sym, struct symlist *next);
-    void symdef(struct symbol *sym, struct ast *val);
-    void freesymbol(struct symbol *sym);
+// Forward definitions
+struct ast;
+struct symbol * env[2];
+struct maplist * globalmap;
+extern int currenv;
+struct symbol * lookup(char * sym);
+struct symlist * newslist(struct symbol * sym, struct symlist * next);
+void symdef(struct symbol * sym, struct ast * val);
+void freesymbol(struct symbol * sym);
 
 #endif  // SYMTAB_H

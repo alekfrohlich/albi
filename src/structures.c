@@ -2,7 +2,7 @@
  *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
- * 	  This file is a part of Albi.
+ *       This file is a part of Albi.
  *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
@@ -19,18 +19,27 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef OUTPUT_H
-#define OUTPUT_H
+#include "structures.h"
 
-    #include "program.h"
-    #include "structures.h"
+#include <stdlib.h>
+#include <string.h>
 
-    // Forward definitions
-    extern FILE *yyout;
-    extern char ast2str[NUMNODETYPES];
-    void outcompart(int);
-    void outparam(char *name, struct ast *val);
-    void outdecls(struct nodelist *decls, struct maplist *namemap, int compartnum);
-    void outreacs(struct reactionlist *reacs, struct maplist *namemap);
+/**
+ * Create map
+ */
+struct maplist * newmaplist(char * key, char * value, struct maplist * next) {
+    struct maplist * ml = (struct maplist *) malloc(sizeof(struct maplist));
+    ml->key = key;
+    ml->value = value;
+    ml->next = next;
+    return ml;
+}
 
-#endif  // OUTPUT_H
+/**
+ * Get entry on map
+ */
+char * getmap(struct maplist * map, char * key) {
+    if (map == NULL) return NULL;
+    if (strcmp(map->key, key) == 0) return map->value;
+    return getmap(map->next, key);
+}

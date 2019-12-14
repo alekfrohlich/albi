@@ -2,7 +2,7 @@
  *    Copyright (C) 2019 Alek Frohlich <alek.frohlich@gmail.com>
  *    & Gustavo Biage <gustavo.c.biage@gmail.com>.
  *
- *       This file is a part of Albi.
+ * 	  This file is a part of Albi.
  *
  *    Albi is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
@@ -19,31 +19,27 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
+#ifndef ERROR_H
+#define ERROR_H
 
-#include "structures.h"
-
-/**
- * Create map
- */
-struct maplist *newmaplist(char *key, char *value, struct maplist *next)
-{
-    struct maplist *ml = (struct maplist*) malloc(sizeof(struct maplist));
-    ml->key = key;
-    ml->value = value;
-    ml->next = next;
-    return ml;
-}
+#include "ast.h"
 
 /**
- * Get entry on map
- */
-char *getmap(struct maplist *map, char *key)
-{
-    if (map == NULL)
-        return NULL;
-    if (strcmp(map->key, key) == 0)
-        return map->value;
-    return getmap(map->next, key);
-}
+     * Keep track of current location
+     */
+#define YY_USER_ACTION                                                         \
+    yylloc.first_line = yylloc.last_line = yylineno;                           \
+    yylloc.first_column = yycolumn;                                            \
+    yylloc.last_column = yycolumn + yyleng - 1;                                \
+    yycolumn += yyleng;
+
+// Forward definitions
+extern int surpressout;
+extern int nowrites;
+extern int yycolumn;
+char * currfilename;
+void errexp(struct ast * a);
+int yyerror(const char * s, ...);
+int yyerrorexp(const char * s, struct ast * a, ...);
+
+#endif  // ERROR_H

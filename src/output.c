@@ -19,29 +19,28 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <stdio.h>
+#include "output.h"
 
 #include "ast.h"
-#include "output.h"
 #include "structures.h"
+
+#include <stdio.h>
 
 /**
  * AST node to string (indexable by type)
  */
-char ast2str[NUMNODETYPES] = { 'K','+','-','*','/','%','^','-','N','S','=','T','C','R' };
+char ast2str[NUMNODETYPES] = {
+    'K', '+', '-', '*', '/', '%', '^', '-', 'N', 'S', '=', 'T', 'C', 'R'};
 
 /**
  * Generate AST with proper name corrections (print)
  */
-static void outexp(struct ast *a, struct maplist *namemap)
-{
-    if (a == NULL)
-        return;
+static void outexp(struct ast * a, struct maplist * namemap) {
+    if (a == NULL) return;
     fprintf(yyout, "(");
-    switch (a->type)
-    {
+    switch (a->type) {
         case CONSLIT:
-            fprintf(yyout, "%0.4lf", ((struct numval*) a)->number);
+            fprintf(yyout, "%0.4lf", ((struct numval *) a)->number);
             break;
 
         case UMINUS:
@@ -50,8 +49,8 @@ static void outexp(struct ast *a, struct maplist *namemap)
             break;
 
         case SYM_REF:
-            fprintf(yyout, "%s",
-                    getmap(namemap, ((struct symref*) a)->sym->name));
+            fprintf(
+                yyout, "%s", getmap(namemap, ((struct symref *) a)->sym->name));
             break;
 
         case PLUS:
@@ -66,7 +65,8 @@ static void outexp(struct ast *a, struct maplist *namemap)
             break;
 
         default:
-            printf("internal error: bad node at outexp, type %c\n", ast2str[a->type]);
+            printf("internal error: bad node at outexp, type %c\n",
+                ast2str[a->type]);
     }
     fprintf(yyout, ")");
 }
@@ -82,53 +82,48 @@ void outcompart(int currcompart) {
 /**
  * Declare and define global variable (print)
  */
-void outparam(char *name, struct ast *val)
-{
+void outparam(char * name, struct ast * val) {
     fprintf(yyout, "%s = %0.4lf;\n", name, eval(val));
 }
 
 /**
  * Declare and define program variables (print)
  */
-void outdecls(struct nodelist *decls, struct maplist *namemap, int compartnum)
-{
-    for (struct nodelist *it = decls; it != NULL; it = it->next)
-    {
+void outdecls(
+    struct nodelist * decls, struct maplist * namemap, int compartnum) {
+    for (struct nodelist * it = decls; it != NULL; it = it->next) {
         // Declare it
         fprintf(yyout, "%s %s in ECOLI%d\n",
-                ((struct tsymassign*)it->node)->_type == SPECIE? "var" : "const",
-                getmap(namemap, ((struct tsymassign*)it->node)->sym->name), compartnum);
+            ((struct tsymassign *) it->node)->_type == SPECIE ? "var" : "const",
+            getmap(namemap, ((struct tsymassign *) it->node)->sym->name),
+            compartnum);
 
         // Define it
         fprintf(yyout, "%s = %0.4lf\n",
-                getmap(namemap, ((struct tsymassign*)it->node)->sym->name),
-                ((struct tsymassign*)it->node)->sym->value);
+            getmap(namemap, ((struct tsymassign *) it->node)->sym->name),
+            ((struct tsymassign *) it->node)->sym->value);
     }
 }
 
 /**
  * List program reactions (print)
  */
-void outreacs(struct reactionlist *reacs, struct maplist * namemap)
-{
-    for (struct reactionlist *it = reacs; it != NULL; it = it->next)
-    {
-        for (struct nodelist *it2 = it->reac->reactant; it2 != NULL; it2 = it2->next)
-        {
+void outreacs(struct reactionlist * reacs, struct maplist * namemap) {
+    for (struct reactionlist * it = reacs; it != NULL; it = it->next) {
+        for (struct nodelist * it2 = it->reac->reactant; it2 != NULL;
+             it2 = it2->next) {
             fprintf(yyout, "%s",
-                    getmap(namemap, ((struct symassign *)it2->node)->sym->name));
-            if (it2->next != NULL)
-                fprintf(yyout, " + ");
+                getmap(namemap, ((struct symassign *) it2->node)->sym->name));
+            if (it2->next != NULL) fprintf(yyout, " + ");
         }
 
         fprintf(yyout, "-> ");
 
-        for (struct nodelist *it2 = it->reac->product; it2 != NULL; it2 = it2->next)
-        {
+        for (struct nodelist * it2 = it->reac->product; it2 != NULL;
+             it2 = it2->next) {
             fprintf(yyout, "%s",
-                    getmap(namemap, ((struct symassign *)it2->node)->sym->name));
-            if (it2->next != NULL)
-                fprintf(yyout, " + ");
+                getmap(namemap, ((struct symassign *) it2->node)->sym->name));
+            if (it2->next != NULL) fprintf(yyout, " + ");
         }
 
         fprintf(yyout, ";");

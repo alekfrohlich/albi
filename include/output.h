@@ -19,21 +19,20 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef STRUCTS_H
-#define STRUCTS_H
+#ifndef OUTPUT_H
+#define OUTPUT_H
 
-    /**
-     * Map implemented
-     * as linked list
-     */
-    struct maplist {
-        char *key;
-        char *value;
-        struct maplist *next;
-    };
+#include "program.h"
+#include "structures.h"
+#include "stdio.h"
 
-    // Forward definitions
-    struct maplist *newmaplist(char *key, char *value, struct maplist *next);
-    char *getmap(struct maplist *map, char *key);
+// Forward definitions
+extern FILE * yyout;
+extern char ast2str[NUMNODETYPES];
+void outcompart(int);
+void outparam(char * name, struct ast * val);
+void outdecls(
+    struct nodelist * decls, struct maplist * namemap, int compartnum);
+void outreacs(struct reactionlist * reacs, struct maplist * namemap);
 
-#endif  // STRUCTS_H
+#endif  // OUTPUT_H

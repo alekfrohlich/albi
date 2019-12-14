@@ -19,27 +19,21 @@
  *    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef ERROR_H
-#define ERROR_H
+#ifndef STRUCTS_H
+#define STRUCTS_H
 
-    #include "ast.h"
-
-    /**
-     * Keep track of current location
+/**
+     * Map implemented
+     * as linked list
      */
-    #define YY_USER_ACTION \
-        yylloc.first_line = yylloc.last_line = yylineno; \
-        yylloc.first_column = yycolumn; yylloc.last_column = yycolumn+yyleng-1; \
-        yycolumn += yyleng;
+struct maplist {
+    char * key;
+    char * value;
+    struct maplist * next;
+};
 
+// Forward definitions
+struct maplist * newmaplist(char * key, char * value, struct maplist * next);
+char * getmap(struct maplist * map, char * key);
 
-    // Forward definitions
-    extern int surpressout;
-    extern int nowrites;
-    extern int yycolumn;
-    char *currfilename;
-    void errexp(struct ast *a);
-    int yyerror(const char *s, ...);
-    int yyerrorexp(const char *s, struct ast *a, ...);
-
-#endif  // ERROR_H
+#endif  // STRUCTS_H
