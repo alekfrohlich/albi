@@ -37,9 +37,9 @@
     extern int surpressout;
     extern int nowrites;
     extern int yycolumn;
-    extern char *currfilename;
-    extern void errexp(struct ast *a);
-    extern int yyerror(const char *s, ...);
-    extern int yyerrorexp(const char *s, struct ast *a, ...);
+    char *currfilename;
+    void errexp(struct ast *a);
+    int yyerror(const char *s, ...);
+    int yyerrorexp(const char *s, struct ast *a, ...);
 
 #endif  // ERROR_H

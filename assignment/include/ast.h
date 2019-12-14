@@ -141,14 +141,14 @@
     };
 
     // Forward definitions
-    extern struct ast *newast(enum nodetypes type, struct ast *left, struct ast *right);
-    extern struct ast *newcompart(char *sym, struct progcall *progcall);
-    extern struct ast *newnum(double d);
-    extern struct ast *newref(struct symbol *sym);
-    extern struct ast *newassign(struct symbol *sym, struct ast *val);
-    extern struct ast *newtassign(enum sbmltypes type, struct symbol *sym, struct ast *val);
-    extern struct ast *newrate(struct ast *exp, struct nodelist *assigns);
-    extern struct ast *newfuncall(enum funtypes type, struct ast *exp);
-    extern void treefree(struct ast *a);
+    struct ast *newast(enum nodetypes type, struct ast *left, struct ast *right);
+    struct ast *newcompart(char *sym, struct progcall *progcall);
+    struct ast *newnum(double d);
+    struct ast *newref(struct symbol *sym);
+    struct ast *newassign(struct symbol *sym, struct ast *val);
+    struct ast *newtassign(enum sbmltypes type, struct symbol *sym, struct ast *val);
+    struct ast *newrate(struct ast *exp, struct nodelist *assigns);
+    struct ast *newfuncall(enum funtypes type, struct ast *exp);
+    void treefree(struct ast *a);
 
 #endif  // AST_H

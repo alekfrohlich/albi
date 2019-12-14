@@ -43,16 +43,16 @@
     };
 
     // Forward definitions
-    extern double eval(struct ast *a);
-    extern double callbuiltin(struct funcall *fun);
-    extern void genparam(char *name, struct ast *val);
-    extern void gencompart(struct compart *compartment);
-    extern struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
-    extern struct progcall *newprogcall(
+    double eval(struct ast *a);
+    double callbuiltin(struct funcall *fun);
+    void genparam(char *name, struct ast *val);
+    void gencompart(struct compart *compartment);
+    struct nodelist *newnodelist(struct ast *node, struct nodelist *next);
+    struct progcall *newprogcall(
             struct symbol *sym,
             struct symlist *symlist,
             struct nodelist *parameters,
             struct progcall *call);
-    extern void progcallfree(struct progcall *prog);
+    void progcallfree(struct progcall *prog);
 
 #endif  // PARSING_H

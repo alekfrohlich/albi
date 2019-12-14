@@ -56,8 +56,8 @@
     };
 
     // Forward definitions
-    extern void progdef(struct symbol *name, struct symlist *syms, struct nodelist *stmts);
-    extern struct maplist **mergeprograms(
+    void progdef(struct symbol *name, struct symlist *syms, struct nodelist *stmts);
+    struct maplist **mergeprograms(
         struct symbol **progrefs,
         struct symlist **export,
         struct nodelist **params,

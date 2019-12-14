@@ -33,7 +33,7 @@
     };
 
     // Forward definitions
-    extern struct maplist *newmaplist(char *key, char *value, struct maplist *next);
-    extern char *getmap(struct maplist *map, char *key);
+    struct maplist *newmaplist(char *key, char *value, struct maplist *next);
+    char *getmap(struct maplist *map, char *key);
 
 #endif  // STRUCTS_H
