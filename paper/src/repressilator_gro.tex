@@ -1,0 +1,15 @@
+\begin{lstlisting}[style=GROSRC]
+ rate(alfa0) : { m1 := m1 + 1, m2 := m2 + 1, m3 := m3 + 1 };
+ rate(alfa / (1 + p3^n)) : {m1 := m1 + 1};
+ rate(m1) : {m1 := m1 - 1};
+ rate(alfa / (1 + p1^n)) : {m2 := m2 + 1};
+ rate(m2) : {m2 := m2 - 1};
+ rate(alfa / (1 + p2^n)) : {m3 := m3 + 1};
+ rate(m3) : {m3 := m3 - 1};
+ rate(beta*m1) : {p1 := p1 + 1};
+ rate(beta*p1) : {p1 := p1 - 1};
+ rate(beta*m2) : {p2 := p2 + 1};
+ rate(beta*p2) : {p2 := p2 - 1};
+ rate(beta*m3) : {p3 := p3 + 1};
+ rate(beta*p3) : {p3 := p3 - 1};
+\end{lstlisting}

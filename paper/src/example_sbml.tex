@@ -1,0 +1,37 @@
+\begin{lstlisting}[style=SBML, caption=Generated SBML document.]
+  <model metaid="__main" id="__main">
+    <listOfCompartments>
+      <compartment id="ECOLI0" spatialDimensions="3" size="1" constant="true"/>
+      <compartment id="ECOLI1" spatialDimensions="3" size="1" constant="true"/>
+    </listOfCompartments>
+    <listOfSpecies>
+      <species id="ECOLI0_prog_E" compartment="ECOLI0" initialConcentration="25" constant="false"/>
+      <species id="ECOLI0_prog_F" compartment="ECOLI0" initialConcentration="100" constant="false"/>
+      <species id="ECOLI0_dupl_E" compartment="ECOLI0" initialConcentration="35" constant="false"/>
+      <species id="ECOLI0_dupl_F" compartment="ECOLI0" initialConcentration="110" constant="false"/>
+      <species id="ECOLI1_prog_E" compartment="ECOLI1" initialConcentration="25" constant="false"/>
+      <species id="ECOLI1_prog_F" compartment="ECOLI1" initialConcentration="100" constant="false"/>
+    </listOfSpecies>
+    <listOfParameters>
+      <parameter id="ECOLI0_prog_K" value="127" constant="true"/>
+      <parameter id="ECOLI0_dupl_K" value="147" constant="true"/>
+      <parameter id="ECOLI1_prog_K" value="127" constant="true"/>
+    </listOfParameters>
+    <listOfReactions>
+      <reaction id="_J0" reversible="true" fast="false">
+        <listOfReactants>
+          <speciesReference species="ECOLI0_prog_F" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ECOLI0_prog_E" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <ci> ECOLI0_prog_K </ci>
+          </math>
+        </kineticLaw>
+      </reaction>
+      ...
+    </listOfReactions>
+  </model>
+\end{lstlisting}

@@ -1,4 +1,4 @@
-\documentclass[12pt]{article}
+   \documentclass[12pt]{article}
 
 % sbc template
 \usepackage{sbc-template}
@@ -6,7 +6,7 @@
 \usepackage[utf8]{inputenc}
 
 % equations
-\usepackage{amsmath}
+\usepackage{mathtools}
 \usepackage{multicol}
 \usepackage[version=4]{mhchem}
 \usepackage{multicol}
@@ -15,6 +15,12 @@
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{xcolor}
+
+% roman enums
+\usepackage{enumitem}
+
+% remove listing name
+\renewcommand{\lstlistingname}{}
 
 % gro language definition
 \definecolor{COLOR_COMMENTS}{RGB}{16, 97, 35}
@@ -28,13 +34,12 @@
 \lstdefinestyle{GROSRC}
 {
   language          =   GROLANG,
-  basicstyle        =   \footnotesize\ttfamily,
+  basicstyle        =   \scriptsize\ttfamily,
   keywordstyle      =   \color{black}\bfseries,
   extendedchars     =   true,
   commentstyle      =   \color{COLOR_COMMENTS},
   backgroundcolor   =   \color{COLOR_BACKGROUND},
   frame             =   single,
-  caption           =   Dummy gro file.,
   tabsize           =   4,
   breaklines        =   true,
   showstringspaces  =   false,
@@ -42,7 +47,7 @@
 
 % parsed.intermediate style definition
 \lstdefinestyle{INTERMEDIATE}{
-  basicstyle        =   \footnotesize\ttfamily,
+  basicstyle        =   \scriptsize\ttfamily,
   backgroundcolor   =   \color{COLOR_BACKGROUND},
   otherkeywords     =   {compartment, var, const, in},
   keywordstyle      =   \color{black}\bfseries,
@@ -53,9 +58,27 @@
   showstringspaces  =   false,
 }
 
+% sbml style definition
+\lstdefinestyle{SBML}
+{
+  basicstyle        =   \scriptsize\ttfamily,
+  keywordstyle      =   \color{black}\bfseries,
+  otherkeywords     =   {reactionlist, reaction, species, <, >, /, listOfSpecies, listOfCompartments, compartment, sbml, xmlns, version, parameter, listOfParameter, reaction, listOfReactions, listOfReactants, specieReference, listOfProducts, kineticLaw, model, math, ?xml},
+  extendedchars     =   true,
+  commentstyle      =   \color{COLOR_COMMENTS},
+  backgroundcolor   =   \color{COLOR_BACKGROUND},
+  frame             =   single,
+  tabsize           =   4,
+  breaklines        =   true,
+  showstringspaces  =   false,
+}
+
+% contribution1 = Facilitating the synthesis process of biological devices through higher level language abstractions.
+%contribution2 = propose an compilation scheme for any higher level language to SBML based on the construction of a parsing and translating tool.
+
 % begin paper
 \sloppy
-\title{Albi:\\ A gro compiler to the SBML standard}
+\title{A compilation scheme to provide high level language abstractions to the synthesis process of biological devices}
 \author{Alek Frohlich\inst{1}, Gustavo Biage\inst{1}}
 \address{Departamento de Informatica e Estatística – Universidade Federal de Santa Catarina \\
 Florianopolis – SC – Brazil
@@ -66,59 +89,96 @@ Florianopolis – SC – Brazil
 \begin{abstract}
 
 
-    The growth of research areas such as synthetic biology and systems biology leads to an increased tendency to develop larger mathematical models for describing complex biological behavior. In order to enable natural flow of development of those models, scientists must have access to tools which increase the level of abstraction and enable the reuse of biological components. The present work tackles those two problems by integrating the existing programming language gro with the SBML standard for model interchangeability and ease of model design.
+    The growth of research areas such as synthetic biology and systems biology leads to an increased tendency to develop larger mathematical models for describing complex biological behavior. In order for those models to be implementable in living systems, scientists must have access to a synthesis process of biological devices that is robust and automated. This process ought to provide higher levels of abstraction than the ones found by tinkering with low level components such as promoters and transcription factors. The present work aids the development of such processes by translating a subset of the gro programming language into SMBL documents, and thus speeding up the synthesis process due to facilitating the design of biological devices through the use of a higher level language.
 
 
 \end{abstract}
 \section{Introduction}
 
 
-    Even though a Systems Biology Markup Language API (LibSBML) has already been developed \cite{Bornstein2008}, it only ought to be useful in cases where a new model is to be developed. In cases where there is a preexisting model, the availability of an SBML library does not help much since the previous model would have to be entirely rewritten to fit the API. Instead, the present work proposes an integration scheme that uses a language parser to generate SBML documents from previously built gro models. Gro is a language for programming, modeling, specifying and simulating the behavior of cells in growing microcolonies of microorganisms \cite{Jang2012}. The parser has been built upon it considering gro has many interesting syntactical constructs such as rate statements\footnote{Here, and all throughout this paper we shall refer to expressions guarded by gro's rate function as rate statements.}, program definitions and bacterial instantiation which can be expressed, respectively, as reactions, local name spaces and compartments in SBML documents.
+    The development of an automated synthesis process is essential to the scalability of synthetic biological devices. Without it, each device has to be designed individually, leading to an error-prone process not well suited for the development of large devices. Many substitutes to this primitive procedure have been proposed, one of them, the Cello framework, automates genetic circuit design with the assistance of a genetic component library. The framework searches the component library for parts compliant with the specifications of the Verilog code to produce an equivalent implementable genetic circuit that is also minimum cost \cite{Nielsenaac7341}. 
     
-    In regards to language support, gro is still tightly coupled with it's original simulator. Although the simulator has recently undergone big improvements in the sense that simulations behave more realistically \cite{Gutirrez2017}, it doesn't change the fact that using it is the only available way to validate gro models. This hinders the reproducibility of experiments built with the language. SBML models, on the other hand, are supported by more than 100 software systems \cite{Hucka2007}, making them more likely to be verified and reused.
+    Cello was heavily inspired by the synthesis process of semi-conductor based electronics. The inspiration is made clearer by the choice of Verilog as the framework's interface. Such an approach may not be ideal as there clearly isn't a one to one correspondence between both processes. An alternative would be to model the high level behavior of biological devices through a language capable of accounting for their unique aspects, e.g. the uncertainty associated with it's reactions occurrence\footnote{The concentration and distribution of molecules dictate the whether biochemical reactions occur}.
     
-    If gro code were translated into SBML, the resulting document could then be further preserved as an entry in BioModels. BioModels is a database of curated SBML and CellML models intended to provide researchers with models related to a particular disease, biological process or molecular complex \cite{LeNovere2006}. Having a model curated is an even stronger guarantee of trustworthiness since the process is done manually for each model: Newly submitted models go through a series of syntactical analysis to confirm that they are valid and well formatted; The model is then numerically verified against the results claimed by the authoring paper; Finally, the validated model gets manually annotated and cross-linked to facilitate later search for it \cite{LeNovere2006}.
+    Systems Biology Markup Language (SBML) is a useful language for describing biochemical models of synthetic and systems biology \cite{Hucka2003}. Although not being able to fully represent the aforementioned aspects of biological devices, SBML does manage express them in more natural terms. However, one may question it's expressiveness as a programming language considering that even small models can be cumbersome to write. The present work proposes a solution that circumvents SBML's lack of high level abstractions, enabling it to be used as the entry point to the physical implementation stage of a synthesis process. The solution consists in abstracting many of SBML's core language features in favor of higher level constructs found in the gro programming.
     
-    The rest of the paper is structured as follows: In Sect. 2, we introduce the language parser and explain the process of converting gro files to SBML models from start to finish; In Sect. 3, we demonstrate a possible use case for the proposed SBML integration scheme through simulating an SBML model generated from gro source code; In Sect. 4, we summarize what has been done and compare it with goals laid out at the start; In Sect. 5 we conclude by presenting possible extensions of the current work.
+    Gro is a language for programming, modeling, specifying and simulating the behavior of cells in growing microcolonies of microorganisms. Gro models are comprised of global variables, program declarations and bacterial instantiations. Programs behave similarly to functions in imperative programming languages. They are used to describe a functionality that will be executed at every time step of the simulation. Inside such construct, there may appear variable definitions and guarded code blocks. Guarded blocks are blocks of code that only execute in case the Boolean expression guarding them evaluates to true. A bacteria can be instantiated with any amount of said programs \cite{Jang2012}.
     
+    The language parser works in conjunction with a framework called Tellurium. Tellurium is a Python-based modeling environment for systems and synthetic biology \cite{Choi2018}. The language parser verifies the correctness of the gro source code. Valid programs are translated to an intermediate format which, in turn, becomes the final SBML document through the assistance of Tellurium.
 
-\section{Architecture}
+    The rest of the paper is structured as follows: Section 2 introduces the language parser and explain the process of converting gro files to SBML models from start to finish. Section 3 presents a case study on the application of the proposed language parser along with an evaluation of its abstractions, and Section 4 presents our final considerations and future works.
 
+
+\section{Code Generation}\label{sec:code-gen}
+
+
+    In this section we describe gro's compilation process (depicted at Figure~\ref{fig:compilation_steps}): First, the gro source code is validated, that is, it’s checked against syntax errors, such as missing semicolon in rate statements and semantic error such as using undeclared variables; Then the code gets translated to an intermediate representation called Antimony \cite{Smith2009}; Finally, Tellurium uses libSBML and libAntimony to convert the given Antimony file down to an SBML document.
     
-    The compilation process is divided in three steps: First, the code is validated, that is, it's checked against syntax errors such as missing semicolon in rate statements and semantic error such as using undeclared variables; Then the code gets compiled to Antimony, a modular model definition language \cite{Smith2009}; This format guides Tellurium in building the final SBML document. As we'll see in the following subsections, Tellurium makes use of the aforementioned libSBML API for code generation purposes.
-
-
-\subsection{The parser}
-    
-    The language parser was implemented using Flex, Bison and C. It currently recognizes only a subset of gro's syntax. Valid programs are constituted by global variable declarations, program definitions and E. coli instantiations. Parameters, messages and guarded statements are also recognized as valid syntax, however no semantic value is assigned to them given that control statements and user interaction do not make sense in the context of an SBML model. Below is an example of gro code containing the syntactical constructs just described.
-
-    \input{example_gro.tex}
-    
-    Compiling this file gives the Antimony model that Tellurium in conjunction with libAntimony use to interact with libSBML. As we can see, the compiler properly handled arithmetic expressions and parameter passing. It did so to enable the use of gro program as a modelling tool for expressing parameterizable SBML models. The compiler also renamed symbols declared inside program definitions to avoid name space clashes between multiple programs instantiated in the same compartment. If this renaming hadn't been done, there wouldn't be a way to differentiate the symbol E, whose name space is limited to reactions inside of prog, from the symbol E which was declared inside of dupl.
-    
-    \input{example_compiled.tex}
-    
-\subsection{The Tellurium framework}
-
-    Tellurium is a Python-based modeling environment for systems and synthetic biology \cite{Choi2018}. It aggregates multiple preexisting libraries such as libSBML, libAntimony and libSBOL to provide the modelling community access to an integrated modelling environment. Tellurium is organized in three functional pillars: Standards support, modelling support and utilities.
-
-
-\section{Case study: The Repressilator}
-
-
-    The goal of this experiment was to illustrate the proposed SBML integration scheme. It was conducted as follows: We first simulated the gro model for a well-known biological device, the Repressilator, in gro's built-in simulator; We then compiled the source code down to SBML following the steps shown in Sect. 2; Finally we simulated the compiled gro code, an SBML document, in COPASI. Finally, the COPASI simulation was compared against an Octave one for the original model. Both yielded the same result, indicating that the compiled model was the same as the original one.
-
-
-\subsection{Mathematical Model}
-
     \begin{figure}[h]
         \centering
-        \includegraphics[scale = 0.7]{repressilator_model.png}
+        \includegraphics[scale = 0.6]{architecture.png}
+        \caption{Flow chart of the compilation steps.}
+        \label{fig:compilation_steps}
+    \end{figure}
+
+
+\subsection{Parsing}
+
+    As mentioned before, the code submitted to the compiling process is parsed and translated to an intermediate language called Antimony, a modular model definition language \cite{Smith2009}. The proposed parser recognizes a subset of gro's syntax. The subset is composed of global variable declarations, program definitions and E. coli instantiations. Parameters, messages and guarded statements are also recognized, however no semantic value is assigned to them given that control statements and user interaction do not fit the context of an SBML model. The following is an example of gro code containing the syntactical constructs just described.
+
+    \input{example_gro.tex}
+
+\subsection{Translating}
+    
+    After the parsing, the code is translated to Antimony. The resultant file will be further submitted to Tellurium. Gro code translation into Antimony occurs as follows:
+
+
+    \begin{enumerate}[label=(\roman*)]
+        \item Gro files are represented as an Antimony file.
+        \item E. coli instantiated in the gro source are declared as compartments.
+        \item Rate statements are represented as \ce{$s_{1}$ R_{1} + $s_{2}$ R_{2} + ... + $s_{n}$ R_{n} -> $t_{1}$ P_{1} + $t_{2}$ P_{2} + ... + $t_{n}$ P_{n}}. Where the stoichiometric constants $s_{i}$ and $t_{j}$ denote the number of times the variables  $R_{i}$ and $P_{j}$ were decremented/incremented inside the guarded block.
+        \item Variables that do not appear in such reactions are considered global constants.
+        \item Code blocks guarded by gro's rate function appear next to their reactions.
+    \end{enumerate}
+    
+    Also, symbols declared inside program definitions are renamed to avoid name space clashes between multiple programs instantiated in the same compartment.
+    
+\subsection{Compiling}
+
+    As mentioned before, after translation the code is submitted to Tellurium to generate the final SBML document. Listing 2 shows a cleaned version of the generated SBML where some reactions and SBML syntax has been omitted to avoid cluttering\footnote{The reaction shown bellow is the one from \textit{prog}, instantiated in the first E. coli. Other tags not shown include the preamble declaration of the XML and the SBML document.}. The gro to SBML mapping is presented bellow:
+    
+    \begin{enumerate}[label=(\roman*)]
+        \item Gro files are represented as models.
+        \item E. coli are represented as compartments.
+        \item Variables are identified as species when participating in a reaction, otherwise they are marked as constant and identified as parameters.
+        \item Reactions are marked irreversible\footnote{Gro reactions are marked irreversible since it does not support reversible ones.} and have their lists of reactants and products filled based on what variables are being decremented and incremented, respectively.
+        \item Expressions inside rate functions that guard blocks of code become kinetic law constants inside reactions.
+    \end{enumerate}
+    
+
+    \input{example_sbml.tex}
+
+
+\section{Case Study: The Repressilator}
+
+
+    This section presents the experiment used to evaluate the proposed compilation process. The experiment consists on executing the Repressilator (a well-known biological device) in gro's built-in simulator and comparing the Octave output to the simulation of the SBML document obtained by compiling the code according to the process described at Section \ref{sec:code-gen}. The SBML simulations were done through Copasi, a pathway simulator \cite{Hoops2006}.
+    
+
+\subsection{Repressilator Model}
+
+    \begin{figure}[ht]
+        \centering
+        \includegraphics[scale = 0.45]{repressilator_model.png}
         \caption{Repressilator's genetic regulatory network.}
         \label{fig:repressilator_model}
     \end{figure}
     
     The Repressilator is a genetic regulatory network constituted by stitching together promoter-repressor pairs. It was first conceptualized by \cite{Elowitz2000}, who used the genes LacI and letR from E. coli and cI from phage lambda to build a three-repressor scheme. As illustrated in Figure~\ref{fig:repressilator_model}, the Repressilator works based on the fact that each gene expresses a protein which represses the next gene in the loop, meaning that a constituent gene in high concentration represses itself indirectly, leading to oscillatory behavior. In the original experiment, there was another biological component involved: the reporter, a green fluorescent protein (GFP) producing gene. It was used to visualize the network's oscillation.
+    
+\subsection{Mathematical Model}\label{math-model}
+    
+    As shown in \cite{Elowitz2000}, the high-level model from Figure~\ref{fig:repressilator_model} could also be presented as the following system of Ordinary Differential Equations (ODE).
     
     \begin{equation}
     \begin{aligned}[c]
@@ -133,114 +193,71 @@ Florianopolis – SC – Brazil
     \end{aligned}
     \end{equation}
 
-    As shown in \cite{Elowitz2000}, the high-level model from Figure~\ref{fig:repressilator_model} could also be presented as the above system of Ordinary Differential Equations (ODE)\footnote{The names given for the components of the Repressilator at (1) shall continue to be used as is for the rest of this section.}. With that system of equations, we then built the corresponding gro model. The process was simple as we just separated the reactions from the equations, meaning, for example, that $\alpha_{0}$ from the left equations became the open reaction:
+\subsection{Gro Code}
+
+    The gro code for the Repressilator is presented below.
+    
+    \input{repressilator_gro.tex}
+
+    Moreover, it is possible to trace a relation of the mathematical model presented at Section \ref{math-model} and the above code snippet. Each reaction in the source code groups variables whose derivatives contain the same sub-expression. The rate of such reaction is the common sub-expression. The decision of which variable is a reactant and which is a product is determined by the sign of the sub-expression. An example of such construction is depicted bellow:
     
     \begin{equation}
     \ce{ ->[\alpha_{0}] m_{1} + m_{2} + m_{3}}
     \end{equation}
     
-    By repeating this process for each ODE, we ended up with a total of 7 reactions. As gro does not support reversible reactions directly through it's \textit{rate} function, each reversible one was split onto two new reactions: One for the forward part and another for the reverse. On doing so, the final gro model packed a total of 13 rate statements, all of whom can be observed below.
-    
-    \input{repressilator_gro.tex}
+    The sub-expression $\alpha_{0}$ appears at three left equations of (1). As in all three equations $\alpha_{0}$ is positive, it's concluded that $m_{1}$, $m_{2}$ and $m_{3}$ are all products and there isn't an explicit reactant. This means that (2) is an open reaction on the rate of $\alpha_{0}$. By repeating this process until no sub-expression remains, the resulting SBML would have 7 reactions. However, as gro does not support reversible reactions directly through it's \textit{rate} function, each reversible reaction is thus split into two new reactions: One for the forward part and another for the reverse. On doing so, the final gro model packs a total of 13 rate statements.
 
-\subsection{Gro}
     
-    Gro simulates multiple different aspects of the bacterial colony, including growth, division and contact forces between cells \cite{Jang2012}. Although that makes for a realistic multicellular simulator, it doesn't carry weight in single cell simulation such as the ones we did for the Repressilator shown in the last section. In it's case, the uniquely relevant aspect of it's simulation was how gro evaluated rate statements. As is indicated by \cite{Hoops2006}, at each simulation step, each guard is evaluated. If it evaluates to true, then the corresponding block is executed, meaning, in our case, that a reaction occurred.
+\section{Results and Discussion}
+
+
+    This section presents a simulation of the gro model shown in the last section and analyses the results. As gro's simulation method is stochastic, it is harder to compare it against a deterministic simulation of the differential equations in (1). Therefore, an octave model was used to compare the compiled SBML document execution on Copasi to the results of a deterministic simulation of (1).
     
-    To model stochastic events, gro provides the \textit{rate} (\textit{r}) function that evaluates to true under the probability of r*dt, where the dt is the step size of the simulation. Simulation parameters in the likes of dt can be set by using the \textit{set} (\textit{key}, \textit{value}) function. Gro makes further use of the \textit{rate} function to approximate the Master Equation with Euler integration. 
-    
+
+\subsection{Gro Simulation}
+
+   Figure~\ref{fig:tons_of_simulations} presents the results of simulating the gro model for the Repressilator. Simulation parameters taken from \cite{ingalls2013mathematical}: $\alpha_{0} = 0.03$ (molecules per $cell \cdot min^{-1}$), $\alpha = 298.2$ (molecules per $cell \cdot min^{-1}$), $\beta = 0.2$ ($min^{-1}$), $n = 2$ and $\delta t = 0.0001$. From it, one may notice that the period and amplitude of the oscillations varied during the course of time, probably due to stochastic fluctuations. Nonetheless, the graph still reminds of oscillatory behavior.
+   
     \begin{figure}[ht]
     \centering
     \minipage{0.33\textwidth}
-      \includegraphics[width=\linewidth]{img1.png}
+      \includegraphics[width=\linewidth]{p1.png}
     \endminipage\hfill
     \minipage{0.33\textwidth}
-      \includegraphics[width=\linewidth]{img2.png}
+      \includegraphics[width=\linewidth]{p2.png}
     \endminipage\hfill
     \minipage{0.33\textwidth}%
-      \includegraphics[width=\linewidth]{img3.png}
+      \includegraphics[width=\linewidth]{p3.png}
     \endminipage
     \caption{Multiple simulations of the Repressilator gro model. From left to right: p1, p2, p3. Black lines are used to indicate an average simulation, whilst the various grey lines are used to indicate the concentration of the respective protein at each individual simulation.}
     \label{fig:tons_of_simulations}
     \end{figure}
 
-   In Figure~\ref{fig:tons_of_simulations}, we see the results of simulating the Repressilator model within gro itself. Simulation parameters taken from \cite{ingalls2013mathematical}: $\alpha_{0} = 0.03$ (molecules per $cell \cdot min^{-1}$), $\alpha = 298.2$ (molecules per $cell \cdot min^{-1}$), $\beta = 0.2$ ($min^{-1}$), $n = 2$ and $\delta t = 0.0001$. The average simulation containing all of $p_{1}, p_{2}, p_{3}, m_{1}, m_{2}, m_{3}$ and illustrated by Figure~\ref{fig:repressilator_average} shows that the original period and amplitude varied during the course of time, probably due to stochastic fluctuations. From a naive perspective the model maintained it's oscillatory behavior. Delving deeper, we are able to conclude from Figure~\ref{fig:biffurcation} that, that the initial values picked for the simulations could be tuned to increase the robustness of the outcome under stochastic simulations.
+\subsection{Compiled SBML Simulation and Comparison}
 
-    \begin{figure}[ht]
-    \centering
-    \minipage{0.5\textwidth}
-      \includegraphics[width=\linewidth]{all_med_thick.png}
-      \caption{Average of the protein's concentrations over multiple simulations.}
-      \label{fig:repressilator_average}
-    \endminipage\hfill
-    \minipage{0.5\textwidth}
-      \includegraphics[width=\linewidth]{biffurcation_a_b_2.png}
-      \caption{Bifurcation graph for $\alpha$ and $\beta$.}
-      \label{fig:biffurcation}
-    \endminipage\hfill
-    \end{figure}
-
-\subsection{COPASI}
-    
-    COPASI is a software package for simulating chemical reactions. We chose to simulate the resulting SBML document on it because of the variety of simulation methods that it supports. Ranging all the way from deterministic methods such as LSODA \cite{Petzold1983} to stochastic ones like Gillespie’s algorithm \cite{Gillespie1976}. Unfortunately, gro does not implement Gillespie’s algorithm\footnote{Gro concurrently simulates growth, geometry, and signal dynamics. Meaning that any other resource-intensive simulation methods would be impractical due to performance reasons.}, thus we compared COPASI's output with that in \cite{Goeldner2019}, whom implement the same starting conditions as \cite{ingalls2013mathematical}. The simulations are shown in Figure~\ref{fig:repressilator_comparison}.
+    This section presents the results of a simulation of the compiled SBML document on Copasi, along with a comparison between it and a simulation of the original ODEs (1) in Octave. The Copasi simulation is presented on the left part of Figure~\ref{fig:repressilator_comparison} and the Octave one to the right.
     
     \begin{figure}[ht]
     \centering
     \minipage{0.5\textwidth}
-      \includegraphics[width=\linewidth]{octave_plot_thick.png}
+      \includegraphics[width=\linewidth]{repressilator_octave.png}
     \endminipage\hfill
     \minipage{0.5\textwidth}
-      \includegraphics[width=\linewidth]{SBML_copasi_LSODA.png}
+      \includegraphics[width=\linewidth]{repressilator_copasi.png}
     \endminipage\hfill
+    \caption{Comparison between the Octave model and compiled gro model for the Repressilator.}
     \label{fig:repressilator_comparison}
-    \caption{Comparison between the Octave model and compiled gro model for the Repressilator. The simulation was done using the same parameters as Figure~\ref{fig:repressilator_average}.}
     \end{figure}
-    
-    As per simple analysis of both graphs we can conclude that the behavior of both models was indeed similar. In order to prove that both mathematical models are identical, however, we need to compare the underlying systems of equations. To accomplish this, we explore the fact that COPASI infers math equations from the SBML model given to it. Hence, by looking at the equations bellow and comparing them to (1), we can conclude that the gro model from Listing 3 is the same as the Octave one.
-    
-    \begin{equation*}
-    \begin{split}
-        \frac{d([ECOLI0\_prog\_m1]*V_{ECOLI0})}{dt} & = +V_{ECOLI0}*(\frac{alfa + [ECOLI\_prog\_p3]^n}{V\_{ECOLI0}}) \\ & +V_{ECOLI0}*(\frac{alfa0}{V_{ECOLI0}})
-        \\ & -V_{ECOLI0}*(\frac{[ECOLI0\_prog\_m1]}{V_{ECOLI0}})
-    \end{split}
-    \end{equation*}
-    \begin{equation*}
-    \begin{split}
-        \frac{d([ECOLI0\_prog\_m2]*V_{ECOLI0})}{dt} & = +V_{ECOLI0}*(\frac{alfa + [ECOLI\_prog\_p1]^n}{V\_{ECOLI0}}) \\ & +V_{ECOLI0}*(\frac{alfa0}{V_{ECOLI0}})
-        \\ & -V_{ECOLI0}*(\frac{[ECOLI0\_prog\_m2]}{V_{ECOLI0}})
-    \end{split}
-    \end{equation*}
-    \begin{equation*}
-    \begin{split}
-        \frac{d([ECOLI0\_prog\_m3]*V_{ECOLI0})}{dt} & = +V_{ECOLI0}*(\frac{alfa + [ECOLI\_prog\_p2]^n}{V_{ECOLI0}})
-        \\ & +V_{ECOLI0}*(\frac{alfa0}{V_{ECOLI0}})
-        \\ & -V_{ECOLI0}*(\frac{[ECOLI0_prog_m1]}{V_{ECOLI0}})
-    \end{split}
-    \end{equation*}
-    \begin{equation*}
-    \begin{split}
-        \frac{d([ECOLI0\_prog\_p1]*V_{ECOLI0})}{dt} & = -V_{ECOLI0}*(\frac{beta*[ECOLI\_prog\_p1]^n}{V_{ECOLI0}}) 
-        \\ & +V_{ECOLI0}*(\frac{beta*[ECOLI\_prog\_m1]^n}{V_{ECOLI0}})
-    \end{split}
-    \end{equation*}
-    \begin{equation*}
-    \begin{split}
-        \frac{d([ECOLI0\_prog\_p2]*V_{ECOLI0})}{dt} & = -V_{ECOLI0}*(\frac{beta*[ECOLI\_prog\_p2]^n}{V_{ECOLI0}}) 
-        \\ & +V_{ECOLI0}*(\frac{beta*[ECOLI\_prog\_m2]^n}{V_{ECOLI0}})
-    \end{split}
-    \end{equation*}
-    \begin{equation*}
-    \begin{split}
-        \frac{d([ECOLI0\_prog\_p3]*V_{ECOLI0})}{dt} & = -V_{ECOLI0}*(\frac{beta*[ECOLI\_prog\_p3]^n}{V_{ECOLI0}}) 
-        \\ & +V_{ECOLI0}*(\frac{beta*[ECOLI\_prog\_m3]^n}{V_{ECOLI0}})
-    \end{split}
-    \end{equation*}
+
+    As depicted at Figure~\ref{fig:repressilator_comparison}, both simulations yielded the same values on concentration over the simulation's duration. Such results demonstrate the effectiveness of the proposed compilation scheme, which besides reducing the coding effort for biological devices, grants a successful simulation of the generated SBML model.
+
+ 
+\section{Conclusion \& Future Works}
 
 
-\section{Conclusion \& Future works}
-    
-    
-    We have presented an SBML integration scheme for the gro language with the intent of facilitating the development of new SBML models and recovering previously built gro models, as was done in Sect. 3, with the Repressilator. The identical models provided there demonstrate the effectiveness of our proposed scheme. For it to be abragente, however, the language parser should be able to handle all possible gro programs. That's not currently the case as signalling and structures have not yet been implemented and could serve as practical extension of the current work.
+    This paper presented a compilation scheme to the design and specification of biological devices using a framework that abstracts low level SBML constructs with higher level ones found in the gro programming language. The framework combines a code translator and Tellurium to map gro files to SBML documents. The proposed framework along with the gro mappings were illustrated through the compilation of a gro model for the Repressilator into an equivalent SBML document. They were also evaluated based on the comparison of two simulations: on for the resulting model and another for the original model (1).
+
+    As future work, we intend to address the set of unrecognized gro language features. In particular, we plan to incorporate signals into our framework, enabling cell to cell communication. We also want to annotate the generated SBML document in cases where the source code contains features not recognized by our framework. This should, at the very least, notify tools which use our framework that some part of the source code was not translated into the SBML document and in other cases help the tool figure out how to deal with the syntactical mismatch.
 
 
 % references
